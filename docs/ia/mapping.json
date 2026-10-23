@@ -1,0 +1,2618 @@
+{
+  "_comment": "Every InSIS page type -> its node in 02-redesign.md (draft 17). node: where it lives; also: where it is linked from or shown; variants: parameter-specific nodes, keyed as follows — 'name=value' is a literal InSIS value, a bare 'name' means that parameter is present, 'predmet=mine' means the course is one of mine, 'no predmet' / 'no zalozka' mean the parameter is absent. form: an action form seen in the crawl, kept on its own InSIS page; action: link (performed through InSIS's own links) | unverified (expected but not offered when crawled). read: background | on-open (only when the student opens it or a page that shows it) | never; fetch / links: parameter-name sets InSIS+ may read / link with ('' = no parameters), not counting transient_params; values: pinned values; verify: parameter sets never seen, so no link and no read until verified; verify_data: links allowed, but the named data or side-effect claim is unconfirmed, so the feature using it stays off; link: shell | insis-only. structure and nodes: en/cs labels, the single source. external: links outside InSIS. Checked by scripts/ia_check.py.",
+  "structure": {
+    "_comment": "Destinations, groups and blocks with their labels (single source with nodes).",
+    "destinations": {
+      "home": [
+        "Home",
+        "Přehled"
+      ],
+      "courses": [
+        "Courses",
+        "Předměty"
+      ],
+      "schedule": [
+        "Schedule",
+        "Rozvrh"
+      ],
+      "exams": [
+        "Exams",
+        "Zkoušky"
+      ],
+      "grades": [
+        "Grades & credits",
+        "Známky a kredity"
+      ],
+      "matters": [
+        "Study matters",
+        "Studijní záležitosti"
+      ],
+      "campus": [
+        "Campus & people",
+        "Kampus a lidé"
+      ],
+      "all": [
+        "All services",
+        "Všechny služby"
+      ]
+    },
+    "topbar": {
+      "messages": [
+        "Messages",
+        "Zprávy v InSIS"
+      ],
+      "notifications": [
+        "Notifications",
+        "Upozornění"
+      ],
+      "help": [
+        "Help",
+        "Nápověda"
+      ],
+      "account": [
+        "Account",
+        "Účet"
+      ],
+      "password": [
+        "Change password",
+        "Změnit heslo"
+      ],
+      "language": [
+        "Language",
+        "Jazyk"
+      ],
+      "logout": [
+        "Log out",
+        "Odhlásit se"
+      ],
+      "plus": [
+        "InSIS+ settings",
+        "Nastavení InSIS+"
+      ],
+      "lang": [
+        "CS / EN",
+        "CS / EN"
+      ]
+    },
+    "groups": {
+      "matters.paperwork": [
+        "Paperwork",
+        "Úřední věci"
+      ],
+      "matters.money": [
+        "Money",
+        "Peníze"
+      ],
+      "matters.future": [
+        "Thesis, exchange & career",
+        "Závěrečná práce, výjezdy a kariéra"
+      ],
+      "campus.contacts": [
+        "Contacts",
+        "Kontakty"
+      ],
+      "campus.campus": [
+        "Campus",
+        "Kampus"
+      ],
+      "campus.info": [
+        "Information",
+        "Informace"
+      ]
+    },
+    "home_blocks": {
+      "todo": [
+        "To do",
+        "K vyřízení"
+      ],
+      "today": [
+        "Today and next",
+        "Dnes a příště"
+      ],
+      "mycourses": [
+        "My courses",
+        "Moje předměty"
+      ],
+      "notices": [
+        "InSIS notices",
+        "Oznámení InSIS"
+      ]
+    },
+    "short": {
+      "home": [
+        "Home",
+        "Přehled"
+      ],
+      "courses": [
+        "Courses",
+        "Předměty"
+      ],
+      "exams": [
+        "Exams",
+        "Zkoušky"
+      ],
+      "grades": [
+        "Grades",
+        "Známky"
+      ],
+      "menu": [
+        "Menu",
+        "Menu"
+      ]
+    },
+    "menu": {
+      "help": [
+        "Help & who to ask",
+        "Nápověda a na koho se obrátit"
+      ],
+      "schedule": [
+        "Schedule",
+        "Rozvrh"
+      ],
+      "matters": [
+        "Study matters",
+        "Studijní záležitosti"
+      ],
+      "campus": [
+        "Campus & people",
+        "Kampus a lidé"
+      ],
+      "all": [
+        "All services",
+        "Všechny služby"
+      ]
+    }
+  },
+  "nodes": {
+    "home": {
+      "en": "Home",
+      "cs": "Přehled"
+    },
+    "notifications": {
+      "en": "Notifications",
+      "cs": "Upozornění"
+    },
+    "courses.mine": {
+      "en": "My courses",
+      "cs": "Moje předměty"
+    },
+    "courses.submissions": {
+      "en": "All submissions",
+      "cs": "Všechny odevzdávárny"
+    },
+    "course.overview": {
+      "en": "Course › Overview",
+      "cs": "Předmět › Souhrn"
+    },
+    "course.files": {
+      "en": "Course › Files",
+      "cs": "Předmět › Materiály"
+    },
+    "course.submissions": {
+      "en": "Course › Submissions",
+      "cs": "Předmět › Odevzdávárny"
+    },
+    "course.points": {
+      "en": "Course › Points",
+      "cs": "Předmět › Body"
+    },
+    "course.people": {
+      "en": "Course › People",
+      "cs": "Předmět › Lidé"
+    },
+    "course.syllabus": {
+      "en": "Course › Syllabus",
+      "cs": "Předmět › Sylabus"
+    },
+    "courses.registration": {
+      "en": "Registration & enrolment",
+      "cs": "Registrace a zápis"
+    },
+    "courses.catalogue": {
+      "en": "Catalogue",
+      "cs": "Katalog předmětů"
+    },
+    "courses.evaluation": {
+      "en": "Course evaluation",
+      "cs": "Anketa"
+    },
+    "courses.files": {
+      "en": "All course files",
+      "cs": "Všechny materiály"
+    },
+    "schedule.week": {
+      "en": "My week",
+      "cs": "Můj týden"
+    },
+    "schedule.calendar": {
+      "en": "Academic calendar",
+      "cs": "Harmonogram"
+    },
+    "schedule.search": {
+      "en": "Timetable search",
+      "cs": "Hledání rozvrhů"
+    },
+    "schedule.export": {
+      "en": "Export to calendar",
+      "cs": "Export do kalendáře"
+    },
+    "exams.mine": {
+      "en": "My dates",
+      "cs": "Moje termíny"
+    },
+    "exams.signup": {
+      "en": "Available dates",
+      "cs": "Volné termíny"
+    },
+    "exams.past": {
+      "en": "Past",
+      "cs": "Proběhlé"
+    },
+    "exams.unscheduled": {
+      "en": "Not yet scheduled",
+      "cs": "Zatím bez termínu"
+    },
+    "exams.tests": {
+      "en": "Online tests",
+      "cs": "Testy a kvízy"
+    },
+    "exams.date": {
+      "en": "Exam date",
+      "cs": "Termín"
+    },
+    "grades.results": {
+      "en": "Results",
+      "cs": "Výsledky"
+    },
+    "grades.plan": {
+      "en": "What's left",
+      "cs": "Co mi chybí"
+    },
+    "studies.papers": {
+      "en": "Confirmations & decisions",
+      "cs": "Potvrzení a rozhodnutí"
+    },
+    "studies.money": {
+      "en": "Payments & scholarships",
+      "cs": "Platby a stipendia"
+    },
+    "studies.excuses": {
+      "en": "Excuse notes",
+      "cs": "Omluvenky"
+    },
+    "studies.status": {
+      "en": "Study status & ID card",
+      "cs": "Stav studia a průkaz"
+    },
+    "studies.thesis": {
+      "en": "Thesis & state exam",
+      "cs": "Závěrečná práce a SZZ"
+    },
+    "studies.nextdegree": {
+      "en": "Next degree",
+      "cs": "Navazující studium"
+    },
+    "studies.abroad": {
+      "en": "Study abroad (Erasmus)",
+      "cs": "Studium v zahraničí (Erasmus)"
+    },
+    "studies.internships": {
+      "en": "Internships & jobs",
+      "cs": "Praxe a pracovní nabídky"
+    },
+    "campus.office": {
+      "en": "Who to ask",
+      "cs": "Na koho se obrátit"
+    },
+    "campus.people": {
+      "en": "People",
+      "cs": "Lidé"
+    },
+    "campus.rooms": {
+      "en": "Rooms",
+      "cs": "Místnosti"
+    },
+    "campus.library": {
+      "en": "Library",
+      "cs": "Knihovna"
+    },
+    "campus.departments": {
+      "en": "Departments",
+      "cs": "Pracoviště"
+    },
+    "campus.plans": {
+      "en": "Study plans",
+      "cs": "Studijní plány"
+    },
+    "campus.theses": {
+      "en": "Theses archive",
+      "cs": "Archiv závěrečných prací"
+    },
+    "campus.about": {
+      "en": "About VŠE",
+      "cs": "O VŠE"
+    },
+    "messages.mail": {
+      "en": "Messages › InSIS mail",
+      "cs": "Zprávy › Pošta v InSIS"
+    },
+    "messages.noticeboard": {
+      "en": "Messages › Noticeboard",
+      "cs": "Zprávy › Vývěska"
+    },
+    "help": {
+      "en": "Help",
+      "cs": "Nápověda"
+    },
+    "help.ask": {
+      "en": "Ask a question",
+      "cs": "Zeptat se"
+    },
+    "account.profile": {
+      "en": "Profile & privacy",
+      "cs": "Profil a soukromí"
+    },
+    "account.security": {
+      "en": "Security",
+      "cs": "Zabezpečení"
+    },
+    "account.devices": {
+      "en": "Apps & devices",
+      "cs": "Aplikace a zařízení"
+    },
+    "account.email": {
+      "en": "E-mail & accounts",
+      "cs": "E-mail a účty"
+    },
+    "account.access": {
+      "en": "Access system",
+      "cs": "Přístupový systém"
+    },
+    "account.custom": {
+      "en": "InSIS customisation",
+      "cs": "Přizpůsobení InSIS"
+    },
+    "language": {
+      "en": "Language",
+      "cs": "Jazyk"
+    },
+    "logout": {
+      "en": "Log out",
+      "cs": "Odhlásit se"
+    },
+    "all.discussions": {
+      "en": "Discussions",
+      "cs": "Diskuse"
+    },
+    "all.tasks": {
+      "en": "InSIS tasks",
+      "cs": "Úkoly v InSIS"
+    },
+    "all.news": {
+      "en": "News subscriptions",
+      "cs": "Odběr novinek"
+    },
+    "all.public-courses": {
+      "en": "Courses on offer & U3V",
+      "cs": "Nabídka kurzů a U3V"
+    },
+    "all.surveys": {
+      "en": "Surveys & elections",
+      "cs": "Průzkumy a volby"
+    },
+    "all.research": {
+      "en": "Research tools",
+      "cs": "Věda a výzkum"
+    },
+    "all.stats": {
+      "en": "Statistics",
+      "cs": "Statistiky"
+    },
+    "all.search": {
+      "en": "Thematic search",
+      "cs": "Tematické vyhledávání"
+    },
+    "all.system": {
+      "en": "About the system",
+      "cs": "O systému"
+    },
+    "all.games": {
+      "en": "Games",
+      "cs": "Hry"
+    },
+    "error": {
+      "en": "Error page",
+      "cs": "Chybová stránka"
+    },
+    "account.password": {
+      "en": "Change password",
+      "cs": "Změnit heslo"
+    },
+    "studies.requests": {
+      "en": "Requests",
+      "cs": "Žádosti"
+    },
+    "plus.settings": {
+      "en": "InSIS+ settings",
+      "cs": "Nastavení InSIS+"
+    }
+  },
+  "transient_params": {
+    "_comment": "Parameters InSIS adds for navigation; the crawl normalised them away. InSIS+ never adds them to URLs it builds. On links copied from InSIS pages they are tolerated as below; any other parameter must match the page's allowed sets.",
+    "lang": {
+      "rule": "only on InSIS's own language links, copied verbatim"
+    },
+    "zpet": {
+      "rule": "tolerated on copied links if its value is an /auth/ URL that itself passes the URL rule (checked recursively); otherwise dropped"
+    },
+    "back": {
+      "rule": "same as zpet (base64-encoded URL: decoded, then checked)"
+    },
+    "_m": {
+      "rule": "tolerated on copied links (menu item id); exempt from the _* deny pattern",
+      "verify": "confirm with an un-normalised snapshot that _m has no side effect (menu or favourites state)"
+    }
+  },
+  "external": {
+    "_comment": "Links outside insis.vse.cz that InSIS+ may show. 'copied': only when copied verbatim from an InSIS page. Everything else outside InSIS is never linked.",
+    "moodle": {
+      "url": "https://moodle.vse.cz/",
+      "where": [
+        "course.files",
+        "courses.files"
+      ],
+      "verify": "host to confirm"
+    },
+    "outlook": {
+      "url": "https://outlook.office.com/mail/",
+      "where": [
+        "messages.mail"
+      ]
+    },
+    "mailto": {
+      "copied": true,
+      "where": [
+        "course.people",
+        "campus.people"
+      ]
+    },
+    "app stores and support": {
+      "copied": true,
+      "where": [
+        "help"
+      ]
+    }
+  },
+  "pages": {
+    "/auth/": {
+      "node": "home",
+      "note": "InSIS's main page is Home itself: its menu, counters and notices are read when the student opens Home, never in the background",
+      "read": "on-open",
+      "also": [
+        "home",
+        "notifications"
+      ],
+      "link": "shell",
+      "links": [
+        ""
+      ],
+      "fetch": [
+        ""
+      ]
+    },
+    "/auth/about/": {
+      "node": "all.system",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/anketky/dotaznik.pl": {
+      "node": "courses.evaluation",
+      "form": true,
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/anketky/dotazniky.pl": {
+      "node": "courses.evaluation",
+      "also": [
+        "course.overview",
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "obdobi,studium"
+      ],
+      "links": [
+        "",
+        "obdobi,studium"
+      ],
+      "note": "background read only while the optional To do item is switched on"
+    },
+    "/auth/ca/konfigurace_prenosu_udalosti.pl": {
+      "node": "schedule.export",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ],
+      "action": "unverified"
+    },
+    "/auth/ca/prehled_tydnu.pl": {
+      "node": "schedule.calendar",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/ca/ucet.pl": {
+      "node": "account.email",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "info",
+        "narok"
+      ],
+      "links": [
+        "",
+        "info",
+        "narok"
+      ]
+    },
+    "/auth/ca/ucty_info.pl": {
+      "node": "account.email",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/devel/": {
+      "node": "error",
+      "note": "InSIS 'Error when using information system' page",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/diskuze/": {
+      "node": "all.discussions",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "diskuze_nastaveni",
+        "diskuze_temata",
+        "diskuze_vyhledavani"
+      ],
+      "links": [
+        "",
+        "diskuze_nastaveni",
+        "diskuze_temata",
+        "diskuze_vyhledavani"
+      ],
+      "form": true
+    },
+    "/auth/dok/faq.pl": {
+      "node": "help",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/dok/help.pl": {
+      "node": "help",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "tab"
+      ],
+      "links": [
+        "",
+        "tab"
+      ]
+    },
+    "/auth/dok/integratori.pl": {
+      "node": "all.system",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/dok_server/": {
+      "node": "courses.files",
+      "also": [
+        "course.files"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ],
+      "verify_data": "course-folder links matched to my courses"
+    },
+    "/auth/dok_server/moje_dok.pl": {
+      "node": "courses.files",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/dok_server/nastaveni_stromu.pl": {
+      "node": "courses.files",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/dok_server/nove_dok.pl": {
+      "node": "courses.files",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ],
+      "note": "opened only by the student; the New course files notification uses the main-page counter instead"
+    },
+    "/auth/dok_server/slozka.pl": {
+      "node": "courses.files",
+      "also": [
+        "course.files"
+      ],
+      "read": "never",
+      "note": "Course › Files links to the folder; InSIS+ never reads it (opening may mark files as read)",
+      "link": "shell",
+      "links": [
+        "ds,id",
+        "id"
+      ]
+    },
+    "/auth/dok_server/vyhledavani.pl": {
+      "node": "courses.files",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/eknihovna/": {
+      "node": "courses.files",
+      "also": [
+        "campus.library"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/eknihovna/opory/": {
+      "node": "courses.files",
+      "note": "opening one e-material",
+      "read": "never",
+      "link": "insis-only",
+      "verify": true
+    },
+    "/auth/eknihovna/slozky_objekty.pl": {
+      "node": "courses.files",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "slozka",
+        "slozka,typ,zobrazit"
+      ],
+      "links": [
+        "slozka",
+        "slozka,typ,zobrazit"
+      ]
+    },
+    "/auth/eknihovna/strom_slozek.pl": {
+      "node": "courses.files",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "slozka"
+      ],
+      "links": [
+        "",
+        "slozka"
+      ]
+    },
+    "/auth/eknihovna/vyhledavani.pl": {
+      "node": "courses.files",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "slozka"
+      ],
+      "links": [
+        "slozka"
+      ]
+    },
+    "/auth/elis/ot/psani_testu.pl": {
+      "node": "exams.tests",
+      "also": [
+        "course.overview",
+        "course.points",
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "vysledky"
+      ],
+      "links": [
+        "",
+        "vysledky"
+      ],
+      "action": "unverified"
+    },
+    "/auth/elis/student/seznam_osnov.pl": {
+      "node": "course.overview",
+      "variants": {
+        "no predmet": "courses.mine"
+      },
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/epd/": {
+      "node": "studies.papers",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/evolby/portal_volice.pl": {
+      "node": "all.surveys",
+      "form": true,
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ]
+    },
+    "/auth/help.pl": {
+      "node": "help",
+      "note": "context help of each page: '?' in the page header",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "page",
+        "tag"
+      ],
+      "links": [
+        "page",
+        "tag"
+      ]
+    },
+    "/auth/herna/": {
+      "node": "all.games",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/herna/housenka.pl": {
+      "node": "all.games",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/herna/kamenozrout.pl": {
+      "node": "all.games",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/herna/soliter.pl": {
+      "node": "all.games",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/hledani/": {
+      "node": "all.search",
+      "note": "thematic search; Ctrl+K covers most of it",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/int/podani_prihlasky.pl": {
+      "node": "studies.abroad",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "verify": true,
+      "note": "stays verify: the application form page was never opened (only its link was seen)"
+    },
+    "/auth/int/zavzpr.pl": {
+      "node": "studies.abroad",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/karty/": {
+      "node": "studies.status",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/karty/platnost.pl": {
+      "node": "studies.status",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/karty/typy_karet.pl": {
+      "node": "studies.status",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/katalog/": {
+      "node": "courses.catalogue",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "jak"
+      ],
+      "links": [
+        "",
+        "jak"
+      ]
+    },
+    "/auth/katalog/dohody.pl": {
+      "node": "studies.abroad",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "typ"
+      ],
+      "links": [
+        "",
+        "typ"
+      ]
+    },
+    "/auth/katalog/plany.pl": {
+      "node": "campus.plans",
+      "also": [
+        "grades.plan"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta",
+        "fakulta,matice",
+        "fakulta,misto_vyuky,poc_obdobi,typ_ss,typ_studia",
+        "fakulta,poc_obdobi,typ_ss",
+        "fakulta,skupina_predmetu_id,studijni_plan"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,info,misto_vyuky,poc_obdobi,program,typ_ss,typ_studia",
+        "fakulta,matice",
+        "fakulta,misto_vyuky,poc_obdobi,program,typ_ss,typ_studia",
+        "fakulta,misto_vyuky,poc_obdobi,typ_ss,typ_studia",
+        "fakulta,poc_obdobi,typ_ss",
+        "fakulta,skupina_predmetu_id,studijni_plan"
+      ],
+      "form": true
+    },
+    "/auth/katalog/rozvrhy_view.pl": {
+      "node": "schedule.search",
+      "variants": {
+        "rozvrh_student": "schedule.week",
+        "rozvrh_ucitel": "schedule.search"
+      },
+      "form": true,
+      "also": [
+        "course.overview",
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "values": {
+        "format": [
+          "html"
+        ]
+      },
+      "fetch": [
+        "format,rozvrh_student,rozvrh_student_obec,studium,zobraz"
+      ],
+      "links": [
+        "",
+        "f,konf",
+        "format,rozvrh_student,rozvrh_student_obec,studium,zobraz",
+        "id,rozvrh_ucitel",
+        "k,konf,rozvrh,z",
+        "k,konf,z",
+        "konf",
+        "konf,vse"
+      ]
+    },
+    "/auth/katalog/syllabus.pl": {
+      "node": "courses.catalogue",
+      "variants": {
+        "predmet=mine": "course.syllabus"
+      },
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "aktualni,poc_obdobi,predmet",
+        "fakulta,predmet",
+        "jazyk,obdobi,odkud,predmet,typ,vystup,zobrazit_obdobi,zobrazit_sklad",
+        "predmet",
+        "predmet,rozvrh_student",
+        "predmet,studium"
+      ],
+      "links": [
+        "aktualni,poc_obdobi,predmet",
+        "fakulta,predmet",
+        "jazyk,obdobi,odkud,predmet,typ,vystup,zobrazit_obdobi,zobrazit_sklad",
+        "predmet",
+        "predmet,rozvrh_student",
+        "predmet,rozvrh_ucitel",
+        "predmet,studium"
+      ],
+      "values": {
+        "vystup": [
+          "1"
+        ]
+      }
+    },
+    "/auth/kc/": {
+      "node": "help.ask",
+      "form": true,
+      "also": [
+        "campus.office"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        "",
+        "formular,zalozka",
+        "zalozka"
+      ]
+    },
+    "/auth/kc/kc.pl": {
+      "node": "help.ask",
+      "form": true,
+      "also": [
+        "campus.office"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "formular,zalozka",
+        "obdobi,studium"
+      ],
+      "links": [
+        "",
+        "formular,zalozka",
+        "obdobi,studium"
+      ]
+    },
+    "/auth/kontrola/": {
+      "node": "account.profile",
+      "form": true,
+      "read": "on-open",
+      "note": "the To do item comes from the notices on InSIS main page, not from this form page",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/kontrola/statistika.pl": {
+      "node": "account.profile",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "obdobi"
+      ],
+      "links": [
+        "",
+        "obdobi"
+      ]
+    },
+    "/auth/kurzy/kurz_prihlaska.pl": {
+      "node": "all.public-courses",
+      "form": true,
+      "read": "never",
+      "link": "insis-only",
+      "verify": true
+    },
+    "/auth/kurzy/nabidka_kurzu.pl": {
+      "node": "all.public-courses",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/kurzy/prihlaska.pl": {
+      "node": "all.public-courses",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "verify": true
+    },
+    "/auth/lide/": {
+      "node": "campus.people",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/lide/absolventi.pl": {
+      "node": "campus.about",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta,rok,zalozka",
+        "fakulta,zalozka",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "fakulta,rok,zalozka",
+        "fakulta,zalozka",
+        "zalozka"
+      ]
+    },
+    "/auth/lide/clovek.pl": {
+      "node": "campus.people",
+      "also": [
+        "course.overview",
+        "course.people"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "fakulta,id",
+        "id",
+        "id,rozvrh_student",
+        "id,studium",
+        "id,zalozka"
+      ],
+      "links": [
+        "fakulta,id",
+        "id",
+        "id,rozvrh_student",
+        "id,rozvrh_ucitel",
+        "id,studium",
+        "id,zalozka"
+      ],
+      "form": true
+    },
+    "/auth/mistnosti/": {
+      "node": "campus.rooms",
+      "also": [
+        "schedule.search",
+        "schedule.week"
+      ],
+      "read": "on-open",
+      "note": "public room list, read on the first room search",
+      "link": "shell",
+      "fetch": [
+        "",
+        "areal",
+        "areal,budova",
+        "areal,budovapodrobne,klic",
+        "arealpodrobne,klic",
+        "id",
+        "rozvrh_student,zobrazit_mistnost",
+        "zobrazit_mistnost"
+      ],
+      "links": [
+        "",
+        "areal",
+        "areal,budova",
+        "areal,budova,klic,mistnostpodrobne",
+        "areal,budovapodrobne,klic",
+        "arealpodrobne,klic",
+        "id",
+        "rozvrh_student,zobrazit_mistnost",
+        "rozvrh_ucitel,zobrazit_mistnost",
+        "zobrazit_mistnost"
+      ]
+    },
+    "/auth/personalizace/menu_indiv.pl": {
+      "node": "account.custom",
+      "form": true,
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/personalizace/menu_user.pl": {
+      "node": "account.custom",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/personalizace/portlety.pl": {
+      "node": "account.custom",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/personalizace/pref.pl": {
+      "node": "account.custom",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/personalizace/vkladani_fotky.pl": {
+      "node": "studies.status",
+      "form": true,
+      "also": [
+        "account.profile"
+      ],
+      "read": "never",
+      "link": "shell",
+      "links": [
+        "",
+        "studium"
+      ]
+    },
+    "/auth/pim/knihovna_vypujcky.pl": {
+      "node": "campus.library",
+      "also": [
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ],
+      "verify_data": "loan due dates"
+    },
+    "/auth/posta/forwardy.pl": {
+      "node": "messages.mail",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "also": [
+        "account.email"
+      ],
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/posta/hz_ng_sprava_mlistu.pl": {
+      "node": "messages.mail",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/posta/kontakty.pl": {
+      "node": "messages.mail",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/posta/nastaveni.pl": {
+      "node": "messages.mail",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ]
+    },
+    "/auth/posta/nova_zprava.pl": {
+      "node": "messages.mail",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "also": [
+        "course.people"
+      ],
+      "links": [
+        "",
+        "studium,uzivatel",
+        "uzivatel"
+      ]
+    },
+    "/auth/posta/novinky.pl": {
+      "node": "all.news",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "kategorie"
+      ],
+      "links": [
+        "",
+        "kategorie"
+      ]
+    },
+    "/auth/posta/slozka.pl": {
+      "node": "messages.mail",
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fid"
+      ],
+      "links": [
+        "",
+        "fid"
+      ],
+      "verify_data": "unread message count"
+    },
+    "/auth/posta/slozky.pl": {
+      "node": "messages.mail",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/pracoviste/kompaktni_telsez.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/pracoviste/pracoviste.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "id",
+        "id,nerozbaluj",
+        "id,nerozbaluj,strom",
+        "strom"
+      ],
+      "links": [
+        "",
+        "id",
+        "id,nerozbaluj",
+        "id,nerozbaluj,strom",
+        "strom"
+      ]
+    },
+    "/auth/pracoviste/predmety.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id"
+      ],
+      "links": [
+        "id"
+      ]
+    },
+    "/auth/pracoviste/prehled_temat.pl": {
+      "node": "campus.departments",
+      "also": [
+        "studies.thesis"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "detail,pism,pracoviste",
+        "detail,pracoviste",
+        "id,pracoviste",
+        "pism,pracoviste",
+        "pracoviste"
+      ],
+      "links": [
+        "detail,pism,pracoviste",
+        "detail,pracoviste",
+        "id,pracoviste",
+        "pism,pracoviste",
+        "pracoviste"
+      ]
+    },
+    "/auth/pracoviste/projekty.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id"
+      ],
+      "links": [
+        "id"
+      ],
+      "form": true
+    },
+    "/auth/pracoviste/publikace.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id",
+        "id,podrobnosti"
+      ],
+      "links": [
+        "id",
+        "id,podrobnosti"
+      ],
+      "form": true
+    },
+    "/auth/pracoviste/stud_odd.pl": {
+      "node": "campus.office",
+      "also": [
+        "help"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta",
+        "fakulta,id",
+        "fakulta,studium,zpet_student"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,id",
+        "fakulta,studium,zpet_student"
+      ],
+      "values": {
+        "zpet_student": [
+          "moje_studium.pl"
+        ]
+      }
+    },
+    "/auth/pracoviste/telsez.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id"
+      ],
+      "links": [
+        "id"
+      ]
+    },
+    "/auth/pracoviste/zamestnanci.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id"
+      ],
+      "links": [
+        "id"
+      ]
+    },
+    "/auth/praxe/": {
+      "node": "studies.internships",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "je_student,obdobi,studium",
+        "je_student,studium,zalozka"
+      ],
+      "links": [
+        "je_student,obdobi,studium",
+        "je_student,studium,zalozka"
+      ]
+    },
+    "/auth/prihlaska/auth/evidence_eprihlasek.pl": {
+      "node": "studies.nextdegree",
+      "note": "study application forms (admission)",
+      "read": "never",
+      "link": "shell",
+      "verify": true
+    },
+    "/auth/ps/": {
+      "node": "account.access",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/ps/body.pl": {
+      "node": "account.access",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/ps/moje_pruchody.pl": {
+      "node": "account.access",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/ps/povolene_body.pl": {
+      "node": "account.access",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/sif/organy.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "clenove,hai,id,kvalodbor,obor,prehled,prog,uni",
+        "hai,id,kvalodbor,obor,prog,uni",
+        "id,obor,prehled",
+        "id,prehled",
+        "id,prehled,prog",
+        "id,uni"
+      ],
+      "links": [
+        "clenove,hai,id,kvalodbor,obor,prehled,prog,uni",
+        "hai,id,kvalodbor,obor,prog,uni",
+        "id,obor,prehled",
+        "id,prehled",
+        "id,prehled,prog",
+        "id,uni",
+        "program,typ_ss"
+      ]
+    },
+    "/auth/sif/organy_prehled.pl": {
+      "node": "campus.departments",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/sit/": {
+      "node": "account.email",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/sit/univ_posta.pl": {
+      "node": "account.email",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/student/bank_spojeni_clovek.pl": {
+      "node": "studies.money",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/student/financovani.pl": {
+      "node": "studies.money",
+      "also": [
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium",
+        "prehled",
+        "studium"
+      ],
+      "links": [
+        "obdobi,studium",
+        "prehled",
+        "studium"
+      ],
+      "verify_data": "items to pay"
+    },
+    "/auth/student/harmonogram.pl": {
+      "node": "schedule.calendar",
+      "also": [
+        "home",
+        "courses.registration",
+        "exams.mine"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta",
+        "fakulta,obdobi",
+        "fakulta,obdobi,studium,zpet_student",
+        "vyber_fakulty"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,obdobi",
+        "fakulta,obdobi,studium,zpet_student",
+        "vyber_fakulty"
+      ],
+      "values": {
+        "zpet_student": [
+          "moje_studium.pl"
+        ]
+      }
+    },
+    "/auth/student/hodnoceni.pl": {
+      "node": "courses.catalogue",
+      "also": [
+        "course.syllabus"
+      ],
+      "note": "course attainment (pass-rate) statistics",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta",
+        "fakulta,obdobi",
+        "fakulta,obdobi,odkud,pismeno,predmet,program",
+        "fakulta,obdobi,odkud,pismeno,program"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,obdobi",
+        "fakulta,obdobi,odkud,pismeno,predmet,program",
+        "fakulta,obdobi,odkud,pismeno,program",
+        "fakulta,obdobi,odkud,program"
+      ]
+    },
+    "/auth/student/list.pl": {
+      "node": "course.points",
+      "note": "lectures sheet: regular assessment per course; notification settings",
+      "also": [
+        "course.files",
+        "course.overview"
+      ],
+      "variants": {
+        "no predmet": "courses.mine",
+        "predmet=mine": "course.points"
+      },
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,predmet,prubezne,studium",
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,predmet,prubezne,studium",
+        "obdobi,studium"
+      ],
+      "action": "link",
+      "verify_data": "that reading it when the course page opens marks nothing as seen; course-folder links"
+    },
+    "/auth/student/mapa_studii.pl": {
+      "node": "grades.plan",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/mimosemestr_zapis.pl": {
+      "node": "courses.registration",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/moje_omluvenky.pl": {
+      "node": "studies.excuses",
+      "form": true,
+      "also": [
+        "schedule.week"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/moje_studium.pl": {
+      "node": "studies.status",
+      "note": "the portal dissolves: its links go to their nodes; restriction column feeds To do; studies table becomes the study switch",
+      "read": "background",
+      "also": [
+        "home"
+      ],
+      "link": "shell",
+      "fetch": [
+        "",
+        "studium"
+      ],
+      "links": [
+        "",
+        "studium"
+      ]
+    },
+    "/auth/student/oblibene_predmety.pl": {
+      "node": "courses.registration",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/odevzdavarny.pl": {
+      "node": "courses.submissions",
+      "also": [
+        "home"
+      ],
+      "variants": {
+        "predmet=mine": "course.submissions"
+      },
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,predmet,studium",
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,predmet,studium",
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/odevzdavarny_odevzdani.pl": {
+      "node": "course.submissions",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,odevzdavarna,studium",
+        "odevzdavarna"
+      ],
+      "links": [
+        "obdobi,odevzdavarna,studium",
+        "odevzdavarna"
+      ],
+      "action": "unverified"
+    },
+    "/auth/student/pruchod_studiem.pl": {
+      "node": "grades.results",
+      "also": [
+        "course.overview",
+        "course.points",
+        "courses.mine",
+        "exams.past",
+        "home",
+        "notifications"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,predmet,studium,vybrane_zobrazeni",
+        "obdobi,studium",
+        "obdobi,studium,vyber"
+      ],
+      "links": [
+        "obdobi,predmet,studium,vybrane_zobrazeni",
+        "obdobi,studium",
+        "obdobi,studium,vyber"
+      ]
+    },
+    "/auth/student/reg_stat_tridy.pl": {
+      "node": "courses.registration",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta",
+        "fakulta,forma,garprac,obdobi,pism,zalozka",
+        "fakulta,obdobi"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,forma,garprac,obdobi,pism,zalozka",
+        "fakulta,obdobi"
+      ],
+      "form": true
+    },
+    "/auth/student/registrace.pl": {
+      "node": "courses.registration",
+      "also": [
+        "home",
+        "notifications"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ],
+      "verify_data": "registration results (places confirmed or lost)",
+      "action": "unverified"
+    },
+    "/auth/student/spoluzaci.pl": {
+      "node": "course.people",
+      "variants": {
+        "no predmet": "courses.mine",
+        "predmet=mine": "course.people"
+      },
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,predmet,skupina,studium",
+        "obdobi,predmet,skupina,studium,vyucujici",
+        "obdobi,predmet,studium",
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,predmet,skupina,studium",
+        "obdobi,predmet,skupina,studium,vyucujici",
+        "obdobi,predmet,studium",
+        "obdobi,studium"
+      ],
+      "form": true
+    },
+    "/auth/student/studium.pl": {
+      "node": "studies.status",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/temata_prihlasovani.pl": {
+      "node": "courses.submissions",
+      "also": [
+        "course.submissions",
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "note": "topic rows matched to a course by the course code in the row",
+      "fetch": [
+        "obdobi,predmetove,studium",
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,predmetove,studium",
+        "obdobi,studium"
+      ],
+      "action": "unverified"
+    },
+    "/auth/student/terminy_info.pl": {
+      "node": "exams.date",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium,termin"
+      ],
+      "links": [
+        "obdobi,studium,termin"
+      ],
+      "note": "exam date details; the list of registered students is only InSIS's own link on this page"
+    },
+    "/auth/student/terminy_seznam.pl": {
+      "node": "exams.signup",
+      "also": [
+        "exams.mine",
+        "course.points",
+        "home",
+        "notifications"
+      ],
+      "form": true,
+      "variants": {
+        "no zalozka": "exams.mine",
+        "zalozka=1": "exams.signup",
+        "zalozka=2": "exams.past",
+        "zalozka=3": "exams.unscheduled",
+        "zobraz_duvod": "exams.signup"
+      },
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium",
+        "obdobi,studium,zalozka"
+      ],
+      "links": [
+        "obdobi,studium",
+        "obdobi,studium,termin,zobraz_duvod",
+        "obdobi,studium,zalozka"
+      ],
+      "note": "every exam action happens here, shown unchanged; InSIS+ adds a summary above and highlights the course"
+    },
+    "/auth/student/tisk_dokumentu.pl": {
+      "node": "studies.papers",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/vs_registrace.pl": {
+      "node": "courses.registration",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "detail,klic,studium,univ_usek,zalozka",
+        "obdobi,studium",
+        "order,studium,univ_usek,zalozka",
+        "studium",
+        "studium,zalozka"
+      ],
+      "links": [
+        "detail,klic,studium,univ_usek,zalozka",
+        "obdobi,studium",
+        "order,studium,univ_usek,zalozka",
+        "studium",
+        "studium,zalozka"
+      ]
+    },
+    "/auth/student/vypl_stip_student.pl": {
+      "node": "studies.money",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/zadost_ubyt_stip.pl": {
+      "node": "studies.money",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/student/zp_temata.pl": {
+      "node": "studies.thesis",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "detail,obdobi,seznam,studium",
+        "obdobi,seznam,studium",
+        "obdobi,studium",
+        "obdobi,studium,zaverecne"
+      ],
+      "links": [
+        "detail,obdobi,seznam,studium",
+        "obdobi,seznam,studium",
+        "obdobi,studium",
+        "obdobi,studium,zaverecne"
+      ]
+    },
+    "/auth/studijni/": {
+      "node": "campus.office",
+      "note": "Study Department landing",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/studijni/reg_stat_tridy.pl": {
+      "node": "courses.registration",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "fakulta"
+      ],
+      "links": [
+        "",
+        "fakulta",
+        "fakulta,obdobi"
+      ]
+    },
+    "/auth/studijni/studijni_povinnosti.pl": {
+      "node": "grades.plan",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "obdobi,studium"
+      ],
+      "links": [
+        "obdobi,studium"
+      ]
+    },
+    "/auth/system/agregat.pl": {
+      "node": "all.stats",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/hesla_nastaveni.pl": {
+      "node": "account.security",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ],
+      "action": "unverified"
+    },
+    "/auth/system/info_dist_srv.pl": {
+      "node": "account.email",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/logout.pl": {
+      "node": "logout",
+      "note": "named exception: avatar › Log out is InSIS own logout link, opened only by the student",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/mobilni_aplikace.pl": {
+      "node": "account.devices",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "vydanapovereni"
+      ],
+      "links": [
+        "",
+        "vydanapovereni"
+      ],
+      "action": "link"
+    },
+    "/auth/system/mobilni_zarizeni.pl": {
+      "node": "account.devices",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/nastaveni_delegatu.pl": {
+      "node": "account.security",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/nastaveni_totp.pl": {
+      "node": "account.security",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/nia.pl": {
+      "node": "account.security",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/oou_uziv.pl": {
+      "node": "account.profile",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "historie,skoc_zpet",
+        "zalozka_souhlas"
+      ],
+      "links": [
+        "",
+        "historie,skoc_zpet",
+        "historie,verze",
+        "zalozka_souhlas"
+      ],
+      "values": {
+        "skoc_zpet": [
+          "1"
+        ]
+      }
+    },
+    "/auth/system/sessions.pl": {
+      "node": "account.security",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/zmena_hesla.pl": {
+      "node": "account.security",
+      "form": true,
+      "read": "never",
+      "also": [
+        "account.password"
+      ],
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/zmena_identity.pl": {
+      "node": "account.security",
+      "form": true,
+      "read": "never",
+      "link": "shell",
+      "links": [
+        ""
+      ]
+    },
+    "/auth/system/zobraz_wlog.pl": {
+      "node": "account.security",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "current"
+      ],
+      "links": [
+        "current"
+      ]
+    },
+    "/auth/tisk/evidence_tisku.pl": {
+      "node": "studies.papers",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/todo/": {
+      "node": "all.tasks",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/uloziste/": {
+      "node": "studies.papers",
+      "also": [
+        "home"
+      ],
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "obdobi,rezim,studium",
+        "rezim",
+        "rezim,slozka"
+      ],
+      "links": [
+        "obdobi,rezim,studium",
+        "rezim",
+        "rezim,slozka",
+        "rezim,slozka,studium"
+      ]
+    },
+    "/auth/uloziste/zobrazeni.pl": {
+      "node": "studies.papers",
+      "note": "opening one stored document",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/verejne_informace.pl": {
+      "node": "campus.about",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/vv/bio/": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/vv/bio/howto.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ]
+    },
+    "/auth/vv/bio/navigace.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/vv/bio/odborne_aktivity.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/bio/osobni_udaje.pl": {
+      "node": "all.research",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "druh_dov,zalozka",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "druh_dov,zalozka",
+        "zalozka"
+      ]
+    },
+    "/auth/vv/bio/pedag_aktivity.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "typ_opory,zalozka",
+        "typ_pedag,zalozka",
+        "typ_prace,zalozka",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "typ_opory,zalozka",
+        "typ_pedag,zalozka",
+        "typ_prace,zalozka",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/bio/prehled.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "oddil"
+      ],
+      "links": [
+        "",
+        "oddil"
+      ]
+    },
+    "/auth/vv/bio/preklad.pl": {
+      "node": "all.research",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ]
+    },
+    "/auth/vv/bio/vv_aktivity.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "realizace,zalozka",
+        "stav,zalozka",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "realizace,zalozka",
+        "stav,zalozka",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/bio/zivotopis.pl": {
+      "node": "all.research",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/vv/epruzkumy/prehled_pruzkumu.pl": {
+      "node": "all.surveys",
+      "read": "background",
+      "link": "shell",
+      "fetch": [
+        "",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/parovani_publikaci.pl": {
+      "node": "all.research",
+      "form": true,
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/vv/projekty.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "",
+        "podrobnosti,projekt",
+        "podrobnosti,projekt,zalozka",
+        "podrobnosti,projekt,zalozka,zobrazit",
+        "zalozka"
+      ],
+      "links": [
+        "",
+        "podrobnosti,projekt",
+        "podrobnosti,projekt,zalozka",
+        "podrobnosti,projekt,zalozka,zobrazit",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/publikace.pl": {
+      "node": "all.research",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "vsechny_zalozky",
+        "vsechny_zalozky,zalozka"
+      ],
+      "links": [
+        "vsechny_zalozky",
+        "vsechny_zalozky,zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vv/sprava/externi_vyzkumnici.pl": {
+      "node": "error",
+      "note": "InSIS 'Error when using information system' page",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/vv/zaznamnik/vysledky.pl": {
+      "node": "error",
+      "note": "InSIS 'Error when using information system' page",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/vyveska/": {
+      "node": "messages.noticeboard",
+      "read": "never",
+      "link": "shell",
+      "links": [
+        "",
+        "podzalozka,zalozka",
+        "zalozka"
+      ],
+      "form": true
+    },
+    "/auth/vyveska/nove_prispevky.pl": {
+      "node": "messages.noticeboard",
+      "read": "never",
+      "link": "insis-only",
+      "verify": true
+    },
+    "/auth/vyveska/slozka.pl": {
+      "node": "messages.noticeboard",
+      "read": "never",
+      "link": "insis-only"
+    },
+    "/auth/zakladni.pl": {
+      "node": "campus.about",
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id"
+      ],
+      "links": [
+        "id"
+      ]
+    },
+    "/auth/zp/": {
+      "node": "campus.theses",
+      "also": [
+        "studies.thesis"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        ""
+      ],
+      "links": [
+        ""
+      ]
+    },
+    "/auth/zp/portal_zp.pl": {
+      "node": "campus.theses",
+      "also": [
+        "studies.thesis"
+      ],
+      "read": "on-open",
+      "link": "shell",
+      "fetch": [
+        "id,pracoviste,prehled",
+        "prehled"
+      ],
+      "links": [
+        "id,pracoviste,prehled",
+        "prehled"
+      ]
+    }
+  },
+  "menu_only": {
+    "_comment": "Main-menu items whose pages are outside /auth/ or were not opened; mapped by their menu label.",
+    "InSIS development projects": "all.system",
+    "About app": "help",
+    "Google Play": "help",
+    "App Store": "help",
+    "Frequently asked questions": "help",
+    "User support": "help"
+  }
+}
