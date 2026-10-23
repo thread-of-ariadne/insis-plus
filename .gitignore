@@ -1,0 +1,22 @@
+# Logged-in InSIS snapshots hold personal data (also guarded by test/fixtures/private/.gitignore)
+test/fixtures/private/*
+!test/fixtures/private/.gitignore
+
+# Local tooling
+.claude/
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+
+# Build output
+dist/
+*.zip
+*.xpi
+*.crx
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

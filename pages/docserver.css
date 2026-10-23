@@ -1,0 +1,150 @@
+/* InSIS+ document server (pages/docserver.js). Loaded inside the shadow root (the new view, classes prefixed ds-)
+   and, on the New documents page, into the page itself for the slotted "mark as read" form (rules under html.ipx-ds). */
+
+/* ---------- layout: main column + rail; the original form (if any) slotted under the main column ---------- */
+
+:host .content { display: grid; grid-template-columns: minmax(0, 1fr) 360px; padding: 0; }
+.ds { display: contents; }
+.ds-main { display: flex; flex-direction: column; gap: 16px; grid-column: 1; grid-row: 1; min-width: 0; padding: 24px 32px 24px; }
+.ds-rail { display: flex; flex-direction: column; gap: 22px; grid-column: 2; grid-row: 1 / span 2; min-width: 0; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
+:host .content > slot { display: none; grid-column: 1; grid-row: 2; min-width: 0; padding: 0 32px 48px; }
+:host .content > .ds.show-form ~ slot { display: block; }
+
+.ds-sub { margin-top: 4px; font-size: 13px; }
+.ds-inline { color: var(--accent); font-weight: 600; }
+.ds-inline:hover { text-decoration: underline; }
+
+/* Tab row of the document server, as a segmented control (links, not buttons) */
+.ds-tabs { display: flex; flex-wrap: wrap; gap: 2px; align-self: flex-start; max-width: 100%; padding: 3px; border-radius: 12px; background: var(--chip); }
+.ds-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ds-tab:hover { color: var(--fg); }
+.ds-tab.on { background: var(--surface); color: var(--fg); font-weight: 700; box-shadow: var(--shadow-raised); }
+.ds-tab-count { padding: 0 6px; border-radius: 6px; background: color-mix(in srgb, var(--faint) 22%, transparent); color: var(--fg-2); font-size: 11.5px; line-height: 18px; }
+.ds-tab-count.hot { background: var(--bad); color: #fff; }
+
+.ds-main .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ds-main .kpis:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1320px) { .ds-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- course cards ---------- */
+
+.ds-courses, .ds-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; align-items: start; }
+.ds-groups { grid-template-columns: minmax(0, 1fr); }
+.ds-course, .ds-group { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px 14px 12px 12px; }
+.ds-course-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ds-course-head .cover { border-radius: 10px; }
+.ds-course-head > .delta { flex: none; align-self: flex-start; margin-top: 2px; }
+.ds-course-titles { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.ds-course-name { overflow: hidden; font: 700 17px/1.2 var(--display); letter-spacing: -0.01em; text-overflow: ellipsis; }
+a.ds-course-name:hover { color: var(--accent); }
+.ds-course-meta { color: var(--muted); font-size: 12.5px; }
+.ds-course > .ds-tree { padding-top: 8px; border-top: 1px solid var(--line); }
+
+/* ---------- folder tree ---------- */
+
+.ds-tree { margin: 0; padding: 0; list-style: none; }
+.ds-tree .ds-tree { display: none; margin-left: 13px; padding-left: 9px; border-left: 1px solid var(--line); }
+.ds-node.open > .ds-tree { display: block; }
+.ds-node[hidden] { display: none; }
+.ds-row { display: flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 6px 2px 0; border-radius: 8px; }
+.ds-row:hover { background: var(--hover); }
+.ds-toggle, .ds-toggle-gap { display: grid; place-items: center; flex: none; width: 22px; height: 22px; }
+.ds-toggle { padding: 0; border: 0; border-radius: 6px; background: none; color: var(--faint); cursor: pointer; }
+.ds-toggle:hover { color: var(--fg); background: var(--chip); }
+.ds-toggle .icon { transform: rotate(-90deg); transition: transform 0.15s ease; }
+.ds-toggle .icon svg { width: 15px; height: 15px; stroke-width: 2; }
+.ds-node.open > .ds-row .ds-toggle .icon { transform: none; }
+.ds-folder { color: var(--faint); }
+.ds-folder svg { width: 16px; height: 16px; }
+.ds-name { flex: 1; min-width: 0; overflow: hidden; color: var(--fg-2); font-size: 14px; white-space: nowrap; text-overflow: ellipsis; }
+.ds-name:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.ds-node.has-new > .ds-row .ds-name { color: var(--fg); font-weight: 700; }
+.ds-node.has-new > .ds-row .ds-folder { color: var(--accent); }
+.ds-counts { display: flex; align-items: center; gap: 6px; flex: none; }
+.ds-files { min-width: 18px; color: var(--faint); font-size: 12px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ds-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--bad); }
+.ds-node.open > .ds-row .ds-dot { display: none; }
+
+/* Whole tree: filter + expand/collapse */
+.ds-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: -6px; }
+.ds-filter-wrap { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 200px; max-width: 360px; padding: 0 12px; border-radius: 10px; background: var(--chip); color: var(--faint); }
+.ds-filter-wrap:focus-within { background: var(--surface); box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-raised); }
+.ds-filter-wrap .icon svg { width: 15px; height: 15px; stroke-width: 2; }
+.ds-filter { flex: 1; min-width: 0; height: 38px; border: 0; outline: none; background: none; color: var(--fg); font: 14px var(--font); }
+.ds-filter::placeholder { color: var(--faint); }
+.ds-btn { height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--chip); color: var(--fg-2); font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.ds-btn:hover { color: var(--fg); background: color-mix(in srgb, var(--faint) 22%, var(--chip)); }
+.ds-btn.primary { background: var(--accent); color: var(--accent-ink); }
+.ds-btn.primary:hover { filter: brightness(1.08); background: var(--accent); color: var(--accent-ink); }
+.ds-whole { padding: 10px 12px; }
+.ds-nomatch { padding: 8px 6px; }
+
+/* ---------- rail ---------- */
+
+.ds-rail .card-head { margin-bottom: 8px; }
+.ds-rail-empty { font-size: 13.5px; line-height: 1.5; }
+.ds-fresh { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.ds-fresh-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.ds-fresh li:last-child .ds-fresh-row { border-bottom: 0; }
+.ds-fresh-body { display: flex; flex-direction: column; min-width: 0; }
+.ds-fresh-body strong { overflow: hidden; font-size: 14px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
+.ds-fresh-body small { overflow: hidden; color: var(--muted); font-size: 12.5px; white-space: nowrap; text-overflow: ellipsis; }
+a.ds-fresh-row:hover strong { color: var(--accent); }
+.ds-fresh-row .delta { flex: none; }
+
+.ds-quota dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 13.5px; }
+.ds-quota dt { color: var(--muted); }
+.ds-quota dd { margin: 0; color: var(--fg); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ds-quota dd small { color: var(--faint); font-weight: 600; }
+
+.ds-mark .muted { margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; }
+.ds-mark .ds-btn { width: 100%; }
+
+/* ---------- new documents ---------- */
+
+.ds-docs { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.ds-doc { display: flex; align-items: flex-start; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.ds-doc:last-child { border-bottom: 0; padding-bottom: 2px; }
+.ds-type { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 10px; background: var(--chip); color: var(--fg-2); font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em; }
+.ds-type[title="PDF"] { background: var(--bad-soft); color: var(--bad); }
+.ds-type[title="DOCX"], .ds-type[title="DOC"] { background: var(--accent-soft); color: var(--accent); }
+.ds-type[title="XLSX"], .ds-type[title="XLS"] { background: var(--ok-soft); color: var(--ok); }
+.ds-type[title="PPTX"], .ds-type[title="PPT"] { background: var(--warn-soft); color: var(--warn); }
+.ds-doc-body { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.ds-doc-name { color: var(--fg); font-size: 14.5px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+a.ds-doc-name:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.ds-doc-comment { margin: 0; color: var(--fg-2); font-size: 13px; }
+.ds-doc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; color: var(--muted); font-size: 12.5px; }
+.ds-doc-meta a:hover { color: var(--accent); }
+.ds-doc-folder { display: inline-flex; align-items: center; gap: 5px; min-width: 0; max-width: 100%; }
+.ds-doc-folder span:not(.icon) { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ds-doc-folder .ds-folder svg { width: 14px; height: 14px; }
+.ds-info { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 8px; color: var(--faint); }
+.ds-info:hover { background: var(--hover); color: var(--accent); }
+.ds-info .icon svg { width: 17px; height: 17px; }
+
+/* ---------- narrower screens ---------- */
+
+@media (max-width: 1100px) {
+  :host .content { grid-template-columns: minmax(0, 1fr); }
+  .ds-rail { grid-column: 1; grid-row: 3; padding: 24px 32px 48px; border-top: 1px solid var(--line); border-left: 0; }
+  :host .content > .ds.show-form ~ slot { padding-bottom: 24px; }
+}
+@media (max-width: 900px) {
+  .ds-main, .ds-rail { padding: 16px; }
+  .ds-main .kpis, .ds-main .kpis:has(> :nth-child(3):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :host .content > slot { padding: 0 16px 16px; }
+  .ds-courses { grid-template-columns: minmax(0, 1fr); }
+  .ds-tabs { flex-wrap: nowrap; align-self: stretch; overflow-x: auto; scrollbar-width: none; }
+  .ds-filter-wrap { max-width: none; flex-basis: 100%; }
+  .ds-tools .ds-btn { flex: 1; }
+  .ds-row { min-height: 36px; }
+  .ds-name { display: -webkit-box; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-toggle .icon { transition: none; }
+}
+
+/* ---------- the original "mark as read" form, slotted into the page (light DOM) ---------- */
+/* Hiding the rest, the card look, stripes and the sticky header fix come from keepOnly() + generic.css. */
+html.ipx-takeover.ipx-ds #str1 [data-ipx-keep="node"] { color-scheme: light dark; overflow-x: auto; }

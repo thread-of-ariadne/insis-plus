@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "InSIS+",
+  "version": "0.5.0",
+  "description": "Faster, friendlier InSIS (insis.vse.cz): a task-based menu, Ctrl+K search, a dashboard and redesigned study pages. Everything stays in your browser.",
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://insis.vse.cz/*"
+      ],
+      "js": [
+        "content.js",
+        "ui.js",
+        "home.js",
+        "syllabus.js",
+        "catalog.js",
+        "pages/timetable.js",
+        "pages/student-portal.js",
+        "pages/submissions.js",
+        "pages/study-record.js",
+        "pages/docserver.js",
+        "generic.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "palette.css",
+        "shared.css",
+        "home.css",
+        "syllabus.css",
+        "catalog.css",
+        "generic.css",
+        "pages/*"
+      ],
+      "matches": [
+        "https://insis.vse.cz/*"
+      ]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "insis-plus@students.vse",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,183 @@
+/* InSIS+ personal timetable (pages/timetable.js). Loaded twice: inside the shadow root (the new view, classes
+   prefixed tt-) and into the page itself for the slotted original form (rules under html.ipx-tt). */
+
+/* ---------- layout: main column + rail, the original form slotted under the main column ---------- */
+
+:host .content { display: grid; grid-template-columns: minmax(0, 1fr) 360px; padding: 0; }
+.tt { display: contents; }
+.tt-main { display: flex; flex-direction: column; gap: 16px; grid-column: 1; grid-row: 1; min-width: 0; padding: 24px 32px 12px; }
+.tt-rail { display: flex; flex-direction: column; gap: 22px; grid-column: 2; grid-row: 1 / span 2; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
+:host .content > slot { display: block; grid-column: 1; grid-row: 2; min-width: 0; padding: 0 32px 48px; }
+
+.tt-main .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1320px) { .tt-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Top bar actions */
+.tt-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--chip);
+  color: var(--fg-2);
+  font: 600 14px var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tt-action:hover { color: var(--accent); }
+
+/* ---------- week navigation and hint ---------- */
+
+.tt-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.tt-nav-label { min-width: 120px; color: var(--fg); font-size: 14.5px; font-weight: 700; text-align: center; }
+.tt-icon, .tt-today {
+  display: inline-grid;
+  place-items: center;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--fg-2);
+  cursor: pointer;
+}
+.tt-icon { width: 34px; }
+.tt-icon.fwd .icon { transform: rotate(180deg); }
+.tt-icon:disabled { opacity: 0.4; cursor: default; }
+.tt-today { padding: 0 12px; font-size: 13px; font-weight: 600; }
+.tt-icon:not(:disabled):hover, .tt-today:hover { color: var(--accent); }
+
+.tt-hint { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--accent-soft); color: var(--fg-2); font-size: 14px; }
+.tt-hint .icon { margin-top: 2px; color: var(--accent); }
+
+/* ---------- week grid ---------- */
+
+.tt-week { padding: 14px 14px 12px 8px; overflow-x: auto; }
+.tt-grid { display: grid; grid-template-columns: 48px repeat(var(--cols), minmax(118px, 1fr)); }
+.tt-gh { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 2px 0 12px; color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.tt-gh b { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 4px; border-radius: 10px; color: var(--fg); font: 800 20px/1 var(--display); font-stretch: 80%; letter-spacing: 0; }
+.tt-gh.today { color: var(--accent); }
+.tt-gh.today b { background: var(--accent); color: var(--accent-ink); }
+
+.tt-axis { position: relative; }
+.tt-axis span { position: absolute; right: 8px; color: var(--faint); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; transform: translateY(-50%); }
+.tt-col { position: relative; border-left: 1px solid var(--line); }
+.tt-col.today { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+.tt-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--line); }
+
+.tt-block {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--fac) 12%, var(--surface));
+  color: var(--fg);
+  font-size: 12px;
+  line-height: 1.25;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.tt-block.t-pred { background: color-mix(in srgb, var(--fac) 22%, var(--surface)); }
+a.tt-block:hover { z-index: 1; box-shadow: var(--shadow-raised); transform: translateY(-1px); }
+.tt-time { color: var(--fg-2); font-weight: 800; font-variant-numeric: tabular-nums; }
+.tt-name { display: -webkit-box; overflow: hidden; font-size: 13px; font-weight: 600; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.tt-code { color: color-mix(in srgb, var(--fac) 80%, var(--fg)); font-weight: 800; }
+.tt-meta { overflow: hidden; color: var(--muted); font-size: 11.5px; white-space: nowrap; text-overflow: ellipsis; }
+.tt-block.short .tt-name { -webkit-line-clamp: 1; }
+
+/* Phone: the week as a list per day (shown below 900px) */
+.tt-list { display: none; flex-direction: column; gap: 12px; }
+.tt-day { padding: 14px 16px 6px; }
+.tt-day-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.tt-day-head b { font: 800 30px/1 var(--display); font-stretch: 80%; }
+.tt-day-head span { color: var(--muted); font-size: 13.5px; font-weight: 600; }
+.tt-day-head span::first-letter { text-transform: uppercase; }
+.tt-day.today .tt-day-head b { color: var(--accent); }
+.tt-item { display: flex; gap: 14px; padding: 10px 0; border-top: 1px solid var(--line); }
+.tt-item-time { display: flex; flex-direction: column; flex: none; width: 46px; font-variant-numeric: tabular-nums; }
+.tt-item-time b { font-size: 15px; }
+.tt-item-time small, .tt-item-body small { color: var(--muted); font-size: 12.5px; }
+.tt-item-body { display: flex; flex-direction: column; min-width: 0; }
+.tt-item-body strong { font-size: 14.5px; font-weight: 700; }
+
+/* ---------- courses in this timetable ---------- */
+
+.tt-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.tt-course { display: flex; flex-direction: column; gap: 8px; }
+.tt-course-top { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.tt-course-code { color: color-mix(in srgb, var(--fac) 85%, var(--fg)); font-weight: 800; letter-spacing: 0.02em; }
+.tt-course-num { color: var(--muted); font-weight: 600; }
+.tt-course-name { font: 700 19px/1.15 var(--display); letter-spacing: -0.01em; }
+a.tt-course-name:hover { color: var(--accent); }
+.tt-facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 4px 0 0; font-size: 13.5px; }
+.tt-facts dt { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.tt-facts dd { margin: 0; color: var(--fg-2); }
+.tt-facts a { color: var(--accent); }
+.tt-facts a:hover { text-decoration: underline; }
+.tt-options-hint { margin-top: -6px; font-size: 13.5px; }
+
+/* ---------- rail ---------- */
+
+.tt-rail .card-head { margin-bottom: 8px; }
+.tt-rail-empty, .tt-changed { font-size: 13px; line-height: 1.5; }
+
+.tt-next { display: flex; flex-direction: column; gap: 4px; }
+.tt-next-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 14px; }
+a.tt-next-row:hover { background: var(--hover); }
+.tt-next-row.first { background: var(--fg); color: var(--surface); }
+a.tt-next-row.first:hover { background: var(--fg); filter: brightness(1.15); }
+.tt-next-day { display: flex; flex-direction: column; align-items: center; flex: none; width: 32px; }
+.tt-next-day b { font: 800 26px/1 var(--display); font-stretch: 80%; }
+.tt-next-day small { margin-top: 2px; color: var(--faint); font-size: 10.5px; font-weight: 700; text-transform: uppercase; }
+.tt-next-sep { flex: none; align-self: stretch; width: 1px; background: var(--line); }
+.tt-next-body { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.tt-next-body strong { overflow: hidden; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; }
+.tt-next-body small { overflow: hidden; color: var(--muted); font-size: 12.5px; white-space: nowrap; text-overflow: ellipsis; }
+.tt-next-time { flex: none; color: var(--fg-2); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tt-next-row.first .tt-next-sep { background: color-mix(in srgb, currentColor 25%, transparent); }
+.tt-next-row.first small, .tt-next-row.first .tt-next-time { color: color-mix(in srgb, currentColor 70%, transparent); }
+.tt-next-row.first .tt-next-time { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  .tt-next-row.first, a.tt-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
+}
+
+.tt-chart .card-head { margin-bottom: 4px; }
+.tt-chart-total { color: var(--fg); font-size: 13px; font-weight: 700; }
+.tt-bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; height: 130px; margin-top: 10px; }
+.tt-bar-col { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 0; }
+.tt-bar-col small { color: var(--muted); font-size: 11px; font-weight: 700; text-align: center; }
+.tt-bar { display: block; border-radius: 6px; background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.tt-bar.zero { background: var(--chip); }
+.tt-bar-col.today .tt-bar { background: var(--accent); }
+.tt-bar-col.today small { color: var(--accent); }
+.tt-bar-labels { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin-top: 8px; color: var(--faint); font-size: 11.5px; font-weight: 700; text-align: center; }
+.tt-bar-labels .today { color: var(--accent); }
+
+/* ---------- narrower screens ---------- */
+
+@media (max-width: 1100px) {
+  :host .content { grid-template-columns: minmax(0, 1fr); }
+  .tt-rail { grid-column: 1; grid-row: 3; padding: 24px 32px 48px; border-top: 1px solid var(--line); border-left: 0; }
+  :host .content > slot { padding-bottom: 24px; }
+  .tt-action { justify-content: center; width: 42px; padding: 0; }
+  .tt-action span:not(.icon) { display: none; }
+}
+@media (max-width: 900px) {
+  .tt-main, .tt-rail { padding: 16px; }
+  .tt-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :host .content > slot { padding: 0 16px 16px; }
+  .tt-week { display: none; }
+  .tt-list { display: flex; }
+  .tt-nav-label { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tt-block { transition: none; }
+}
+
+/* ---------- the original display-mode form, slotted into the page (light DOM) ---------- */
+/* Hiding the rest and the card look come from keepOnly() + generic.css; only the colour scheme is page-specific. */
+html.ipx-takeover.ipx-tt #str1 [data-ipx-keep="node"] { color-scheme: light dark; }

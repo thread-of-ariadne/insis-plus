@@ -1,0 +1,54 @@
+/* InSIS+ course catalogue, on top of generic.css (tokens, tabs, form controls, tables come from there).
+   Injected into the page and scoped to html.ipx-cat. */
+
+/* The search form as a card */
+html.ipx-cat #str1 form {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--fg-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+html.ipx-cat #str1 input.uisSearchInput { width: min(560px, 100%); height: 46px; margin: 8px 6px 8px 0; font-size: 16px; }
+html.ipx-cat #str1 input.uisSearchButton { height: 46px; padding: 0 24px; font-size: 15px; }
+
+/* Results: one row per course, a mini cover, semesters as a segmented strip */
+html.ipx-cat .ipx-results { display: grid; gap: 8px; margin: 18px 0 20px; font-weight: 400; }
+html.ipx-cat .ipx-count { margin: 0 0 4px; color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+html.ipx-cat .ipx-course {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 1px 0 rgba(16, 19, 31, 0.06);
+  transition: box-shadow 0.2s;
+}
+html.ipx-cat .ipx-course:hover { box-shadow: var(--shadow-card); }
+html.ipx-cat #str1 .ipx-main { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; min-width: 0; color: var(--fg); text-decoration: none; }
+html.ipx-cat .ipx-main .cover { display: block; flex: none; overflow: hidden; border-radius: 9px; line-height: 0; }
+html.ipx-cat .ipx-code { font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; }
+html.ipx-cat .ipx-name { font-size: 15px; font-weight: 700; }
+html.ipx-cat .ipx-main:hover .ipx-name { color: var(--accent); }
+html.ipx-cat .ipx-fac { color: var(--muted); font-size: 13px; }
+html.ipx-cat .ipx-sems { display: flex; flex-wrap: wrap; margin-left: auto; padding: 3px; border-radius: 10px; background: var(--chip); }
+html.ipx-cat #str1 .ipx-sem {
+  padding: 4px 10px;
+  border-radius: 7px;
+  color: var(--fg-2);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+html.ipx-cat #str1 .ipx-sem:hover { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-raised); }
+
+/* Filters */
+html.ipx-cat .ipx-filters { margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: var(--chip); font-weight: 400; }
+html.ipx-cat .ipx-filters summary { color: var(--fg); font-weight: 700; cursor: pointer; }
+html.ipx-cat .ipx-filters[open] summary { margin-bottom: 10px; }
+html.ipx-cat .ipx-filters td { color: var(--fg-2); }

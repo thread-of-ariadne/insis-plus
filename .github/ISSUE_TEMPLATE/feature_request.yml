@@ -1,0 +1,20 @@
+name: Feature or improvement
+description: Suggest something that would make InSIS easier to use.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is hard today?
+      description: Describe the task you're trying to do in InSIS and where it gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: Sketches and references from other apps are welcome.
+  - type: input
+    id: pages
+    attributes:
+      label: InSIS pages involved
