@@ -1,5 +1,5 @@
 {
-  "_comment": "Every InSIS page type -> its node in 02-redesign.md (draft 17). node: where it lives; also: where it is linked from or shown; variants: parameter-specific nodes, keyed as follows — 'name=value' is a literal InSIS value, a bare 'name' means that parameter is present, 'predmet=mine' means the course is one of mine, 'no predmet' / 'no zalozka' mean the parameter is absent. form: an action form seen in the crawl, kept on its own InSIS page; action: link (performed through InSIS's own links) | unverified (expected but not offered when crawled). read: background | on-open (only when the student opens it or a page that shows it) | never; fetch / links: parameter-name sets InSIS+ may read / link with ('' = no parameters), not counting transient_params; values: pinned values; verify: parameter sets never seen, so no link and no read until verified; verify_data: links allowed, but the named data or side-effect claim is unconfirmed, so the feature using it stays off; link: shell | insis-only. structure and nodes: en/cs labels, the single source. external: links outside InSIS. Checked by scripts/ia_check.py.",
+  "_comment": "Every InSIS page type -> its node in 02-redesign.md (draft 18). node: where it lives; also: where it is linked from or shown; variants: parameter-specific nodes, keyed as follows — 'name=value' is a literal InSIS value, a bare 'name' means that parameter is present, 'predmet=mine' means the course is one of mine, 'no predmet' / 'no zalozka' mean the parameter is absent. form: an action form seen in the crawl, kept on its own InSIS page; action: link (performed through InSIS's own links) | unverified (expected but not offered when crawled). read: background | on-open (only when the student opens it or a page that shows it) | never; fetch / links: parameter-name sets InSIS+ may read / link with ('' = no parameters), not counting transient_params; values: pinned values; verify: parameter sets never seen, so no link and no read until verified; verify_data: links allowed, but the named data or side-effect claim is unconfirmed, so the feature using it stays off; link: shell | insis-only. structure and nodes: en/cs labels, the single source. external: links outside InSIS. Checked by scripts/ia_check.py.",
   "structure": {
     "_comment": "Destinations, groups and blocks with their labels (single source with nodes).",
     "destinations": {
@@ -116,6 +116,22 @@
       "notices": [
         "InSIS notices",
         "Oznámení InSIS"
+      ],
+      "week": [
+        "This week",
+        "Tento týden"
+      ],
+      "timetable": [
+        "Timetable",
+        "Rozvrh"
+      ],
+      "newfiles": [
+        "New materials",
+        "Nové materiály"
+      ],
+      "hours": [
+        "Teaching this week",
+        "Výuka tento týden"
       ]
     },
     "short": {
@@ -217,8 +233,8 @@
       "cs": "Anketa"
     },
     "courses.files": {
-      "en": "All course files",
-      "cs": "Všechny materiály"
+      "en": "Materials",
+      "cs": "Materiály"
     },
     "schedule.week": {
       "en": "My week",
@@ -643,9 +659,10 @@
     "/auth/dok_server/": {
       "node": "courses.files",
       "also": [
-        "course.files"
+        "course.files",
+        "home"
       ],
-      "read": "on-open",
+      "read": "background",
       "link": "shell",
       "fetch": [
         ""
@@ -653,7 +670,7 @@
       "links": [
         ""
       ],
-      "verify_data": "course-folder links matched to my courses"
+      "note": "document server tree: per-course new-file counts and folder links; the crawl opened it and InSIS's new-documents counter stayed unchanged"
     },
     "/auth/dok_server/moje_dok.pl": {
       "node": "courses.files",
@@ -1002,7 +1019,8 @@
       "form": true,
       "also": [
         "course.overview",
-        "home"
+        "home",
+        "schedule.week"
       ],
       "read": "background",
       "link": "shell",
