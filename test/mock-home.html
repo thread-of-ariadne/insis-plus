@@ -1,0 +1,96 @@
+<!doctype html>
+<!-- Rough copy of the InSIS main page (from a screenshot) to test InSIS+ without logging in.
+     Open the file directly in a browser; the shim below stands in for the extension APIs. -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>InSIS - Personal administration</title>
+<style>
+  body { font: 11px Verdana, sans-serif; margin: 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .box { border: 1px solid #ccc; }
+  .head { background: #999; color: #fff; font-weight: bold; padding: 6px; }
+  .notice { display: inline-block; border: 1px solid #c90; padding: 20px; margin: 8px 8px 8px 0; background: #ffe; }
+</style>
+<script>
+  window.chrome = {
+    runtime: { getURL: (p) => '../' + p },
+    storage: { local: {
+      get: async (k) => { try { return { [k]: JSON.parse(localStorage.getItem(k)) || undefined }; } catch { return {}; } },
+      set: async (o) => { try { for (const k in o) localStorage.setItem(k, JSON.stringify(o[k])); } catch {} },
+    } },
+  };
+</script>
+</head>
+<body>
+<table width="100%"><tr>
+  <td><a href="auth/"><img alt="VŠE" width="80" height="80"></a></td>
+  <td><div style="font-size:20px;color:#2a5aa8">Integrated Study Information System</div>Oct 23, 2026 7:13 p.m.</td>
+  <td align="right"><a href="?lang=cz">ČESKY</a> <a href="?lang=sk">SLOVENSKY</a></td>
+</tr></table>
+<table width="100%" style="background:#e6f6fb"><tr>
+  <td><b>Logged in:</b> Jana Nováková</td>
+  <td><a href="https://outlook.office.com">Office365</a></td>
+  <td><a href="auth/dok_server/">10 documents</a></td>
+  <td><a href="auth/ukoly/">0 tasks</a></td>
+</tr></table>
+<div style="background:#eee;padding:10px"><a href="auth/"><img alt="Home"></a> » Personal administration <a href="help/"><img alt="Help"></a></div>
+<div>
+  <div class="notice"><img alt="!"> :: <a href="auth/news.pl">Change of distribution server</a></div>
+  <div class="notice"><img alt="i"> <a href="auth/app.pl">My College mobile app. Just. Study. Anywhere.</a></div>
+</div>
+<div class="grid">
+  <div class="box"><div class="head">Public information portal</div><ul>
+    <li><a href="katalog/plany.pl">Study plans</a></li><li><a href="katalog/rozvrhy_view.pl">Timetables</a></li>
+    <li><a href="lide/">Persons at VŠE</a></li><li><a href="lide/pracoviste.pl">Departments</a></li>
+    <li><a href="katalog/hledani.pl">Thematic search</a></li></ul></div>
+  <div class="box"><div class="head">My College</div><ul>
+    <li><a href="auth/student/">Student's portal</a></li><li><a href="auth/hodnoceni/">Course Attainment Evaluation</a></li>
+    <li><a href="auth/hodnoceni/anketa.pl">Course evaluation by students</a></li><li><a href="auth/prihlaska/">Study application form</a></li>
+    <li><a href="auth/statistiky/">Student enrollment statistics</a></li></ul></div>
+  <div class="box"><div class="head">eLearning</div><ul>
+    <li><a href="auth/elis/testy/">Tests and examinations</a></li><li><a href="auth/elis/ena/">Electronic study materials</a></li></ul></div>
+  <div class="box"><div class="head">Science and research</div><ul>
+    <li><a href="auth/vv/">Matching of publications</a></li><li><a href="auth/vv/bio.pl">Biographical information</a></li>
+    <li><a href="auth/vv/cv.pl">Creation of CVs</a></li></ul></div>
+  <div class="box"><div class="head">Personal management</div><ul>
+    <li><a href="auth/dok_server/">Document server</a></li><li><a href="auth/posta/">Mail box</a></li>
+    <li><a href="auth/news/">Sign up for news</a></li><li><a href="auth/uloziste/">Document storage</a></li>
+    <li><a href="auth/diskuze/">Discussion platforms</a></li></ul></div>
+  <div class="box"><div class="head">eAgenda</div><ul>
+    <li><a href="auth/kontakt/">Contact centre</a></li><li><a href="auth/eankety/">eSurveys</a></li>
+    <li><a href="auth/volby/">My Elections</a></li><li><a href="auth/tisky/">Register of printouts</a></li>
+    <li><a href="auth/overeni/">Electronic document verification</a></li></ul></div>
+  <div class="box"><div class="head">Technology and its administration</div><ul>
+    <li><a href="auth/acs/">Access control system</a></li><li><a href="auth/ucty/">Accounts administration section</a></li>
+    <li><a href="auth/email/">University e-mail delivery</a></li><li><a href="auth/karty/">Identification cards in use</a></li></ul></div>
+  <div class="box"><div class="head">InSIS documentation</div><ul>
+    <li><a href="auth/dok/">InSIS documentation</a></li><li><a href="auth/dok/integ.pl">System integrators</a></li>
+    <li><a href="auth/dok/lic.pl">Licence information</a></li><li><a href="auth/dok/stat.pl">Statistics of using InSIS</a></li>
+    <li><a href="auth/dok/op.pl">My operations</a></li></ul></div>
+  <div class="box"><div class="head">Game room</div><ul>
+    <li><a href="auth/hry/stone.pl">Stone Eater</a></li><li><a href="auth/hry/cat.pl">Caterpillar</a></li>
+    <li><a href="auth/hry/">List of games and statistics</a></li><li><a href="auth/hry/iq.pl">IQ Solitaire</a></li></ul></div>
+  <div class="box"><div class="head">Adjustment of the information system</div><ul>
+    <li><a href="auth/nastaveni/">User settings</a></li><li><a href="auth/portlety/">Portlets in InSIS</a></li>
+    <li><a href="auth/foto/">Change photo</a></li><li><a href="auth/menu/">Administration of My favourites menu</a></li>
+    <li><a href="auth/o365/">Configure transfer of events to Office 365</a></li></ul></div>
+  <div class="box"><div class="head">Information system set-up</div><ul>
+    <li><a href="auth/otp/">Setting of authentication using one-time passwords (OTP)</a></li><li><a href="auth/eid/">Link your account to eID</a></li>
+    <li><a href="auth/dok/op.pl">My operations</a></li><li><a href="auth/identita/">Change identity</a></li>
+    <li><a href="auth/delegati/">Delegates set-up</a></li></ul></div>
+  <div class="box"><div class="head">Protection of personal data</div><ul>
+    <li><a href="auth/gdpr/">Personal data check</a></li><li><a href="auth/gdpr/schval.pl">Approvals by user</a></li>
+    <li><a href="auth/gdpr/stat.pl">Personal data check statistics</a></li></ul></div>
+  <div class="box"><div class="head">My College mobile app 2</div><ul>
+    <li><a href="auth/app/">About app</a></li><li><a href="auth/app/devices.pl">Administration of paired devices</a></li>
+    <li><a href="https://play.google.com">Google Play</a></li><li><a href="auth/app/faq.pl">Frequently asked questions</a></li>
+    <li><a href="https://apps.apple.com">App Store</a></li></ul></div>
+</div>
+<div style="border:1px solid #ccc;padding:6px;margin-top:10px;width:500px"><i>In Integrated Study Information System 2,455,262,673 operations in total have been carried out since July 23rd 2007.</i></div>
+<script src="../content.js"></script>
+<script src="../ui.js"></script>
+<script src="../home.js"></script>
+<script src="../generic.js"></script>
+</body>
+</html>

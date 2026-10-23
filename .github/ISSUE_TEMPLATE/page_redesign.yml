@@ -1,0 +1,38 @@
+name: Page redesign
+description: Claim or propose a redesign of one InSIS page (see docs/pages.md).
+labels: [page]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: Name and address, as listed in docs/pages.md.
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Tier in docs/pages.md
+      options: ["1 — special care", "2 — light", "3 — generic only (proposing an upgrade)", "Not listed"]
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      description: Pages with forms or actions must keep InSIS's original form (docs/agents.md).
+      options: ["Rebuild from parsed data", "Keep the original form, restyled", "Both"]
+  - type: textarea
+    id: plan
+    attributes:
+      label: What the new page shows
+      description: Layout, components from ipx.ui you plan to use, anything new you'd need in shared files.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Checks
+      options:
+        - label: I will only add pages/<page>.js and pages/<page>.css, and ask for shared changes in the PR.
+          required: true
+        - label: I won't commit snapshots of logged-in pages or post personal data.
+          required: true

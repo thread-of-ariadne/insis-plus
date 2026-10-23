@@ -1,0 +1,165 @@
+/* InSIS+ e-study record and course attainment picker (pages/study-record.js). Loaded inside the shadow root
+   (classes prefixed sr-) and, when part of the original stays, into the page itself (rules under html.ipx-sr). */
+
+/* ---------- layout: main column + rail; unrecognised original content slotted under the main column ---------- */
+
+:host .content:has(> .sr) { display: grid; grid-template-columns: minmax(0, 1fr) 360px; padding: 0; }
+.sr { display: contents; }
+.sr-main { display: flex; flex-direction: column; gap: 16px; grid-column: 1; grid-row: 1; min-width: 0; padding: 24px 32px 48px; }
+.sr.has-slot .sr-main { padding-bottom: 12px; }
+.sr-rail { display: flex; flex-direction: column; gap: 22px; grid-column: 2; grid-row: 1 / span 2; min-width: 0; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
+:host .content:has(> .sr) > slot { display: block; grid-column: 1; grid-row: 2; min-width: 0; padding: 0 32px 48px; }
+
+.sr-main .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1320px) { .sr-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Views of the record (original links) */
+.link-tabs { gap: 4px 18px; margin-top: 4px; }
+.link-tabs .tab { font-size: 14px; }
+
+.sr-sem-meta { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; font-weight: 600; }
+
+/* ---------- course rows ---------- */
+
+.sr-list { display: flex; flex-direction: column; margin: 0; padding: 4px 18px; list-style: none; }
+.sr-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(180px, 0.8fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.sr-row:first-child { border-top: 0; }
+
+.sr-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--chip);
+  color: var(--muted);
+  font: 800 22px/1 var(--display);
+  font-stretch: 80%;
+}
+.t-ok .sr-badge { background: var(--ok-soft); color: var(--ok); }
+.t-bad .sr-badge { background: var(--bad-soft); color: var(--bad); }
+.t-warn .sr-badge { background: var(--warn-soft); color: var(--warn); }
+
+.sr-course { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sr-code { color: color-mix(in srgb, var(--fac) 85%, var(--fg)); font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.sr-name { font: 700 18px/1.2 var(--display); letter-spacing: -0.01em; }
+a.sr-name:hover { color: var(--accent); }
+.sr-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.sr-tags .tag { font-size: 11.5px; }
+.sr-tags .tag.raw::first-letter { text-transform: none; }
+
+.sr-result { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+.sr-result-text { color: var(--fg-2); font-size: 14px; font-weight: 600; }
+.sr-result-text.muted-text { color: var(--faint); font-weight: 500; }
+.sr-meta { color: var(--muted); font-size: 12.5px; }
+.sr-meta a { color: var(--accent); }
+.sr-meta a:hover { text-decoration: underline; }
+
+.sr-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 64px; text-align: right; }
+.sr-credits { font: 800 24px/1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.sr-credits small { margin-left: 3px; color: var(--faint); font: 700 12px var(--font); }
+.sr-ects {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--chip);
+  color: var(--fg-2);
+  font-size: 12px;
+  font-weight: 800;
+}
+.sr-attempt { color: var(--muted); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+a.sr-attempt { color: var(--accent); }
+a.sr-attempt:hover { text-decoration: underline; }
+
+/* ---------- rail ---------- */
+
+.sr-rail .card-head { margin-bottom: 8px; }
+.sr-study p { margin: 0; }
+.sr-study-name { font-size: 14.5px; font-weight: 700; }
+.sr-study .muted { margin-top: 2px; font-size: 13px; }
+
+.sr-big { font: 800 40px/1 var(--display); font-stretch: 80%; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.sr-big small { color: var(--faint); font-size: 20px; font-weight: 700; }
+.sr-bar { height: 8px; margin-top: 12px; overflow: hidden; border-radius: 6px; background: var(--chip); }
+.sr-bar span { display: block; height: 100%; border-radius: 6px; background: var(--ok); }
+.sr-mini { display: flex; gap: 20px; margin: 12px 0 0; font-size: 13px; }
+.sr-mini dt { color: var(--muted); font-weight: 600; }
+.sr-mini dd { margin: 0; font-weight: 800; font-size: 15px; }
+.sr-mini dd.bad { color: var(--bad); }
+
+.sr-dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; margin: 0; font-size: 13px; }
+.sr-dl dt, .sr-dl dd { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.sr-dl dt { color: var(--fg-2); line-height: 1.35; }
+.sr-dl dd { margin: 0; color: var(--fg); font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.sr-dl dt:nth-last-child(2), .sr-dl dd:last-child { border-bottom: 0; }
+
+.sr-stats .card-sub { margin: 0 0 6px; }
+.sr-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin: 0; }
+.sr-grid > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.sr-grid dt { color: var(--fg-2); font-size: 13.5px; line-height: 1.35; }
+.sr-grid dd { flex: none; margin: 0; font: 800 18px/1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+@media (max-width: 1320px) { .sr-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.sr-key summary { color: var(--fg); font-size: 15.5px; font-weight: 700; cursor: pointer; }
+.sr-key summary::marker { color: var(--faint); }
+.sr-key .sr-dl { grid-template-columns: auto minmax(0, 1fr); margin-top: 8px; }
+.sr-key .sr-dl dd { font-weight: 500; text-align: left; color: var(--fg-2); }
+
+.sr-links { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.sr-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.sr-links li:last-child .sr-link, .sr-unit-list li:last-child .sr-link { border-bottom: 0; }
+.sr-link .icon { color: var(--faint); }
+.sr-link .icon svg { width: 15px; height: 15px; }
+.sr-link:hover { color: var(--accent); }
+.sr-link:hover .icon { color: var(--accent); }
+
+/* ---------- course attainment: faculty picker ---------- */
+
+.sr-attain { display: flex; flex-direction: column; gap: 16px; max-width: 1100px; }
+.sr-attain-hint { font-size: 14px; }
+.sr-units { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.sr-unit { display: flex; flex-direction: column; gap: 12px; padding: 10px; }
+.sr-unit .cover { width: 100%; }
+.sr-unit .cover svg { width: 100%; height: 64px; }
+.sr-unit-body { display: flex; flex-direction: column; gap: 4px; padding: 0 6px 6px; }
+.sr-unit-code { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.sr-unit strong { font: 700 17px/1.2 var(--display); letter-spacing: -0.01em; }
+.sr-unit:hover strong { color: var(--accent); }
+.sr-unit.mine { box-shadow: var(--shadow-card), 0 0 0 2px var(--accent-soft); }
+.sr-unit-list { margin: 0; padding: 4px 18px; list-style: none; }
+
+/* ---------- narrower screens ---------- */
+
+@media (max-width: 1100px) {
+  :host .content:has(> .sr) { grid-template-columns: minmax(0, 1fr); }
+  .sr-rail { grid-column: 1; grid-row: 3; padding: 24px 32px 48px; border-top: 1px solid var(--line); border-left: 0; }
+  .sr-row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .sr-result { grid-column: 2; grid-row: 2; }
+  .sr-side { grid-column: 3; grid-row: 1 / span 2; }
+}
+@media (max-width: 900px) {
+  .sr-main, .sr-rail { padding: 16px; }
+  :host .content:has(> .sr) > slot { padding: 0 16px 16px; }
+  .sr-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .link-tabs { margin: 0 -16px; padding: 0 16px 4px; }
+  .sr-list { padding: 2px 14px; }
+  .sr-row { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 6px 12px; }
+  .sr-badge { width: 40px; height: 40px; font-size: 20px; }
+  .sr-name { font-size: 16.5px; }
+  .sr-side { grid-row: 1; align-self: start; }
+  .sr-result { grid-column: 2 / span 2; flex-flow: row wrap; align-items: center; gap: 2px 8px; }
+  .sr-meta { flex-basis: 100%; }
+}
+
+/* ---------- original content that stays (light DOM, only when a view has unrecognised parts) ---------- */
+

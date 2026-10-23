@@ -1,0 +1,84 @@
+/* InSIS+ Student's portal. Layout follows the dashboard (main column + rail); tokens and components in shared.css. */
+
+.content { padding: 0; }
+.sp { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 100%; }
+.sp-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px 32px 48px; }
+.rail { display: flex; flex-direction: column; gap: 22px; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
+.rail .card-head { margin-bottom: 8px; }
+.rail-empty { font-size: 13.5px; line-height: 1.5; }
+
+.sp-title { margin-top: 10px; }
+
+/* The study */
+.sp-study { display: flex; align-items: center; gap: 16px; padding: 16px 18px; }
+.sp-badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fac) 14%, var(--surface));
+  color: var(--fac);
+  font: 800 15px var(--display);
+  font-stretch: 85%;
+}
+.sp-study-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.sp-study-text strong { font: 700 20px/1.2 var(--display); letter-spacing: -0.01em; }
+.sp-study-text small { color: var(--muted); font-size: 13px; }
+.sp-study-side { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.sp-study-side .delta::first-letter { text-transform: uppercase; }
+
+/* Main actions */
+.sp-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sp-action { display: flex; align-items: center; gap: 14px; padding: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+.sp-action:hover { transform: translateY(-1px); }
+.sp-action-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.sp-action-icon .icon svg { width: 21px; height: 21px; stroke-width: 1.8; }
+.sp-action-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.sp-action-text strong { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.sp-action-text strong::first-letter { text-transform: uppercase; }
+.sp-action-text small { margin-top: 2px; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.sp-go { color: var(--faint); opacity: 0; transform: translateX(-4px); transition: opacity 0.15s, transform 0.15s; }
+.sp-action:hover .sp-go { opacity: 1; transform: none; color: var(--accent); }
+
+/* Everything else */
+.sp-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.sp-group .card-sub { margin-top: -8px; }
+.sp-tiles { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+.sp-tile { display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin: 0 -8px; border-radius: 10px; font-size: 14px; font-weight: 500; }
+.sp-tile:hover { background: var(--hover); }
+.sp-tile .tile-icon { width: 30px; height: 30px; border-radius: 9px; }
+.sp-tile .tile-icon svg { width: 16px; height: 16px; }
+.sp-tile span:last-child::first-letter { text-transform: uppercase; }
+
+.sp-others { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sp-others li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.sp-others li span:nth-child(2) { flex: 1; min-width: 0; }
+
+.sp-contacts { display: flex; flex-direction: column; gap: 2px; }
+
+@media (max-width: 1250px) {
+  .sp-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1100px) {
+  .sp { grid-template-columns: minmax(0, 1fr); }
+  .rail { border-left: 0; border-top: 1px solid var(--line); padding: 24px 32px 48px; }
+}
+@media (max-width: 900px) {
+  .sp-main, .rail { padding: 16px; }
+  .sp-groups { grid-template-columns: minmax(0, 1fr); }
+  .sp-study { flex-wrap: wrap; }
+}
+@media (max-width: 520px) {
+  .sp-actions { grid-template-columns: minmax(0, 1fr); }
+}

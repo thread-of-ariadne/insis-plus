@@ -1,0 +1,159 @@
+/* InSIS+ look for original InSIS content slotted into the shell (generic.js, catalog.js, …).
+   The content stays in the page's own DOM, so this file is injected into the page and scoped to html.ipx-generic.
+   Tokens mirror shared.css; keep them in step. */
+
+html.ipx-generic #str1 {
+  --surface: #ffffff;
+  --fg: #10131f;
+  --fg-2: #3a4052;
+  --muted: #6b7286;
+  --faint: #8a90a2;
+  --line: #eef0f4;
+  --chip: #eef0f5;
+  --stripe: #f8f9fb;
+  --accent: #2f45d1;
+  --accent-ink: #ffffff;
+  --accent-soft: #eceffe;
+  --shadow-card: 0 1px 0 rgba(16, 19, 31, 0.06), 0 12px 28px -20px rgba(16, 19, 31, 0.4);
+  --shadow-raised: 0 1px 2px rgba(20, 40, 120, 0.08), 0 4px 10px -6px rgba(20, 40, 120, 0.3);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  color: var(--fg);
+  color-scheme: light dark;
+  font: 15px/1.5 "Figtree", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  html.ipx-generic #str1 {
+    --surface: #1b1f2a;
+    --fg: #eceef4;
+    --fg-2: #c5c9d6;
+    --muted: #9aa1b2;
+    --faint: #7b8296;
+    --line: #232734;
+    --chip: #262b39;
+    --stripe: #181c26;
+    --accent: #8d9cff;
+    --accent-ink: #0c0e13;
+    --accent-soft: #1f2547;
+    --shadow-card: 0 12px 28px -18px rgba(0, 0, 0, 0.7);
+    --shadow-raised: 0 4px 12px -6px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* The shell's top bar already shows the title and trail */
+html.ipx-generic #str1 nav[aria-label="breadcrumb"],
+html.ipx-generic #str1 #titulek { display: none; }
+
+html.ipx-generic #str1 a { color: var(--accent); text-decoration: none; }
+html.ipx-generic #str1 a:hover { text-decoration: underline; }
+html.ipx-generic #str1 h1, html.ipx-generic #str1 h2, html.ipx-generic #str1 h3 { color: var(--fg); font-family: "Figtree", sans-serif; letter-spacing: -0.01em; }
+html.ipx-generic #str1 h2 { font-size: 19px; }
+html.ipx-generic #str1 h3 { font-size: 16px; }
+html.ipx-generic #str1 .small { color: var(--muted); font-size: 13.5px; }
+html.ipx-generic #str1 hr, html.ipx-generic #str1 hr.uisseparator { height: 1px; margin: 16px 0; border: 0; background: var(--line); }
+html.ipx-generic #str1 b, html.ipx-generic #str1 strong { color: var(--fg); }
+html.ipx-generic #str1 .uf-icon svg { width: 16px; height: 16px; vertical-align: -3px; }
+html.ipx-generic #str1 .uf-icon.xs svg, html.ipx-generic #str1 .uf-icon.xxs svg { width: 14px; height: 14px; }
+
+/* Tab rows (portal_menu) as a segmented control */
+html.ipx-generic #str1 table.portal_menu { margin: 4px 0 20px; padding: 3px; border-collapse: separate; border-spacing: 0; border-radius: 12px; background: var(--chip); box-shadow: none; }
+html.ipx-generic #str1 table.portal_menu td { padding: 0 !important; border: 0 !important; background: none !important; }
+html.ipx-generic #str1 table.portal_menu a {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+html.ipx-generic #str1 table.portal_menu a:hover { color: var(--fg); }
+html.ipx-generic #str1 table.portal_menu b a { background: var(--surface); color: var(--fg); font-weight: 700; box-shadow: var(--shadow-raised); }
+
+/* Data tables: the ones with a header row (zahlavi) become cards; layout tables stay invisible */
+html.ipx-generic #str1 table { border-collapse: collapse; font-size: 14px; }
+html.ipx-generic #str1 td, html.ipx-generic #str1 th { color: var(--fg-2); vertical-align: top; }
+html.ipx-generic #str1 td.odsazena, html.ipx-generic #str1 th { padding: 8px 10px; }
+html.ipx-generic #str1 table:has(.zahlavi) {
+  margin: 8px 0 16px;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+html.ipx-generic #str1 tr.zahlavi > *, html.ipx-generic #str1 th.zahlavi, html.ipx-generic #str1 td.zahlavi {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+}
+html.ipx-generic #str1 table:has(.zahlavi) td { padding: 9px 12px; border-bottom: 1px solid var(--line); }
+/* InSIS stripes rows itself (light grey even in dark mode) and pins header rows above our sticky top bar. */
+html.ipx-generic #str1 table:has(.zahlavi) tr { background: none !important; }
+html.ipx-generic #str1 tr.zahlavi { position: static !important; }
+html.ipx-generic #str1 table:has(.zahlavi) tr:last-child > td { border-bottom: 0; }
+html.ipx-generic #str1 table:has(.zahlavi) tr.sudy > td { background: var(--stripe); }
+html.ipx-generic #str1 table:has(.zahlavi) tbody tr:hover > td { background: var(--accent-soft); }
+
+/* Form controls */
+html.ipx-generic #str1 input[type="text"], html.ipx-generic #str1 input[type="search"],
+html.ipx-generic #str1 input[type="password"], html.ipx-generic #str1 input[type="number"],
+html.ipx-generic #str1 input[type="email"], html.ipx-generic #str1 input[type="date"],
+html.ipx-generic #str1 input:not([type]), html.ipx-generic #str1 select, html.ipx-generic #str1 textarea {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--fg);
+  font: 15px "Figtree", system-ui, sans-serif;
+  outline: none;
+  vertical-align: middle;
+}
+html.ipx-generic #str1 textarea { padding: 10px 12px; }
+html.ipx-generic #str1 input:focus, html.ipx-generic #str1 select:focus, html.ipx-generic #str1 textarea:focus { background: var(--surface); box-shadow: 0 0 0 2px var(--accent); }
+html.ipx-generic #str1 input[type="checkbox"], html.ipx-generic #str1 input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; vertical-align: -3px; }
+html.ipx-generic #str1 input[type="submit"], html.ipx-generic #str1 input[type="button"],
+html.ipx-generic #str1 input[type="reset"], html.ipx-generic #str1 button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 700 14px "Figtree", system-ui, sans-serif;
+  cursor: pointer;
+  vertical-align: middle;
+}
+html.ipx-generic #str1 input[type="reset"] { background: var(--chip); color: var(--fg); }
+html.ipx-generic #str1 input[type="submit"]:hover, html.ipx-generic #str1 input[type="button"]:hover, html.ipx-generic #str1 button:hover { filter: brightness(1.08); }
+
+/* keepOnly() / hideInSlot() in ui.js: show one original node (usually a form) as a card, hide the rest.
+   Only while InSIS+ is on; classic view shows the page untouched. */
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="hide"] { display: none !important; }
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="path"] { font-size: 0 !important; line-height: 0 !important; }
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="node"] {
+  display: block;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: var(--shadow-card);
+}
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="node"] td.odsazena { padding: 6px 4px; }
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="node"] p { margin: 4px 0; }
+
+/* Legends that InSIS toggles with jQuery */
+html.ipx-generic #str1 .uisLegend { margin: 10px 0; padding: 10px 14px; border-radius: 12px; background: var(--chip); color: var(--muted); font-size: 13.5px; }
+html.ipx-generic #str1 .uisLegendTitle a { font-weight: 700; }

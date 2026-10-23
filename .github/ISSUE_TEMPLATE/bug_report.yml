@@ -1,0 +1,53 @@
+name: Bug report
+description: Something looks broken or doesn't work on an InSIS page.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Please don't post personal data**: blur names, study numbers, grades and finances in
+        screenshots, and don't attach saved InSIS pages. Security problems go to SECURITY.md, not here.
+  - type: input
+    id: page
+    attributes:
+      label: InSIS page
+      description: Page title and the part of the address after insis.vse.cz (drop numbers like studium=…).
+      placeholder: "Course syllabus, /auth/katalog/syllabus.pl"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: Does it work in Classic view (bottom of the sidebar)?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open … 2. Click … 3. See …"
+  - type: input
+    id: version
+    attributes:
+      label: InSIS+ version
+      description: Shown on the extension card in chrome://extensions or about:addons.
+      placeholder: "0.4.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options: [Chrome, Edge, Brave, Firefox, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: InSIS language
+      options: [Czech, English, Slovak]
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (personal data blurred)
