@@ -18,8 +18,9 @@ vyhledávání Ctrl+K a čitelné sylaby. Vše běží jen ve vašem prohlíže�
 
 - **Sidebar with the whole InSIS menu**, regrouped by what you want to do (Study, Communication, Documents,
   Account & settings, Other), with a filter, pins and a switch back to InSIS's own grouping.
-- **Dashboard**: new documents and tasks, your courses with generated covers, this week, next classes, submission
-  deadlines, courses with new documents, teaching hours, recently opened pages.
+- **Dashboard**: new documents and tasks, the Student's portal main actions, the courses you are enrolled in, this
+  week, next classes, submission deadlines, courses with new documents, teaching hours, recently opened pages.
+  Filled right after you log in: the pages it needs are read in the background (see [PRIVACY.md](PRIVACY.md)).
 - **Student's portal** around the main actions (exams, course registration, timetable, study record, submissions,
   plan check) instead of unlabelled icons.
 - **Personal timetable** as a week view; **study record** with credits, average and status per course;
@@ -56,7 +57,7 @@ No build step and no dependencies. Load the folder as an unpacked extension, edi
 reload the InSIS tab. To work without logging in:
 
 ```
-python -m http.server 8765
+python test/serve.py
 ```
 
 and open `http://localhost:8765/test/mock-home.html` or a page in `test/fixtures/`.
@@ -72,7 +73,8 @@ and open `http://localhost:8765/test/mock-home.html` or a page in `test/fixtures
 provides shared components (`ipx.ui`). Page modules (`home.js`, `syllabus.js`, `catalog.js`, `pages/*.js`) recognise
 their page by its content and either rebuild it from parsed data or move InSIS's original content into the shell.
 `generic.js` handles every page without a module. Pages are detected by content, not URL, and a module that isn't
-sure does nothing.
+sure does nothing. `sync.js` loads the pages the dashboard needs in a hidden same-origin frame, where the same
+modules only store their data (`ipx.syncOnly`).
 
 ## Roadmap
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "InSIS+",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Faster, friendlier InSIS (insis.vse.cz): a task-based menu, Ctrl+K search, a dashboard and redesigned study pages. Everything stays in your browser.",
   "permissions": [
     "storage"
@@ -22,9 +22,11 @@
         "pages/submissions.js",
         "pages/study-record.js",
         "pages/docserver.js",
-        "generic.js"
+        "generic.js",
+        "sync.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [

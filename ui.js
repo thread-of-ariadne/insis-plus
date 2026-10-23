@@ -9,22 +9,22 @@
     cs: { classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', dashboard: 'Přehled', search: 'Hledat v InSIS…',
       menu: 'Menu', collapse: 'Sbalit panel', expand: 'Rozbalit panel', docs: 'Dokumenty', tasks: 'Úkoly',
       note: 'Neoficiální rozšíření. Data zůstávají ve vašem prohlížeči.', public: 'Veřejné informace',
-      catalogue: 'Katalog předmětů', timetables: 'Rozvrhy', plans: 'Studijní plány', people: 'Osoby na VŠE',
+      catalogue: 'Katalog předmětů', timetables: 'Rozvrhy', myTimetable: 'Můj rozvrh', plans: 'Studijní plány', people: 'Osoby na VŠE',
       study: 'Studium', comms: 'Komunikace', account: 'Účet a nastavení', other: 'Ostatní',
       filter: 'Filtrovat menu…', pin: 'Připnout', unpin: 'Odepnout', found: 'Nalezeno', nothing: 'Nic nenalezeno',
       pinned: 'Připnuté', mainItems: 'Hlavní', more: 'Další služby', originalLabel: 'Členění InSIS',
       originalToggle: 'Původní členění', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
-      inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', tomorrowAt: 'zítra',
+      inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', creditsOf: (a, b) => `${a} z ${b} kreditů`, creditsN: (a) => `${a} kreditů`, nothingDue: 'Nic nečeká na odevzdání', tomorrowAt: 'zítra',
       inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`) },
     en: { classic: 'Classic view', back: 'InSIS+ view', dashboard: 'Dashboard', search: 'Search InSIS…',
       menu: 'Menu', collapse: 'Collapse sidebar', expand: 'Expand sidebar', docs: 'Documents', tasks: 'Tasks',
       note: 'Unofficial extension. Your data stays in your browser.', public: 'Public information',
-      catalogue: 'Course catalogue', timetables: 'Timetables', plans: 'Study plans', people: 'Persons at VŠE',
+      catalogue: 'Course catalogue', timetables: 'Timetables', myTimetable: 'My timetable', plans: 'Study plans', people: 'Persons at VŠE',
       study: 'Study', comms: 'Communication', account: 'Account & settings', other: 'Other',
       filter: 'Filter menu…', pin: 'Pin', unpin: 'Unpin', found: 'Found', nothing: 'Nothing found',
       pinned: 'Pinned', mainItems: 'Main', more: 'More services', originalLabel: 'InSIS grouping',
       originalToggle: 'Original grouping', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
-      inMin: (n) => `in ${n} min`, inHours: (n) => `in ${n} h`, todayAt: 'today', tomorrowAt: 'tomorrow',
+      inMin: (n) => `in ${n} min`, inHours: (n) => `in ${n} h`, todayAt: 'today', creditsOf: (a, b) => `${a} of ${b} credits`, creditsN: (a) => `${a} credits`, nothingDue: 'Nothing due', tomorrowAt: 'tomorrow',
       inDays: (n) => `in ${n} days` },
   }[lang];
 
@@ -39,6 +39,18 @@
     { re: /testy a zkouseni|^testy|tests and exam/, icon: 'check', desc: ['Online testy', 'Online tests'] },
     { re: /osoby na vse|lide na vse|persons at vse/, icon: 'people', desc: ['Lidé a kontakty', 'People and contacts'] },
     { re: /studijni plany|study plans/, icon: 'list', desc: ['Předměty a požadavky', 'Courses and requirements'] },
+  ];
+
+  // What students come to the Student's portal for, in this order. Matched on the link's address (stable) rather
+  // than its label. pages/student-portal.js stores the student's own links in ipx.state.portal.links[id], and the
+  // dashboard and the sidebar use them. name, desc: [cs, en]
+  const PORTAL_ACTIONS = [
+    { id: 'exams', re: /terminy_seznam\.pl/, icon: 'check', name: ['Zkoušky', 'Exams'], desc: ['Termíny a přihlášení', 'Dates and registration'] },
+    { id: 'enrol', re: /\/registrace\.pl/, icon: 'list', name: ['Zápis předmětů', 'Course registration'], desc: ['Zápis a změny po zápisu', 'Enrolment and changes'] },
+    { id: 'timetable', re: /rozvrhy_view\.pl.*rozvrh_student/, icon: 'calendar', name: ['Můj rozvrh', 'My timetable'], desc: ['Vaše hodiny po týdnech', 'Your classes by week'] },
+    { id: 'record', re: /pruchod_studiem\.pl/, icon: 'award', name: ['Výsledky', 'Study record'], desc: ['Známky a kredity', 'Grades and credits'] },
+    { id: 'submissions', re: /odevzdavarny\.pl/, icon: 'file', name: ['Odevzdávárny', 'Submissions'], desc: ['Odevzdání prací', 'Hand-ins and deadlines'] },
+    { id: 'plan', re: /studijni_povinnosti\.pl/, icon: 'layers', name: ['Kontrola plánu', 'Plan check'], desc: ['Co zbývá splnit', 'What is left to do'] },
   ];
 
   const ICONS = {
@@ -187,6 +199,14 @@
       out[TASKS.find((x) => x.re.test(t))?.id || 'other'].push(l);
     }
     main.sort((a, b) => a.i - b.i);
+    // The menu's "Timetables" is the public search. Once the portal gave us the student's own timetable, Main
+    // links to that, and the public search moves to Study.
+    const mine = ipx.state.portal?.links?.timetable;
+    const pub = main.findIndex((l) => l.icon === 'calendar');
+    if (mine && pub >= 0) {
+      out.study.unshift(main[pub]);
+      main[pub] = { href: mine.href, text: T.myTimetable, icon: 'calendar', i: main[pub].i };
+    }
     // TASKS is ordered for matching (most specific first); show groups in order of how often students need them.
     const shown = ['study', 'comms', 'docs', 'account'].map((id) => TASKS.find((x) => x.id === id));
     return { main, groups: [...shown.map((x) => ({ id: x.id, title: T[x.id], icon: x.icon, links: out[x.id] })),
@@ -211,6 +231,7 @@
       pinListeners.forEach((fn) => fn());
     };
 
+    ipx.onData?.(() => render());
     const item = (l, ic) => h('div', { class: 'nav-row' + (ic ? ' has-icon' : '') },
       anchor(l, { class: 'nav-item' + (samePage(l.href) ? ' active' : ''), title: l.text },
         ic && icon(ic), h('span', { class: 'label' }, l.text)),
@@ -335,6 +356,8 @@
   // Replaces the original page with the InSIS+ shell rendered in a closed shadow root.
   // `slotted` nodes stay in the light DOM (so InSIS's own scripts and forms keep working) and show in the content area.
   function takeover({ key, css, active, title, subtitle, extra, build, slotted }) {
+    // In the hidden background-sync frame, modules only store their data.
+    if (ipx.syncOnly) return null;
     if (!document.getElementById('insis-plus-takeover-style')) {
       const style = h('style', { id: 'insis-plus-takeover-style' });
       style.textContent = `
@@ -632,6 +655,48 @@
     }));
   }
 
+  // ---------- the portal's main actions ----------
+
+  // One live line per action when the data is there: the next class, credits, the nearest deadline.
+  function actionInfo(id, now = new Date()) {
+    const s = ipx.state;
+    if (id === 'timetable' && s.timetable) {
+      const e = (s.timetable.events || []).filter((x) => x.date && at(x.date, x.end) > now)
+        .sort((a, b) => at(a.date, a.start) - at(b.date, b.start))[0];
+      if (e) {
+        const start = at(e.date, e.start);
+        return { text: `${start <= now ? T.now : countdown(start, now)} · ${e.code || e.name}` };
+      }
+    }
+    if (id === 'record' && s.studyRecord?.credits?.earned != null) {
+      const c = s.studyRecord.credits;
+      return { text: c.registered != null ? T.creditsOf(c.earned, c.registered) : T.creditsN(c.earned) };
+    }
+    if (id === 'submissions' && s.submissions) {
+      const b = (s.submissions.boxes || []).map((x) => ({ ...x, at: x.closes && new Date(x.closes), from: x.opens && new Date(x.opens) }))
+        .filter((x) => x.at && x.at > now && (!x.from || x.from <= now) && x.submitted !== true)
+        .sort((a, c) => a.at - c.at)[0];
+      return b ? { text: `${countdown(b.at, now)} · ${b.code || b.title}`, tone: deadlineTone(b.at, false, now) } : { text: T.nothingDue };
+    }
+    return null;
+  }
+
+  // The Student's portal main actions as labelled cards (dashboard and portal). `links` maps PORTAL_ACTIONS ids to
+  // the student's own links (ipx.state.portal.links); actions without a link are left out.
+  function quickActions(links) {
+    const i = lang === 'cs' ? 0 : 1;
+    const cards = PORTAL_ACTIONS.filter((a) => links?.[a.id]).map((a) => {
+      const info = actionInfo(a.id);
+      return anchor(links[a.id], { class: 'card qa', title: links[a.id].text || a.name[i] },
+        h('span', { class: 'qa-icon' }, icon(a.icon)),
+        h('span', { class: 'qa-text' },
+          h('strong', {}, a.name[i]),
+          h('small', { class: info?.tone ? `qa-info ${info.tone}` : null }, info?.text || a.desc[i])),
+        h('span', { class: 'qa-go' }, icon('arrow')));
+    });
+    return cards.length ? h('div', { class: 'qa-grid' }, cards) : null;
+  }
+
   // ---------- keeping part of the original page ----------
 
   // Hide everything in `page` except `node` (and the path down to it) while InSIS+ is on; classic view shows the
@@ -653,6 +718,7 @@
   // Original InSIS content that stays in the page (slotted into the shell) gets the shared look from generic.css,
   // plus an optional page stylesheet for what is specific to that page.
   function styleSlotted(pageCss) {
+    if (ipx.syncOnly) return;
     document.documentElement.classList.add('ipx-generic');
     for (const file of ['generic.css', pageCss].filter(Boolean)) {
       if (document.querySelector(`link[data-ipx="${file}"]`)) continue;
@@ -664,7 +730,7 @@
   const onPinsChange = (fn) => pinListeners.push(fn);
 
   ipx.ui = {
-    h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
+    PORTAL_ACTIONS, quickActions, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
     facultyFromCode, facultyFor, linkTabs, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
     kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,

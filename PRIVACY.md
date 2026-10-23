@@ -10,7 +10,8 @@ Locally, in your browser's extension storage (`chrome.storage.local`), and nowhe
 - Your pinned pages and interface choices (sidebar grouping, collapsed state, classic view per page).
 - The InSIS menu, your name and the document/task counters from the InSIS main page, to show them on other pages.
 - Summaries of course syllabi you opened (code, name, semester, credits), for "My courses".
-- Parsed data from pages that a module reads, such as your timetable, for the dashboard.
+- Parsed data from pages that a module reads (your portal links, timetable, study record, submission deadlines,
+  courses with new documents), for the dashboard.
 
 You can delete all of it by removing the extension or clearing its storage.
 
@@ -20,8 +21,11 @@ You can delete all of it by removing the extension or clearing its storage.
 - **No requests outside InSIS**, with one exception: the fonts (Bricolage Grotesque and Figtree) are loaded from
   Google Fonts, which means Google sees your IP address and that a font was requested. Bundling the fonts with the
   extension to remove this is planned.
-- Modules may read other InSIS pages in the background (for example your timetable) using your existing session.
-  These are ordinary read-only requests to `insis.vse.cz`; nothing is submitted or changed.
+- In the background, InSIS+ opens five InSIS pages in a hidden frame, using your existing session: the Student's
+  portal, your personal timetable, your study record, coursework submissions and the document server. That happens
+  at most every 3 hours, only while you are logged in, and is the same as you clicking those links: ordinary page
+  loads from `insis.vse.cz`; nothing is clicked, submitted or changed there, and what is read stays in your
+  browser.
 
 ## Permissions
 

@@ -1,45 +1,55 @@
 // InSIS+ — Student's portal (student/moje_studium.pl), rebuilt around what students come here to do.
-// The original page mixes a table of studies (whose most important actions — exam and course registration —
-// are unlabelled icons), a row of 11 tabs and four blocks of icons. Here: the study on top, the main actions as
-// labelled cards, everything else grouped below, next classes and contacts on the side.
+// The original page mixes a table of studies (whose most important actions, exam and course registration, are
+// unlabelled icons), a row of 11 tabs and five blocks of ~30 icons. Here: the study on top, the six main actions
+// as labelled cards with live data, everything else as one short list in plain groups (with a filter), and the
+// week, next classes, deadlines and contacts on the side.
 // Only links are rebuilt (original hrefs); the page's form is not used and nothing is submitted.
+//
+// Stored for the dashboard, the sidebar and the background sync (plain data, no HTML):
+// ipx.state.portal = {
+//   updated, source,
+//   study: { faculty, name, detail, progress } | null,
+//   links: { exams, enrol, timetable, record, submissions, plan: { href, text } | undefined },
+// }
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
   const { clean, norm, lang } = ipx;
-  const { h, icon, anchor, takeover, nextClasses, classDays, weekStrip, facultyColors } = ipx.ui;
+  const { h, icon, anchor, takeover, quickActions, PORTAL_ACTIONS, nextClasses, classDays, weekStrip, deadlineList,
+    facultyColors } = ipx.ui;
 
   const T = {
-    cs: { title: 'Portál studenta', todo: 'Co potřebujete udělat', more: 'Další možnosti', study: 'Studium',
-      active: 'aktivní', otherStudies: 'Další studia', schedule: 'Nejbližší hodiny', fullSchedule: 'Rozvrh →',
-      noSchedule: 'Otevřete osobní rozvrh a ukážou se tu nejbližší hodiny.', help: 'Kontakty a pomoc',
-      sections: 'Všechny aplikace portálu' },
-    en: { title: "Student's portal", todo: 'What do you need to do', more: 'More', study: 'Study',
-      active: 'active', otherStudies: 'Other studies', schedule: 'Next classes', fullSchedule: 'Timetable →',
-      noSchedule: 'Open your personal timetable and your next classes will show up here.', help: 'Contacts and help',
-      sections: 'All portal applications' },
+    cs: { title: 'Portál studenta', main: 'Hlavní', more: 'Všechno ostatní', filter: 'Hledat v portálu',
+      nothing: 'Nic takového tu není.', otherStudies: 'Další studia', schedule: 'Nejbližší hodiny', fullSchedule: 'Rozvrh →',
+      noSchedule: 'Rozvrh se načítá na pozadí, nebo ho otevřete v kartě Můj rozvrh.', deadlines: 'Termíny odevzdání',
+      allDeadlines: 'Odevzdávárny →', help: 'Kontakty a pomoc', insisHelp: 'Nápověda InSIS',
+      groups: { study: 'Studium', calendar: 'Kalendář a omluvenky', docs: 'Dokumenty a ankety', money: 'Finance', other: 'Ostatní' } },
+    en: { title: "Student's portal", main: 'Main', more: 'Everything else', filter: 'Search the portal',
+      nothing: 'Nothing like that here.', otherStudies: 'Other studies', schedule: 'Next classes', fullSchedule: 'Timetable →',
+      noSchedule: 'Your timetable is loading in the background, or open it from My timetable.', deadlines: 'Deadlines',
+      allDeadlines: 'Submissions →', help: 'Contacts and help', insisHelp: 'InSIS help',
+      groups: { study: 'Study', calendar: 'Calendar and excuses', docs: 'Documents and surveys', money: 'Money', other: 'Other' } },
   }[lang];
 
-  // The main actions, in this order. Matched on the link's address (stable) rather than its label.
-  // Short names of our own (InSIS's labels are long and stay as the tooltip). name, desc: [cs, en]
-  const ACTIONS = [
-    { id: 'exams', re: /terminy_seznam\.pl/, icon: 'check', name: ['Zkoušky', 'Exams'], desc: ['Termíny a přihlášení na zkoušky', 'Exam dates and registration'] },
-    { id: 'enrol', re: /\/registrace\.pl/, icon: 'list', name: ['Zápis předmětů', 'Course registration'], desc: ['Zápis a změny po zápisu', 'Enrolment and later changes'] },
-    { id: 'timetable', re: /rozvrhy_view\.pl.*rozvrh_student/, icon: 'calendar', name: ['Rozvrh', 'Timetable'], desc: ['Vaše hodiny po týdnech', 'Your classes week by week'] },
-    { id: 'record', re: /pruchod_studiem\.pl/, icon: 'award', name: ['Studijní výsledky', 'Study record'], desc: ['Známky, kredity a pokusy', 'Grades, credits and attempts'] },
-    { id: 'submissions', re: /odevzdavarny\.pl/, icon: 'file', name: ['Odevzdávárny', 'Submissions'], desc: ['Odevzdání prací a termíny', 'Hand-ins and deadlines'] },
-    { id: 'plan', re: /studijni_povinnosti\.pl/, icon: 'layers', name: ['Kontrola plánu', 'Plan check'], desc: ['Co ještě musíte splnit', 'What is left to complete'] },
+  // Our own groups for the remaining applications (by address; InSIS's own blocks mix unrelated things).
+  const GROUPS = [
+    ['calendar', /prehled_tydnu|harmonogram|omluvenk|mimosemestr/],
+    ['money', /financ|stip|bank/],
+    ['docs', /tisk|uloziste|anketk|dotaznik|evaluace/],
+    ['study', /student\/|studijni|elis|zp_|diplom|registrace|zkousk|terminy/],
   ];
+  const CONTACTS = /stud_odd|kc\.pl/;
 
-  // Icon for the remaining applications, by InSIS's own icon id (data-sysid) or address.
+  // Icon per application, by address.
   const ICON_BY = [
-    [/zkousk|terminy/, 'check'], [/zapis|registrace/, 'list'], [/mimosemestr/, 'calendar'], [/diplom|zp_/, 'file'],
-    [/rozvrh/, 'calendar'], [/harmonogram|tydnu/, 'clock'], [/oddeleni|stud_odd|spoluzaci/, 'people'], [/kc/, 'mail'],
-    [/omluvenk/, 'file'], [/tisk/, 'file'], [/uloziste/, 'layers'], [/evaluace|anketk/, 'star'], [/firma|praxe/, 'cpu'],
-    [/fin|stipend|bank/, 'award'], [/ubytovani/, 'home'], [/pobyt|int\//, 'globe'], [/fotk/, 'people'],
-    [/mapa/, 'layers'], [/osnov/, 'book'], [/temata/, 'list'], [/list\.pl/, 'file'], [/oblibene/, 'star'], [/studium\.pl/, 'cap'],
+    [/terminy|zkousk/, 'check'], [/registrace|zapis/, 'list'], [/rozvrh|harmonogram|tydnu|mimosemestr/, 'calendar'],
+    [/omluvenk|tisk|list\.pl|diplom|zp_/, 'file'], [/spoluzaci|stud_odd/, 'people'], [/kc\.pl/, 'mail'], [/uloziste|mapa/, 'layers'],
+    [/anketk|evaluace|oblibene/, 'star'], [/praxe/, 'cpu'], [/financ|stip|bank/, 'award'], [/int\//, 'globe'],
+    [/fotk/, 'people'], [/osnov/, 'book'], [/temata/, 'list'], [/studium\.pl/, 'cap'],
   ];
-  const iconFor = (key) => ICON_BY.find(([re]) => re.test(key))?.[1] || 'layers';
+  // Addresses are compared without their query: many carry a link back to the portal (zpet=…/student/…).
+  const path = (href) => new URL(href).pathname;
+  const iconFor = (href) => ICON_BY.find(([re]) => re.test(path(href)))?.[1] || 'layers';
 
   // ---------- reading the original page ----------
 
@@ -48,7 +58,6 @@
     target: a.target || null,
     text: clean(label || a.querySelector('.app-ikona-text')?.textContent || a.textContent || a.title ||
       a.querySelector('[aria-label]')?.getAttribute('aria-label')),
-    key: `${a.querySelector('[data-sysid]')?.dataset.sysid || ''} ${a.getAttribute('href')}`,
   });
 
   function parse() {
@@ -70,7 +79,6 @@
       const status = cells[0]?.querySelector('[data-sysid]');
       return {
         active: /aktivni/.test(status?.dataset.sysid || ''),
-        statusText: clean(status?.getAttribute('aria-label')),
         choose: cells[0]?.querySelector('a[href]') && linkOf(cells[0].querySelector('a[href]'), headers[0]),
         faculty: clean(cells[1]?.textContent),
         name: [...(cells[2]?.querySelectorAll('b') || [])].flatMap((b) => b.innerText.split('\n')).map(clean).filter(Boolean),
@@ -82,65 +90,79 @@
       };
     }).filter((s) => s.faculty || s.name.length) : [];
 
-    // Icon blocks: a bold title, a short description, then a .rada-ikon row of labelled icons.
-    const sections = [...page.querySelectorAll('.rada-ikon')].map((row) => {
-      let title = '';
-      let desc = '';
-      for (let el = row.closest('table') || row; el && !title; el = el.previousElementSibling) {
-        if (!desc && el.matches?.('.small')) desc = clean(el.textContent);
-        if (el.tagName === 'B') title = clean(el.textContent);
-      }
-      return { title, desc, items: [...row.querySelectorAll('a.app-ikona[href]')].map((a) => linkOf(a)) };
-    }).filter((s) => s.items.length);
-
-    const crumbs = [...page.querySelectorAll('.breadcrumb-item')].map((li) => clean(li.textContent)).filter(Boolean);
+    const icons = [...page.querySelectorAll('.rada-ikon a.app-ikona[href]')].map((a) => linkOf(a));
     const help = page.querySelector('.helpinbreadcrumbs a[href]');
-    return { head, tabs: tabsRow, studies, sections, crumbs, help: help && { href: help.href, target: '_blank' } };
+    const study = studies.find((s) => s.active) || studies[0] || null;
+
+    // Every link once (the study's own icons first: their labels are the clearest), then sort them out.
+    const seen = new Set([location.href.split('#')[0]]);
+    const all = [...(study?.actions || []), ...tabsRow.filter((t) => !t.on), ...icons]
+      .filter((l) => l.text && !/moje_studium\.pl$/.test(new URL(l.href).pathname) && !seen.has(l.href) && seen.add(l.href));
+    const used = new Set();
+    const links = {};
+    for (const a of PORTAL_ACTIONS) {
+      const l = all.find((x) => a.re.test(x.href));
+      if (l) {
+        links[a.id] = { href: l.href, text: l.text };
+        used.add(l.href);
+      }
+    }
+    // The e-index is the same page as the study record.
+    for (const l of all) if (/pruchod_studiem\.pl/.test(path(l.href))) used.add(l.href);
+    const contacts = all.filter((l) => !used.has(l.href) && CONTACTS.test(path(l.href)));
+    contacts.forEach((l) => used.add(l.href));
+    const rest = all.filter((l) => !used.has(l.href));
+    const groupOf = (l) => GROUPS.find(([, re]) => re.test(path(l.href)))?.[0] || 'other';
+    const groups = ['study', 'calendar', 'docs', 'money', 'other'].map((id) => ({
+      id,
+      title: T.groups[id],
+      items: rest.filter((l) => groupOf(l) === id),
+    })).filter((g) => g.items.length);
+
+    return { head, study, others: studies.filter((s) => s !== study), links, contacts, groups,
+      help: help && { href: help.href, target: '_blank' } };
+  }
+
+  function remember(d) {
+    const s = d.study;
+    ipx.state.portal = {
+      updated: Date.now(),
+      source: location.href,
+      study: s && { faculty: s.faculty, name: s.name[0] || '', detail: s.name.slice(1).join(', '), progress: s.progress },
+      links: d.links,
+    };
+    ipx.save();
   }
 
   // ---------- building the new page ----------
 
-  function actionCard(a, link) {
-    const i = lang === 'cs' ? 0 : 1;
-    return anchor(link, { class: 'card sp-action', title: link.text },
-      h('span', { class: 'sp-action-icon' }, icon(a.icon)),
-      h('span', { class: 'sp-action-text' }, h('strong', {}, a.name[i]), h('small', {}, a.desc[i])),
-      h('span', { class: 'sp-go' }, icon('arrow')));
-  }
+  const row = (l) => anchor(l, { class: 'sp-link', title: l.text }, h('span', { class: 'sp-link-icon' }, icon(iconFor(l.href))), h('span', {}, l.text));
 
-  function tile(link) {
-    return anchor(link, { class: 'sp-tile' }, h('span', { class: 'tile-icon' }, icon(iconFor(link.key))), h('span', {}, link.text));
+  function buildMore(d) {
+    const filter = h('input', { class: 'sp-filter', type: 'search', placeholder: T.filter, 'aria-label': T.filter, autocomplete: 'off' });
+    const body = h('div', { class: 'sp-cols' });
+    const render = () => {
+      const q = norm(filter.value);
+      const match = (l) => !q || q.split(' ').every((w) => norm(l.text).includes(w));
+      const groups = d.groups.map((g) => ({ ...g, items: g.items.filter(match) })).filter((g) => g.items.length);
+      body.replaceChildren(...(groups.length
+        ? groups.map((g) => h('section', { class: 'sp-col' }, h('h3', {}, g.title), g.items.map(row)))
+        : [h('p', { class: 'muted' }, T.nothing)]));
+    };
+    filter.addEventListener('input', render);
+    filter.addEventListener('keydown', (e) => e.stopPropagation());
+    render();
+    return h('section', { class: 'card sp-more' },
+      h('div', { class: 'card-head' }, h('h2', {}, T.more), h('span', { class: 'sp-filter-wrap' }, icon('search'), filter)),
+      body);
   }
 
   function buildPage(d) {
-    const study = d.studies.find((s) => s.active) || d.studies[0];
-    const others = d.studies.filter((s) => s !== study);
-
-    // Every link on the page once, then pick the main actions out of them.
-    const all = [...(study?.actions || []), ...d.tabs, ...d.sections.flatMap((s) => s.items)];
-    const seen = new Set();
-    const unique = all.filter((l) => !seen.has(l.href) && seen.add(l.href));
-    const used = new Set();
-    const main = ACTIONS.map((a) => {
-      const link = unique.find((l) => a.re.test(l.href));
-      if (link) used.add(link.href);
-      return link && actionCard(a, link);
-    }).filter(Boolean);
-
-    // Contacts go to the rail, not to a group.
-    const contacts = unique.filter((l) => !used.has(l.href) && /stud_odd|kc\.pl/.test(l.href));
-    contacts.forEach((l) => used.add(l.href));
-
-    // The rest, grouped: the study's own links (tabs and table icons), then InSIS's icon blocks.
-    const studyLinks = [...(study?.actions || []), ...d.tabs.filter((t) => !t.on)].filter((l) => !used.has(l.href) && used.add(l.href));
-    const groups = [
-      { title: T.study, items: studyLinks },
-      ...d.sections.map((s) => ({ title: s.title, desc: s.desc, items: s.items.filter((l) => !used.has(l.href) && used.add(l.href)) })),
-    ].filter((g) => g.items.length);
-
+    const study = d.study;
     const tt = ipx.state.timetable;
-    const ttLink = unique.find((l) => /rozvrh_student/.test(l.href));
-    const upcoming = tt && nextClasses(tt.events, ttLink?.href || tt.source);
+    const ttHref = d.links.timetable?.href || tt?.source;
+    const upcoming = tt && nextClasses(tt.events, ttHref);
+    const sub = ipx.state.submissions;
 
     return h('div', { class: 'sp' },
       h('div', { class: 'sp-main' },
@@ -148,48 +170,55 @@
           h('span', { class: 'sp-badge', style: `--fac: ${facultyColors(study.faculty)[1]}` }, study.faculty || '—'),
           h('span', { class: 'sp-study-text' },
             h('strong', {}, study.name[0] || d.head[0] || ''),
-            h('small', {}, [study.name.slice(1).join(', '), d.head[0]].filter(Boolean).join(' · '))),
+            h('small', {}, [study.name.slice(1).join(', '), d.head[1]].filter(Boolean).join(' · '))),
           h('span', { class: 'sp-study-side' },
             study.progress && h('span', { class: 'delta ' + (study.active ? 'ok' : 'neutral') }, study.progress),
             study.restriction && h('span', { class: 'delta warn' }, study.restriction))),
 
-        h('h2', { class: 'section-title sp-title' }, T.todo),
-        h('div', { class: 'sp-actions' }, main),
+        h('h2', { class: 'section-title sp-title' }, T.main),
+        quickActions(d.links),
 
-        h('h2', { class: 'section-title sp-title' }, T.sections),
-        h('div', { class: 'sp-groups' }, groups.map((g) => h('section', { class: 'card sp-group' },
-          h('div', { class: 'card-head' }, h('h2', {}, g.title)),
-          g.desc && h('p', { class: 'card-sub' }, g.desc),
-          h('div', { class: 'sp-tiles' }, g.items.map(tile))))),
+        buildMore(d),
 
-        others.length && h('section', { class: 'card sp-group' },
+        d.others.length > 0 && h('section', { class: 'card sp-more' },
           h('div', { class: 'card-head' }, h('h2', {}, T.otherStudies)),
-          h('ul', { class: 'sp-others' }, others.map((s) => h('li', {},
+          h('ul', { class: 'sp-others' }, d.others.map((s) => h('li', {},
             h('b', {}, s.faculty), h('span', {}, s.name.join(', ')), h('span', { class: 'delta neutral' }, s.progress),
             s.choose && anchor(s.choose, { class: 'more' }, s.choose.text || '→')))))),
 
       h('aside', { class: 'rail' },
         weekStrip(new Date(), classDays(tt?.events)),
         h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.schedule), ttLink && anchor(ttLink, { class: 'more' }, T.fullSchedule)),
+          h('div', { class: 'card-head' }, h('h2', {}, T.schedule), ttHref && anchor({ href: ttHref }, { class: 'more' }, T.fullSchedule)),
           upcoming || h('p', { class: 'muted rail-empty' }, T.noSchedule)),
-        (contacts.length || d.help) && h('section', {},
+        sub && h('section', {},
+          h('div', { class: 'card-head' }, h('h2', {}, T.deadlines), anchor({ href: d.links.submissions?.href || sub.source }, { class: 'more' }, T.allDeadlines)),
+          deadlineList(sub.boxes) || h('p', { class: 'muted rail-empty' }, lang === 'cs' ? 'Žádná otevřená odevzdávárna nečeká.' : 'No open submission box is waiting.')),
+        (d.contacts.length > 0 || d.help) && h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, T.help)),
           h('div', { class: 'sp-contacts' },
-            contacts.map(tile),
-            d.help && anchor({ ...d.help, text: lang === 'cs' ? 'Nápověda InSIS' : 'InSIS help' }, { class: 'sp-tile' },
-              h('span', { class: 'tile-icon' }, icon('alert')), h('span', {}, lang === 'cs' ? 'Nápověda InSIS' : 'InSIS help'))))));
+            d.contacts.map(row),
+            d.help && anchor({ ...d.help, text: T.insisHelp }, { class: 'sp-link' },
+              h('span', { class: 'sp-link-icon' }, icon('alert')), h('span', {}, T.insisHelp))))));
   }
 
   ipx.ready.then(() => {
     const data = parse();
     if (!data) return;
+    remember(data);
     takeover({
       key: 'student-portal',
       css: 'pages/student-portal.css',
       title: T.title,
       subtitle: data.head[1] || null,
-      build: () => buildPage(data),
+      build: () => {
+        // Redrawn when the background sync brings the timetable, credits or deadlines.
+        const wrap = h('div', {});
+        const render = () => wrap.replaceChildren(buildPage(data));
+        render();
+        ipx.onData(render);
+        return wrap;
+      },
     });
   });
 })();

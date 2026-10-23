@@ -16,7 +16,7 @@
 //   study: 'FIS C-BI pres [term 1, E]' | '', period: 'WS 2026/2027 - FIS' | '',
 //   credits: { earned: number | null, registered: number | null },   // from the statistics table, else row sums
 //   average: number | null,                                          // as InSIS states it, else mean of row grades
-//   courses: [{ code, name, ects: number | null (credits), completion, result, grade: 1–4 | null,
+//   courses: [{ code, name, href (syllabus), ects: number | null (credits), completion, result, grade: 1–4 | null,
 //               semester, passed: true | false | null (null = no result yet) }],
 // }
 (() => {
@@ -425,7 +425,7 @@
       period: d.period,
       credits: { earned: t.earned, registered: t.registered },
       average: t.average,
-      courses: t.rows.map((r) => ({ code: r.code, name: r.name, ects: r.credits, completion: r.completion,
+      courses: t.rows.map((r) => ({ code: r.code, name: r.name, href: r.href, ects: r.credits, completion: r.completion,
         result: r.result, grade: r.grade, semester: r.semester, passed: r.passed })),
     };
     ipx.save();

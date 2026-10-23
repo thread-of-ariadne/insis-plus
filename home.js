@@ -7,16 +7,20 @@
   if (!ipx?.ui) return;
   const { clean, norm, lang } = ipx;
   const { h, anchor, takeover, onPinsChange, kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip,
-    nextClasses, hoursChart, classDays, deadlineList, facultyColors, facultyFor } = ipx.ui;
+    nextClasses, hoursChart, classDays, deadlineList, facultyColors, facultyFor, quickActions } = ipx.ui;
 
   const T = {
     cs: { morning: 'Dobré ráno', day: 'Dobrý den', evening: 'Dobrý večer', welcome: 'Vítejte zpět',
       docs: 'Dokumenty', tasks: 'Úkoly', pinned: 'Připnuté', fresh: 'nové', allDone: '✓ hotovo', waiting: (n) => `${n} čeká`,
-      courses: 'Moje předměty', termTab: 'Tento semestr', allTab: 'Nedávno zobrazené', catalogue: 'Katalog →',
-      coursesHint: 'Předměty, jejichž sylabus jste otevřeli.',
+      courses: 'Moje předměty', termTab: 'Zapsané', allTab: 'Nedávno zobrazené', catalogue: 'Katalog →',
+      coursesHint: 'Předměty, jejichž sylabus jste otevřeli.', fromTimetable: 'Podle vašeho rozvrhu.',
       coursesEmpty: 'Zatím žádné. Otevřete sylabus předmětu, třeba z katalogu, a objeví se tady.',
+      enrolledEmpty: 'Zapsané předměty se zatím nenačetly. Najdete je ve Výsledcích v portálu studenta.',
+      loading: 'Načítám data z InSIS…', portal: 'Portál studenta', allPortal: 'Celý portál →',
+      portalEmpty: 'Zkoušky, zápis předmětů, rozvrh, výsledky a odevzdávárny najdete v portálu studenta.',
+      openPortal: 'Otevřít portál studenta', passed: 'splněno', failed: 'nesplněno',
       semester: 'Semestr', schedule: 'Rozvrh', fullSchedule: 'Celý rozvrh →',
-      scheduleEmpty: 'Až otevřete svůj rozvrh v InSIS, ukážou se tu nejbližší hodiny a zkoušky.',
+      scheduleEmpty: 'Váš rozvrh se zatím nenačetl. Otevřete ho v portálu studenta.',
       scheduleDone: 'V tomto rozvrhu už žádné další hodiny nejsou.',
       deadlines: 'Termíny odevzdání', allDeadlines: 'Odevzdávárny →', noDeadlines: 'Žádná otevřená odevzdávárna nečeká.',
       newDocs: 'Nové dokumenty', allDocs: 'Dokumentový server →', newN: (n) => `${n} nové`,
@@ -24,11 +28,15 @@
       today: 'dnes', yesterday: 'včera' },
     en: { morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', welcome: 'Welcome back',
       docs: 'Documents', tasks: 'Tasks', pinned: 'Pinned', fresh: 'new', allDone: '✓ done', waiting: (n) => `${n} waiting`,
-      courses: 'My courses', termTab: 'This semester', allTab: 'Recently viewed', catalogue: 'Catalogue →',
-      coursesHint: 'Courses whose syllabus you have opened.',
+      courses: 'My courses', termTab: 'Enrolled', allTab: 'Recently viewed', catalogue: 'Catalogue →',
+      coursesHint: 'Courses whose syllabus you have opened.', fromTimetable: 'From your timetable.',
       coursesEmpty: 'None yet. Open a course syllabus, for example from the catalogue, and it shows up here.',
+      enrolledEmpty: "Your enrolled courses have not loaded yet. They are in Study record in the Student's portal.",
+      loading: 'Loading your data from InSIS…', portal: "Student's portal", allPortal: 'Whole portal →',
+      portalEmpty: "Exams, course registration, your timetable, results and submissions are in the Student's portal.",
+      openPortal: "Open the Student's portal", passed: 'passed', failed: 'not passed',
       semester: 'Semester', schedule: 'Timetable', fullSchedule: 'Full timetable →',
-      scheduleEmpty: 'Once you open your timetable in InSIS, your next classes and exams will show up here.',
+      scheduleEmpty: "Your timetable has not loaded yet. Open it from the Student's portal.",
       scheduleDone: 'No more classes in this timetable.',
       deadlines: 'Deadlines', allDeadlines: 'Submissions →', noDeadlines: 'No open submission box is waiting.',
       newDocs: 'New documents', allDocs: 'Document server →', newN: (n) => `${n} new`,
@@ -161,6 +169,36 @@
     return (winter ? /\b(ZS|WS)\b/ : /\b(LS|SS)\b/).test(semester) && years.test(semester);
   }
 
+  // This semester's courses: from the study record (stored by pages/study-record.js, loaded in the background),
+  // else the courses in the personal timetable. Syllabus pages the student opened add the faculty and aims.
+  function enrolled(viewed) {
+    const byCode = new Map();
+    for (const c of viewed) if (c.code && !byCode.has(c.code)) byCode.set(c.code, c);
+    const card = (c) => {
+      const v = byCode.get(c.code) || {};
+      return { ...c, href: c.href || v.href, faculty: v.faculty || facultyFor(c.code), aims: v.aims };
+    };
+    const rec = ipx.state.studyRecord;
+    if (rec?.courses?.length) {
+      const terms = [...new Set(rec.courses.map((c) => c.semester).filter(Boolean))];
+      const term = terms.find(isThisTerm) || (terms.includes(rec.period) ? rec.period : terms.at(-1));
+      const list = rec.courses.filter((c) => !term || c.semester === term).map((c) => card({
+        code: c.code, name: c.name, href: c.href, semester: c.semester, ects: c.ects ?? '',
+        tags: [c.completion, c.passed === true ? T.passed : c.passed === false ? T.failed : null] }));
+      if (list.length) return { list };
+    }
+    const tt = ipx.state.timetable;
+    const seen = new Map();
+    for (const e of tt?.events || []) {
+      if (!e.code) continue;
+      const c = seen.get(e.code) || { code: e.code, name: e.name, types: new Set() };
+      if (e.type) c.types.add(e.type);
+      seen.set(e.code, c);
+    }
+    const href = ipx.state.portal?.links?.timetable?.href || tt?.source;
+    return { fromTimetable: true, list: [...seen.values()].map((c) => card({ code: c.code, name: c.name, href, tags: [...c.types] })) };
+  }
+
   function buildPage({ header, notices, quick }, state) {
     const pins = ipx.state.fav.filter((url) => ipx.state.links[url]);
     const here = location.href.split('#')[0];
@@ -172,16 +210,20 @@
       .slice(0, 5)
       .map(([url, l]) => ({ href: url, text: l.t, s: l.s }));
 
-    const courses = Object.values(ipx.state.courses || {}).sort((a, b) => b.s - a.s);
-    const thisTerm = courses.filter((c) => isThisTerm(c.semester));
-    const tab = state.tab || (thisTerm.length ? 'term' : 'all');
-    const shown = (tab === 'term' ? thisTerm : courses).slice(0, 4);
+    const viewed = Object.values(ipx.state.courses || {}).sort((a, b) => b.s - a.s);
+    const mine = enrolled(viewed);
+    const tab = state.tab || (mine.list.length || !viewed.length ? 'term' : 'all');
+    const shown = tab === 'term' ? mine.list.slice(0, 8) : viewed.slice(0, 4).map((c) => ({ ...c, tags: [c.completion, c.language] }));
+    const syncing = ipx.state.sync?.running;
 
     const { docs, tasks } = header;
     // The personal timetable module stores its classes; the menu's "Timetables" is only the public search.
+    // The student's own timetable: never the menu's "Timetables", which is the public search.
     const tt = ipx.state.timetable;
-    const timetable = tt?.source ? { href: tt.source } : quick.find((q) => q.icon === 'calendar')?.link;
-    const upcoming = tt && nextClasses(tt.events, tt.source);
+    const portal = ipx.state.portal;
+    const portalLink = portal?.source ? { href: portal.source } : quick.find((q) => q.icon === 'cap')?.link;
+    const timetable = portal?.links?.timetable || (tt?.source && { href: tt.source });
+    const upcoming = tt && nextClasses(tt.events, timetable?.href);
     // Stored by pages/submissions.js and pages/docserver.js when those pages were opened.
     const sub = ipx.state.submissions;
     const ds = ipx.state.docserver || {};
@@ -199,20 +241,28 @@
             status: tasks.count > 0 ? { tone: 'warn', text: T.waiting(tasks.count) } : { tone: 'ok', text: T.allDone } }),
           kpi({ label: T.pinned, value: pins.length })),
 
+        sectionHead(T.portal, portalLink && { href: portalLink.href, text: T.allPortal }),
+        quickActions(portal?.links) || (syncing
+          ? emptyState(T.loading)
+          : emptyState(T.portalEmpty, portalLink && { href: portalLink.href, text: T.openPortal })),
+
         sectionHead(T.courses, { href: catalogue, text: T.catalogue },
           tabs([{ id: 'term', label: T.termTab }, { id: 'all', label: T.allTab }], tab, state.setTab)),
+        tab === 'term' && mine.fromTimetable && shown.length > 0 && h('p', { class: 'muted hint' }, T.fromTimetable),
+        tab === 'all' && shown.length > 0 && h('p', { class: 'muted hint' }, T.coursesHint),
         shown.length
-          ? [h('p', { class: 'muted hint' }, T.coursesHint),
-              h('div', { class: 'course-list' }, shown.map((c) => courseCard({ ...c, tags: [c.completion, c.language] })))]
-          : emptyState(T.coursesEmpty)),
+          ? h('div', { class: 'course-list' }, shown.map(courseCard))
+          : tab === 'term'
+            ? emptyState(syncing ? T.loading : T.enrolledEmpty, !syncing && portalLink ? { href: portalLink.href, text: T.openPortal } : undefined)
+            : emptyState(T.coursesEmpty)),
 
       h('aside', { class: 'rail' },
         weekStrip(new Date(), classDays(tt?.events)),
         h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, T.schedule), timetable && anchor(timetable, { class: 'more' }, T.fullSchedule)),
-          upcoming || h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : T.scheduleEmpty)),
+          upcoming || h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : syncing ? T.loading : T.scheduleEmpty)),
         sub && h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.deadlines), anchor({ href: sub.source }, { class: 'more' }, T.allDeadlines)),
+          h('div', { class: 'card-head' }, h('h2', {}, T.deadlines), anchor(portal?.links?.submissions || { href: sub.source }, { class: 'more' }, T.allDeadlines)),
           deadlineList(sub.boxes) || h('p', { class: 'muted rail-empty' }, T.noDeadlines)),
         news.length > 0 && h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, T.newDocs), ds.source && anchor({ href: ds.source }, { class: 'more' }, T.allDocs)),
@@ -257,6 +307,8 @@
         const render = () => wrap.replaceChildren(buildPage(data, state));
         render();
         onPinsChange(render);
+        // The background sync (sync.js) brings the portal links, timetable, record, deadlines and documents.
+        ipx.onData(render);
         return wrap;
       },
     });

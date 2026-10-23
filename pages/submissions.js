@@ -86,12 +86,12 @@
   // ---------- reading the original page ----------
 
   const COLS = [
-    ['course', /^(course|predmet)/],
+    ['course', /^(course|predmet|nazev predmetu)/],
     ['title', /^(name|nazev)/],
     ['type', /^(type|typ)/],
     ['slot', /^(announced|vypsan|urcen|pro )/],
-    ['since', /^(since|from|od|otevreno od)$/],
-    ['until', /^(until|till|to|do|otevreno do)$/],
+    ['since', /^(since|from|od|odkdy|otevreno od)$/],
+    ['until', /^(until|till|to|do|dokdy|otevreno do)$/],
     ['topic', /^(topic|tema)/],
     ['open', /^(open|otevren)/],
     ['points', /^(points|body)/],
