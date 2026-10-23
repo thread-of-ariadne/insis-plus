@@ -1,4 +1,4 @@
-# InSIS+: new information architecture (draft 17)
+# InSIS+: new information architecture (draft 18)
 
 Goal: a student finds what they need without knowing how InSIS is built. (Pages still marked `verify`, such as the
 study application form and the U3V application, are reached through Classic view of Home until verified.) The design is organised around **what a
@@ -107,8 +107,8 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
 ## 3. The tree
 
 ```
-Home                    To do · Today and next · My courses · InSIS notices
-Courses                 My courses · All submissions · Registration & enrolment · Catalogue · Course evaluation · All course files
+Home                    To do · My courses · InSIS notices | rail: This week · Timetable · New materials · Teaching hours
+Courses                 My courses · Materials · All submissions · Registration & enrolment · Catalogue · Course evaluation
   └ Course page         Overview · Files · Submissions · Points · People · Syllabus
 Schedule                My week · Academic calendar · Timetable search · Export to calendar
 Exams                   My dates · Available dates · Past · Not yet scheduled · Online tests       (header: exam period dates)
@@ -126,10 +126,19 @@ All services            Discussions · InSIS tasks · News subscriptions · Cour
 ```
 
 ### Home
+Two columns on desktop, as in today's InSIS+ dashboard: the main column (To do, My courses, InSIS notices) and a
+right rail (this week, timetable, new materials, teaching hours). On phones the rail follows the main column.
 - **To do** (section 6): things to do, soonest deadline first, grouped where alike ("4 courses need an exam date");
   each links to the InSIS page that holds the action and says when it was last checked; a source not read yet says
   "not checked yet".
-- **Today and next**: next classes (time, room → room page, course → course page), my exams in the next 3 days.
+- **Rail › This week**: the week strip (Mon–Sun, today raised, a dot on days with classes).
+- **Rail › Today and next / Dnes a příště** (titled "Timetable / Rozvrh" with "Full timetable →"): the next three
+  classes (date, course, type, room → room page, course → course page), my exams in the next 3 days; "Full
+  timetable →" opens Schedule › My week.
+- **Rail › New materials / Nové materiály**: my courses with new files and how many ("4SA471 · 6 new"), from the
+  document server's tree; each row opens that course's folder in InSIS; "All materials →" opens Courses ›
+  Materials.
+- **Rail › Teaching this week / Výuka tento týden**: hours of classes per weekday, today highlighted.
 - **My courses**: cards → course page (next class, nearest deadline).
 - **InSIS notices**: the notices InSIS shows on its main page, except those already shown as a To do item (e.g. the
   personal data check). One Home surface per fact: a registration round or exam sign-up period appears as a To do
@@ -156,10 +165,14 @@ All services            Discussions · InSIS tasks · News subscriptions · Cour
   faculty"); *Favourite courses* (a planning list); enrollment statistics.
 - **Catalogue**: InSIS's course search (choose the period on InSIS's form); syllabi of any course; pass rates.
 - **Course evaluation / Anketa**: InSIS's list of questionnaires.
-- **All course files**: document server (new, my folders, all folders, search, settings), e-library, Moodle link (once confirmed).
+- **Materials / Materiály** (second tab of Courses, right after My courses — the document server is one of the most
+  used places): my courses first, each with its new-file count and its folder; then InSIS's document server views
+  (new documents, all my folders, the whole tree, search, settings), the e-library and the Moodle link (once
+  confirmed).
 
 ### Schedule
-- **My week**: personal timetable by week (back and forward), list view, print. Each class links to its room and
+- **My week** (opened by "Full timetable →" on Home): InSIS+'s week view of the personal timetable with the week
+  strip and teaching hours on top, back and forward by week, a list view and InSIS's own print/export form. Each class links to its room and
   course; past classes offer "Absent? Excuse note" → Study matters › Excuse notes.
 - **Academic calendar**: teaching weeks and my faculty's academic year schedule (exam period, registration rounds,
   holidays); other faculties' courses may differ (noted).
@@ -260,7 +273,9 @@ higher than the page-load counts in `01-current-map.md` §2. ↓ marks a regress
 | Did I pass | 3 | Grades & credits | 1 | 1 |
 | What's left in my plan | 3 | Grades & credits → What's left | 2 | 2 |
 | Points so far | 5 | Course card → Points (to verify: lectures sheet read on opening) | 2 | 2 |
-| Course files | 4–7 | Course card → Files → folder (to verify; until then via all folders: 4) | 3 | 3 |
+| New materials in a course | 3–6 | Home › New materials → the course's folder | 1 | 1 |
+| Materials of any of my courses | 3–6 | Courses → Materials → the course's folder (or course card → Files → folder) | 3 | 3 |
+| Full timetable | 2 (hunt) | Home › Full timetable → (or Schedule › My week) | 1 | 1 |
 | Hand in coursework | 4 | To do item → InSIS box page → submit | 2 | 2 |
 | Seminar classmates | 5 | Course card → People | 2 | 2 |
 | Syllabus of another course | 4 | Courses → Catalogue → InSIS search submit → syllabus | 4 | 4 |
@@ -376,7 +391,7 @@ výjezd, exchange → Study abroad · praxe, stáž, internship → Internships 
 Messages · osobní údaje, kontrola údajů → Account › Profile & privacy · žádost, přerušení, uznání
 předmětů → Requests · Outlook → Messages (university e-mail button) · heslo, password → Change password · přesměrování,
 forwarding → Messages settings, E-mail delivery · jazyk, language → Language · moje studium, portál studenta →
-Study matters · zápis, registrace → Registration & enrolment · místnost, room → Rooms · Moodle → All course files.
+Study matters · zápis, registrace → Registration & enrolment · místnost, room → Rooms · Moodle → Materials.
 
 ## 10. Labels (single source)
 
@@ -503,8 +518,8 @@ submissions; Language; Messages on phones; one counting rule.
 - *Polish*: registered-students list only through InSIS's own link; main-page sources refresh "when Home is
   opened"; Points marked to verify; Moodle link hidden until its host is confirmed; Shared computer mode compares
   results with the session start; `incognito: split`; compose page no longer fetched; avatar menu text aligned.
-- *Outside the IA*: `sync.js` (0.6.0) still reads the document server in the background; to be aligned when the
-  new structure is built.
+- *Outside the IA*: `sync.js` (0.6.0) reads the document server tree in the background; draft 18 keeps that read
+  (see round 17).
 
 **Round 13** (IA review):
 - *Language*: InSIS's language links are copied verbatim from the page, like Log out (the crawl normalised `lang`
@@ -532,3 +547,13 @@ submissions; Language; Messages on phones; one counting rule.
 **Round 16** (IA review: *ready for user review*, polish only): `zpet_student` and `skoc_zpet` values pinned;
 fetch URLs always built, never copied; the deny-list clause applies to every URL; `verify` menu pages reachable via
 Classic view; pages skipped by the crawl but linked listed to confirm.
+
+**Round 17** (user feedback on draft 17):
+- *Home keeps today's dashboard rail*: week strip, timetable with "Full timetable →", new materials by course,
+  teaching hours chart.
+- *Full timetable*: "Full timetable →" opens Schedule › My week (InSIS+'s week view, with the week strip and hours on
+  top).
+- *Document server is a top path*: Courses › **Materials** is the second tab; Home › New materials opens a course's
+  folder in one click. The document server tree (`dok_server/`) is read in the background again for per-course
+  new-file counts: the crawl opened the tree and folders and InSIS's own "10 new documents" counter did not change,
+  so reading the tree marks nothing as read (the new-documents *list* stays never-read).
