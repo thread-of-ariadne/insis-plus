@@ -16,7 +16,7 @@ import urllib.parse
 
 ORIGIN = "https://insis.vse.cz"
 OUT = pathlib.Path(__file__).parent / "fixtures" / "private"
-MAX_BYTES = 5 * 1024 * 1024
+MAX_BYTES = 20 * 1024 * 1024
 SELF = "http://127.0.0.1:8766"
 
 # Accepts messages only from the InSIS origin and forwards them to /save on this same origin.
