@@ -15,7 +15,7 @@ import re
 import sys
 
 SERVER = "http://localhost:8765/"
-SCRIPTS = ["content.js", "ui.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js"]
+SCRIPTS = ["content.js", "ui.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
 
 SHIM = """<script>
 window.chrome = {
@@ -23,9 +23,25 @@ window.chrome = {
   storage: { local: {
     get: async (k) => { try { return { [k]: JSON.parse(localStorage.getItem(k)) || undefined }; } catch { return {}; } },
     set: async (o) => { try { for (const k in o) localStorage.setItem(k, JSON.stringify(o[k])); } catch {} },
-  } },
+  },
+  // Writes from other test pages (the sync frame) arrive as "storage" events.
+  onChanged: { addListener: (fn) => addEventListener('storage', (e) => {
+    try { e.key && fn({ [e.key]: { newValue: JSON.parse(e.newValue) } }, 'local'); } catch {}
+  }) } },
 };
 </script>""" % SERVER
+
+# Logged-in test pages: background sync loads these local snapshots instead of InSIS (same language as the page).
+SYNC_MAP = r"""<script>
+window.__ipxFixtureFor = (url) => {
+  const cs = /-cs[.-]/.test(location.pathname);
+  // Most specific first: other addresses carry a link back to the portal (zpet=…moje_studium.pl).
+  const map = [[/rozvrh_student/, 'timetable-personal'], [/moje_studium/, 'student-portal'],
+    [/pruchod_studiem/, 'study-record'], [/odevzdavarny/, 'submissions', 'submissions-cs-real'], [/dok_server\/$/, 'docserver']];
+  const hit = map.find(([re]) => re.test(url));
+  return hit && new URL((cs ? hit[2] || hit[1] + '-cs' : hit[1]) + '.built.html', location.href).href;
+};
+</script>"""
 
 
 def main():
@@ -40,9 +56,11 @@ def main():
     # Snapshots from collect_server.py start with "<!-- source: <url> -->"; that url is the best base.
     source = re.match(r"<!-- source: (\S+) -->", html)
     base = args[2] if len(args) > 2 else source.group(1) if source else "https://insis.vse.cz/"
-    scripts = SCRIPTS[:-1] + extra + SCRIPTS[-1:]
+    scripts = SCRIPTS[:-2] + extra + SCRIPTS[-2:]
 
-    head = f'<base href="{base}">\n{SHIM}\n'
+    fixtures = pathlib.Path(__file__).parent / "fixtures"
+    private = src.resolve().parent == (fixtures / "private").resolve()
+    head = f'<base href="{base}">\n{SHIM}\n' + (SYNC_MAP + "\n" if private else "")
     i = html.lower().find("<head>")
     html = html[: i + 6] + "\n" + head + html[i + 6 :] if i >= 0 else head + html
 
@@ -51,8 +69,6 @@ def main():
     html = html[:j] + tail + html[j:] if j >= 0 else html + tail
 
     # Logged-in snapshots hold personal data: their test pages stay next to them in the git-ignored private/ folder.
-    fixtures = pathlib.Path(__file__).parent / "fixtures"
-    private = src.resolve().parent == (fixtures / "private").resolve()
     out = fixtures / "private" / f"{name}.built.html" if private else fixtures / f"{name}.html"
     out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")

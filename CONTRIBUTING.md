@@ -25,7 +25,7 @@ No build step and no dependencies: the extension is plain JavaScript and CSS.
 You can work without logging in to InSIS:
 
 ```
-python -m http.server 8765
+python test/serve.py
 ```
 
 Then open `http://localhost:8765/test/mock-home.html` or any page in `test/fixtures/`. To test a page module on a

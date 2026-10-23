@@ -1,7 +1,10 @@
 // InSIS+ — command palette (Ctrl+K) over every InSIS page you have seen.
 // Data never leaves the browser: links are indexed from pages you open and kept in chrome.storage.local.
 (() => {
-  if (window.top !== window) return;
+  // Frames are left alone, except the hidden frame sync.js uses to read pages in the background: there page modules
+  // only parse and store their data (ipx.syncOnly), nothing is drawn.
+  const syncOnly = window.top !== window && window.name === 'ipx-sync';
+  if (window.top !== window && !syncOnly) return;
 
   const STORE_KEY = 'insisPlus';
   const MAX_LINKS = 2000;
@@ -51,7 +54,24 @@
     state = Object.assign({ links: {}, fav: [] }, data[STORE_KEY]);
   }
 
-  function save() {
+  // Data that page modules store (each with an `updated` time). Another tab or the background sync frame may have
+  // stored a newer copy since this page loaded, so saving keeps whichever is newer instead of overwriting it.
+  const DATA_KEYS = ['timetable', 'submissions', 'docserver', 'studyRecord', 'portal', 'sync'];
+  const dataListeners = [];
+
+  function adoptNewer(from) {
+    let changed = false;
+    for (const k of DATA_KEYS) {
+      if (from?.[k] && (from[k].updated || 0) > (state[k]?.updated || 0)) {
+        state[k] = from[k];
+        changed = true;
+      }
+    }
+    if (from?.courses) state.courses = { ...from.courses, ...state.courses };
+    return changed;
+  }
+
+  async function save() {
     const keys = Object.keys(state.links);
     if (keys.length > MAX_LINKS) {
       const favs = new Set(state.fav);
@@ -61,8 +81,22 @@
         .slice(0, keys.length - MAX_LINKS)
         .forEach((k) => delete state.links[k]);
     }
+    const stored = (await chrome.storage.local.get(STORE_KEY))[STORE_KEY];
+    // The sync frame only adds page data; pins, settings and history stay as the visible tabs left them.
+    if (syncOnly) {
+      const merged = { ...stored };
+      for (const k of DATA_KEYS) if (state[k] && (state[k].updated || 0) > (stored?.[k]?.updated || 0)) merged[k] = state[k];
+      merged.courses = { ...stored?.courses, ...state.courses };
+      return chrome.storage.local.set({ [STORE_KEY]: merged });
+    }
+    if (adoptNewer(stored)) dataListeners.forEach((fn) => fn());
     return chrome.storage.local.set({ [STORE_KEY]: state });
   }
+
+  // Pick up data stored elsewhere (background sync, other tabs) and tell the page.
+  chrome.storage.onChanged?.addListener((changes, area) => {
+    if (area === 'local' && changes[STORE_KEY] && adoptNewer(changes[STORE_KEY].newValue)) dataListeners.forEach((fn) => fn());
+  });
 
   function pageTitle() {
     return clean(document.title)
@@ -305,14 +339,18 @@
   );
 
   const ready = load().then(() => {
+    if (syncOnly) return;
     indexPage();
     save();
     document.body.append(host);
   });
 
-  // Shared with home.js (same content-script world).
+  // Shared with ui.js, sync.js and the page modules (same content-script world).
   globalThis.insisPlus = {
     ready,
+    syncOnly,
+    onData: (fn) => dataListeners.push(fn),
+    notify: () => dataListeners.forEach((fn) => fn()),
     lang,
     clean,
     norm,

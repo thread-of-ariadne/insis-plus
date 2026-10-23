@@ -638,3 +638,29 @@ kbd {
   .course .cover svg { width: 100%; height: 96px; }
   .course-side { flex-direction: row; align-items: baseline; width: 100%; padding: 0 4px; }
 }
+
+/* The Student's portal main actions (quickActions): dashboard and portal */
+.qa-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.qa { display: flex; align-items: center; gap: 14px; padding: 14px 16px; transition: transform 0.2s, box-shadow 0.2s; }
+.qa:hover { transform: translateY(-1px); box-shadow: var(--shadow-raised); }
+.qa-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.qa-icon .icon svg { width: 20px; height: 20px; stroke-width: 1.8; }
+.qa-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.qa-text strong { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.qa-text small { margin-top: 2px; overflow: hidden; color: var(--muted); font-size: 12.5px; line-height: 1.35; white-space: nowrap; text-overflow: ellipsis; }
+.qa-info.bad { color: var(--bad); font-weight: 700; }
+.qa-info.warn { color: var(--warn); font-weight: 700; }
+.qa-go { color: var(--faint); opacity: 0; transform: translateX(-4px); transition: opacity 0.15s, transform 0.15s; }
+.qa:hover .qa-go { opacity: 1; transform: none; color: var(--accent); }
+@media (max-width: 1250px) { .qa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .qa-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .qa, .qa-go { transition: none; } }

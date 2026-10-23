@@ -93,7 +93,7 @@ on top, slot the original below.
 
 ## Testing (required before you report)
 
-1. Serve the repository root: `python -m http.server 8765` (run it in the repository folder).
+1. Serve the repository root: `python test/serve.py` (port 8765, caching off).
 2. Build the test page from the snapshot, with your module loaded before `generic.js`:
    `python test/make_fixture.py test/fixtures/private/<snapshot>.html <snapshot> --with pages/<page>.js`
    (public snapshots: same script, output goes to `test/fixtures/<snapshot>.html`). Rebuild after each change to
@@ -118,6 +118,11 @@ on top, slot the original below.
   (no HTML) with `updated` and `source`, document the shape at the top of your module, and say so in the report.
 - **Timetable events** are available to every module through `ipx.state.timetable.events` and the shared
   `nextClasses()`, `hoursChart()` and `classDays()` components.
+- **Background sync.** `sync.js` loads the portal, personal timetable, study record, submissions and document
+  server in a hidden frame; there `ipx.syncOnly` is true and `takeover()` does nothing, so your module must call
+  its `remember()` **before** `takeover()` and must not depend on layout (sizes, visibility). Pages that show
+  synced data redraw with `ipx.onData(render)`. The portal's links are in `ipx.state.portal.links`
+  (`exams enrol timetable record submissions plan`), drawn by `quickActions(links)`.
 
 ## Report (your final message)
 

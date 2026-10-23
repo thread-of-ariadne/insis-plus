@@ -6,6 +6,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-23
+
+### Added
+- Background sync (`sync.js`): when the data is missing or older than 3 hours, the Student's portal, personal
+  timetable, study record, submissions and document server are read in a hidden same-origin frame, so the
+  dashboard is filled right after logging in, without opening each page first. Nothing is clicked or submitted.
+- Dashboard: a "Student's portal" row with the six main actions (exams, course registration, my timetable, study
+  record, submissions, plan check), each with a live line (next class, credits, nearest deadline).
+- Shared `quickActions()` component and `PORTAL_ACTIONS` in `ipx.ui`; `ipx.onData()` for pages that redraw when
+  synced data arrives. `test/serve.py` serves the test pages with caching off.
+
+### Changed
+- Student's portal rebuilt: study, the six main actions, and everything else in one card as plain columns of
+  links (Study, Calendar and excuses, Documents and surveys, Money, Other) with a filter, instead of five blocks
+  of tiles.
+- "My courses" on the dashboard shows the courses you are enrolled in (study record, else your timetable);
+  syllabi you opened are under "Recently viewed".
+- Saving merges data stored by other tabs or the sync frame instead of overwriting it.
+
+### Fixed
+- The dashboard's "Full timetable" and the sidebar's main timetable item opened the public timetable search;
+  they now open your personal timetable ("My timetable"), and the public search moved to Study.
+- Czech submissions page was not recognised ("Název předmětu", "Odkdy", "Dokdy" columns).
+
 ## [0.5.0] - 2026-10-23
 
 ### Added
