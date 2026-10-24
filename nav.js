@@ -187,8 +187,11 @@
     // Node labels carry their parent ("Course › Files"); inside the parent only the last part is shown.
     return pick(n).split(' › ').pop();
   }
+  // A section with views (structure.views): the section a view belongs to, and its sidebar label.
+  const sectionOf = (node) => Object.entries(D.structure.views || {}).find(([k, list]) => !k.startsWith('_') && list.includes(node))?.[0] || node;
+  const sectionLabel = (id) => D.structure.section_labels?.[id]?.[L] || label(id);
   const gloss = (id) => D.structure.glosses?.[id]?.[L] || '';
   const shortLabel = (id) => D.structure.short?.[id]?.[L] || label(id);
 
-  ipx.nav = { route, safe, allowed, target, label, gloss, shortLabel, composedUrl, destOf, tabs: D.structure.tabs, data: D, parse };
+  ipx.nav = { route, safe, allowed, target, label, sectionLabel, sectionOf, views: D.structure.views || {}, gloss, shortLabel, composedUrl, destOf, tabs: D.structure.tabs, data: D, parse };
 })();

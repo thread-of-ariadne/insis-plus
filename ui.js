@@ -55,6 +55,7 @@
     file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
     mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
     book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+    tick: '<path d="M20 6 9 17l-5-5"/>',
     check: '<path d="m9 11 3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
     people: '<circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-5.5"/>',
     list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
@@ -178,15 +179,18 @@
     function render() {
       const items = DESTS.map((d) => {
         const on = where.dest === d.id;
-        // Destinations without a tab row (Study matters, Campus & people) open their sections as a submenu.
-        const groups = d.landing && on && nav().tabs[d.id];
-        const subs = groups && !Array.isArray(groups) ? nodeLinks(Object.values(groups).flat()) : [];
-        const inSub = subs.some((l) => l.node === where.node);
+        // The current destination opens its sections as a submenu (Stripe/Linear-style local navigation): sections
+        // are places, not views, so they live in the sidebar and the page keeps at most one row of view tabs.
+        const groups = on && nav().tabs[d.id];
+        const subs = groups ? nodeLinks(Array.isArray(groups) ? groups : Object.values(groups).flat()) : [];
+        // A course page sits under My courses.
+        const current = where.node?.startsWith('course.') ? 'courses.mine' : nav().sectionOf(where.node);
+        const inSub = subs.some((l) => l.node === current);
         const item = h('a', { class: 'nav-item has-icon' + (on ? (inSub ? ' parent' : ' active') : ''), href: destHref(d), title: nav().label(d.id),
           'aria-current': on && !inSub ? 'page' : null }, icon(d.icon), h('span', { class: 'label' }, nav().label(d.id)));
-        if (!subs.length) return item;
-        return [item, h('div', { class: 'nav-sub' }, subs.map((l) => anchor(l, { class: 'nav-item sub' + (where.node === l.node ? ' active' : ''),
-          'aria-current': where.node === l.node ? 'page' : null, title: l.text }, h('span', { class: 'label' }, l.text))))];
+        if (subs.length < 2) return item;
+        return [item, h('div', { class: 'nav-sub' }, subs.map((l) => anchor(l, { class: 'nav-item sub' + (current === l.node ? ' active' : ''),
+          'aria-current': where.node === l.node ? 'page' : null, title: nav().sectionLabel(l.node) }, h('span', { class: 'label' }, nav().sectionLabel(l.node)))))];
       }).flat();
       const pinned = ipx.state.fav.map((url) => ipx.state.links[url] && { href: url, text: ipx.state.links[url].t }).filter(Boolean);
       body.replaceChildren(...[
@@ -299,14 +303,12 @@
   }
 
   // The destination's tabs under the top bar (links, the current one marked); none on pages without tabs.
-  function tabRow() {
-    const where = here();
-    const list = nav().tabs[where.dest];
-    if (!Array.isArray(list) || where.node?.startsWith('course.')) return null;
-    const links = nodeLinks(list);
-    if (links.length < 2) return null;
-    return h('nav', { class: 'dest-tabs', 'aria-label': nav().label(where.dest) },
-      links.map((l) => h('a', { href: l.href, class: l.node === where.node ? 'on' : null, 'aria-current': l.node === where.node ? 'page' : null }, l.text)));
+  // One row of view tabs: views of one thing (a course, one InSIS tool, one list cut different ways).
+  // links: [{ href, text, on, count }]
+  function viewTabs(links, label) {
+    if (!links || links.length < 2) return null;
+    return h('nav', { class: 'view-tabs', 'aria-label': label || null }, links.map((l) => h('a', { href: l.href, class: l.on ? 'on' : null,
+      'aria-current': l.on ? 'page' : null }, l.text, l.count != null && h('b', { class: 'view-tab-count' + (l.count > 0 ? ' hot' : '') }, String(l.count)))));
   }
 
   // ---------- page takeover ----------
@@ -361,7 +363,6 @@
       h('div', { class: 'scrim', onclick: () => shellEl.classList.remove('drawer') }),
       h('div', { class: 'main' },
         topBar(title, subtitle, extra),
-        tabRow(),
         h('main', { class: 'content' }, build ? build() : null, slotted ? h('slot') : null)),
       bottomBar());
     const pill = h('button', { class: 'pill', type: 'button', onclick: () => setClassic(false) }, icon('layout'), T.back);
@@ -488,8 +489,9 @@
   const notice = (link) => anchor(link, { class: 'notice' }, icon('alert'), h('span', {}, link.text), icon('arrow'));
 
   // Course card. c: { href, code, faculty, name, aims, tags: [], semester, ects }
+  // c.status: { tone, text } shown as a pill (a finished or failed course); c.done dims the card.
   function courseCard(c) {
-    return h('a', { class: 'card course', href: c.href },
+    return h('a', { class: 'card course' + (c.done ? ' is-done' : ''), href: c.href },
       cover(c.code, c.faculty),
       h('span', { class: 'course-body' },
         h('span', { class: 'course-code', style: `color: ${facultyColors(c.faculty)[1]}` }, [c.code, c.faculty].filter(Boolean).join(' · ')),
@@ -497,7 +499,8 @@
         c.aims && h('span', { class: 'course-desc' }, c.aims),
         h('span', { class: 'tags' }, (c.tags || []).filter(Boolean).map((t) => h('span', { class: 'tag' }, t)))),
       h('span', { class: 'course-side' },
-        c.semester && h('span', { class: 'course-term' }, T.semester, h('b', {}, c.semester)),
+        c.status ? h('span', { class: `delta ${c.status.tone}` }, c.done && icon('tick'), c.status.text)
+          : c.semester && h('span', { class: 'course-term' }, T.semester, h('b', {}, c.semester)),
         c.ects && h('span', { class: 'course-num' }, c.ects, h('small', {}, 'ECTS'))));
   }
 
@@ -697,7 +700,7 @@
   const onPinsChange = (fn) => pinListeners.push(fn);
 
   ipx.ui = {
-    PORTAL_ACTIONS, quickActions, here, nodeLinks, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
+    PORTAL_ACTIONS, quickActions, here, nodeLinks, viewTabs, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
     facultyFromCode, facultyFor, linkTabs, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
     kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,

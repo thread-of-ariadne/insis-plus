@@ -12,9 +12,9 @@
   const { countdown, deadlineTone } = ipx.ui;
 
   const T = {
-    cs: { submissions: 'odevzdávárny', hand: (t) => `Odevzdat: ${t}`, restriction: 'Omezení studia', restrictionSub: 'Podívejte se, co znamená a koho kontaktovat',
+    cs: { submissions: 'termíny odevzdávárn', restrictionWatch: 'omezení studia', noticeWatch: 'žádosti InSIS o kontrolu údajů', hand: (t) => `Odevzdat: ${t}`, restriction: 'Omezení studia', restrictionSub: 'Podívejte se, co znamená a koho kontaktovat',
       notice: 'oznámení InSIS', dataCheck: 'Kontrola osobních údajů', dataCheckSub: 'InSIS vás žádá o kontrolu', portal: 'portál', group: 'skupinová' },
-    en: { submissions: 'submissions', hand: (t) => `Hand in: ${t}`, restriction: 'Study restriction', restrictionSub: 'See what it means and whom to contact',
+    en: { submissions: 'submission deadlines', restrictionWatch: 'study restrictions', noticeWatch: 'InSIS requests to check your data', hand: (t) => `Hand in: ${t}`, restriction: 'Study restriction', restrictionSub: 'See what it means and whom to contact',
       notice: 'InSIS notices', dataCheck: 'Personal data check', dataCheckSub: 'InSIS asks you to check your data', portal: 'portal', group: 'group' },
   }[lang];
 
@@ -38,7 +38,7 @@
 
   // A restriction in the portal's studies table.
   add({
-    id: 'portal', label: T.portal, key: 'portal',
+    id: 'portal', label: T.restrictionWatch, key: 'portal',
     items(state) {
       const r = state.portal?.study?.restriction;
       return r && !/^[-–—\s]*$/.test(r) ? [{ id: 'restriction', title: T.restriction, sub: `${r} · ${T.restrictionSub}`, tone: 'bad', href: ipx.nav.target('studies.status') }] : [];
@@ -47,7 +47,7 @@
 
   // InSIS's own notice on its main page asking for a personal data check (shown here, not also as a notice).
   add({
-    id: 'notices', label: T.notice, key: 'notices',
+    id: 'notices', label: T.noticeWatch, key: 'notices',
     items(state) {
       return (state.notices?.items || []).filter((n) => /kontrol\w* osobnich|personal data check/.test(norm(n.text)))
         .map((n) => ({ id: 'datacheck', title: T.dataCheck, sub: T.dataCheckSub, tone: 'warn', href: ipx.nav.safe(n.href, 'link', { copied: true }) || ipx.nav.target('account.profile') }));

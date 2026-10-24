@@ -24,8 +24,9 @@
       outside: (r) => `Dnešek je mimo období tohoto rozvrhu (${r}), proto ukazuji nejbližší týden s výukou.`,
       templateNote: 'Rozvrh je ve formě týdenního přehledu: data jednotlivých hodin nejsou uvedena.',
       hoursChart: 'Výuka v týdnu', semesterCourses: 'Předměty v rozvrhu', teachers: 'Vyučující', rooms: 'Místnosti',
-      notes: 'Poznámky', options: 'Výpis, tisk a PDF', optionsHint: 'Původní nastavení InSIS: zvolte typ výpisu, období nebo formát PDF a stiskněte Zobrazit.',
-      criteria: 'Změnit kritéria', print: 'Tisk / PDF', lastChange: 'Poslední změna', noEvents: 'V tomto rozvrhu nejsou žádné hodiny.',
+      notes: 'Poznámky', options: 'Export a tisk', optionsHint: 'Výpis, tisk nebo PDF: zvolte typ výpisu, období nebo formát PDF a stiskněte Zobrazit (formulář InSIS).',
+      toCalendar: 'Do Outlooku a telefonu', toCalendarText: 'InSIS přenese rozvrh do kalendáře vašeho univerzitního účtu: uvidíte ho v Outlooku i v telefonu.',
+      criteria: 'Změnit kritéria', print: 'Export', lastChange: 'Poslední změna', noEvents: 'V tomto rozvrhu nejsou žádné hodiny.',
       inWeek: (n) => `${n}× v týdnu`, total: 'celkem' },
     en: { title: 'Timetable', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       classesWeek: 'Classes this week', classesShown: 'Classes in week', hoursWeek: 'Hours this week', hoursShown: 'Hours in week',
@@ -39,8 +40,9 @@
       outside: (r) => `Today is outside this timetable's period (${r}), so this shows the nearest week with classes.`,
       templateNote: 'This timetable is a weekly overview: it does not list the dates of individual classes.',
       hoursChart: 'Teaching this week', semesterCourses: 'Courses in this timetable', teachers: 'Teachers', rooms: 'Rooms',
-      notes: 'Notes', options: 'List, print and PDF', optionsHint: 'The original InSIS settings: choose the list type, period or the PDF format and press Display.',
-      criteria: 'Select criteria', print: 'Print / PDF', lastChange: 'Last change', noEvents: 'There are no classes in this timetable.',
+      notes: 'Notes', options: 'Export and print', optionsHint: 'A list, print or PDF: choose the list type, period or PDF format and press Display (the InSIS form).',
+      toCalendar: 'To Outlook and your phone', toCalendarText: 'InSIS transfers the timetable to the calendar of your university account: it shows in Outlook and on your phone.',
+      criteria: 'Select criteria', print: 'Export', lastChange: 'Last change', noEvents: 'There are no classes in this timetable.',
       inWeek: (n) => `${n}× a week`, total: 'total' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -478,7 +480,15 @@
           : emptyState(T.emptyWeek),
 
       d.events.length > 0 && [sectionHead(T.semesterCourses), courseSummary(d)],
-      d.form && [sectionHead(T.options), h('p', { class: 'muted tt-options-hint' }, T.optionsHint)]);
+      // One place for everything that takes the timetable elsewhere: the calendar transfer, then InSIS's own
+      // list / print / PDF form (slotted right under this section).
+      (d.form || ipx.nav.target('schedule.export')) && [
+        h('div', { id: 'tt-export' }, sectionHead(T.options)),
+        ipx.nav.target('schedule.export') && anchor({ href: ipx.nav.target('schedule.export') }, { class: 'card glist-item tt-export' },
+          h('span', { class: 'tt-export-ico' }, icon('calendar')),
+          h('span', { class: 'glist-text' }, h('strong', {}, T.toCalendar), h('small', {}, T.toCalendarText)),
+          h('span', { class: 'glist-go' }, icon('arrow'))),
+        d.form && h('p', { class: 'muted tt-options-hint' }, T.optionsHint)]);
 
     const marks = [...new Set(list.map((e) => e.weekday))];
     const rail = h('aside', { class: 'tt-rail' },
@@ -525,8 +535,8 @@
     const start = initialWeek(data, now);
     const extra = [
       data.criteria && anchor(data.criteria, { class: 'tt-action', title: T.criteria }, icon('calendar'), h('span', {}, T.criteria)),
-      slotted && h('button', { type: 'button', class: 'tt-action', title: T.print,
-        onclick: () => data.form.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, icon('file'), h('span', {}, T.print)),
+      (slotted || ipx.nav.target('schedule.export')) && h('button', { type: 'button', class: 'tt-action', title: T.print,
+        onclick: (e) => e.currentTarget.getRootNode().getElementById('tt-export')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, icon('file'), h('span', {}, T.print)),
     ];
 
     takeover({

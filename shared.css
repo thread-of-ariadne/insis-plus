@@ -703,21 +703,13 @@ kbd {
 
 /* Navigation of the new structure (ui.js): destinations, destination tabs, top-bar menus */
 .dests { display: flex; flex-direction: column; gap: 2px; padding-top: 6px; }
-.dest-tabs {
-  display: flex;
-  gap: 4px;
-  margin: 14px 32px 0;
-  padding: 4px;
-  width: fit-content;
-  max-width: calc(100% - 64px);
-  overflow-x: auto;
-  border-radius: 12px;
-  background: var(--chip);
-  scrollbar-width: none;
-}
-.dest-tabs a { flex: none; padding: 7px 14px; border-radius: 9px; color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
-.dest-tabs a:hover { color: var(--fg); }
-.dest-tabs a.on { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-raised); }
+/* View tabs: one row per page, for views of one thing (ui.viewTabs, the course page, InSIS tools) */
+.view-tabs { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.view-tabs a { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 2px 0 11px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.view-tabs a:hover { color: var(--fg); }
+.view-tabs a.on { border-bottom-color: var(--accent); color: var(--fg); font-weight: 700; }
+.view-tab-count { padding: 0 6px; border-radius: 6px; background: color-mix(in srgb, var(--faint) 22%, transparent); color: var(--fg-2); font-size: 11.5px; line-height: 18px; }
+.view-tab-count.hot { background: var(--bad); color: #fff; }
 .chip-btn .q { font: 800 15px/1 var(--display); }
 .langs { display: flex; gap: 2px; }
 .pop-wrap { position: relative; }
@@ -752,9 +744,6 @@ button.avatar { border: 0; cursor: pointer; }
 .glist-item:hover .glist-go { color: var(--accent); }
 .glist-note { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; }
 .glist-note p { margin: 0; color: var(--muted); font-size: 14px; }
-@media (max-width: 900px) {
-  .dest-tabs { margin: 12px 16px 0; max-width: calc(100% - 32px); }
-}
 @media (prefers-reduced-motion: reduce) { .glist-item { transition: none; } }
 
 /* Phone bottom bar (ui.js bottomBar) */
@@ -870,3 +859,19 @@ a.person:hover { border-color: var(--accent); }
 .gcol-item strong { font-size: 14px; font-weight: 650; }
 .gcol-item small { color: var(--muted); font-size: 12.5px; line-height: 1.35; }
 @media (max-width: 860px) { .dest-top { grid-template-columns: minmax(0, 1fr); } }
+
+/* Finished courses: under their own heading, the cover dimmed, a check in the status pill */
+.course-group-done { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.course-group-title { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.course.is-done .cover { filter: grayscale(1); opacity: 0.55; }
+.course.is-done .course-name { color: var(--fg-2); }
+.course-side .delta { display: inline-flex; align-items: center; gap: 4px; }
+.course-side .delta svg { width: 13px; height: 13px; }
+.course.is-done { padding: 8px; }
+.course.is-done .cover svg { width: 84px; height: 56px; }
+.course.is-done .course-name { font-size: 16px; }
+.else-card { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.else-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 20px; margin: 0 0 12px; font-size: 14px; }
+.else-list dt { font-weight: 700; color: var(--fg); }
+.else-list dd { margin: 0; color: var(--muted); line-height: 1.45; }
+@media (max-width: 640px) { .else-list { grid-template-columns: minmax(0, 1fr); } .else-list dd { margin-bottom: 6px; } }

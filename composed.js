@@ -20,7 +20,7 @@
       clear: 'Smazat uložená data', clearText: 'Smaže vše, co InSIS+ uložil, kromě volby sdíleného počítače.', clearButton: 'Smazat', cleared: 'Smazáno.',
       newFiles: (n) => `${n} nových dokumentů`, result: (c, n) => `Výsledek: ${c} ${n}`, fresh: 'nové', noNotifications: 'Zatím nic nového.',
       notifHint: 'Upozornění ukazují, co se v InSIS změnilo. Zprávy v InSIS najdete pod ikonou obálky.',
-      myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
+      somethingElse: 'Něco jiného?', myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
       studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
       myTeachers: 'Tvoji vyučující v tomto semestru', findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
       nextDegree: 'Přihlášky ke studiu jsou v InSIS pod položkou Přihláška ke studiu na hlavní stránce (v klasickém zobrazení). InSIS+ je zatím neotevírá. Pokud si nejste jistí postupem, zeptejte se na studijním oddělení.' },
@@ -34,7 +34,7 @@
       clear: 'Clear stored data', clearText: 'Deletes everything InSIS+ stored, except the shared-computer choice.', clearButton: 'Clear', cleared: 'Cleared.',
       newFiles: (n) => `${n} new documents`, result: (c, n) => `Result: ${c} ${n}`, fresh: 'new', noNotifications: 'Nothing new yet.',
       notifHint: 'Notifications show what changed in InSIS. InSIS messages are under the envelope icon.',
-      myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
+      somethingElse: 'Something else?', myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
       studyUnknown: 'Your study details have not loaded yet.', toHandle: 'To handle', nothingToHandle: 'Nothing waiting.',
       myTeachers: 'Your teachers this semester', findPerson: 'Find a person', teachersUnknown: 'Your teachers appear once your timetable has loaded.',
       nextDegree: 'Study applications are in InSIS under Study application form on the main page (in Classic view). InSIS+ does not open them yet. If you are unsure how to apply, ask the study department.' },
@@ -105,7 +105,14 @@
           h('section', { class: 'card pad' },
             h('h2', { class: 'card-title' }, T.toHandle),
             todo.length ? todoRows(todo) : h('p', { class: 'muted' }, T.nothingToHandle))),
-        groupColumns('matters'));
+        groupColumns('matters'),
+        // What InSIS has no page for: said here, with whom to ask (no dead-end sections in the navigation).
+        h('section', { class: 'card pad else-card' },
+          h('h2', { class: 'card-title' }, T.somethingElse),
+          h('dl', { class: 'else-list' },
+            h('dt', {}, nav.label('studies.requests')), h('dd', {}, T.requests),
+            h('dt', {}, nav.label('studies.nextdegree')), h('dd', {}, T.nextDegree)),
+          nav.target('campus.office') && anchor({ href: nav.target('campus.office') }, { class: 'btn ghost' }, nav.label('campus.office'))));
     },
   }));
 

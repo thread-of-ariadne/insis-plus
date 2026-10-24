@@ -178,8 +178,24 @@
         "Všechny služby"
       ]
     },
+    "views": {
+      "_comment": "Sections whose nodes are views of one InSIS page (one list cut different ways): the sidebar shows the section once, the page shows the views as one row of view tabs (02-redesign.md §2).",
+      "exams.mine": [
+        "exams.mine",
+        "exams.signup",
+        "exams.past",
+        "exams.unscheduled"
+      ]
+    },
+    "section_labels": {
+      "_comment": "Sidebar label of a section with views, when it differs from its first view's label.",
+      "exams.mine": [
+        "Exam dates",
+        "Termíny zkoušek"
+      ]
+    },
     "tabs": {
-      "_comment": "Order of the tabs (or grouped sections) of each destination; node ids from nodes.",
+      "_comment": "Sections of each destination (the sidebar submenu), in order; grouped where the destination has groups. Node ids from nodes. Nodes left out on purpose: schedule.export (an action of My week), studies.requests and studies.nextdegree (no InSIS page: a card on the Study matters overview).",
       "courses": [
         "courses.mine",
         "courses.files",
@@ -198,26 +214,22 @@
       "schedule": [
         "schedule.week",
         "schedule.calendar",
-        "schedule.search",
-        "schedule.export"
+        "schedule.search"
       ],
       "exams": [
         "exams.mine",
-        "exams.signup",
-        "exams.past",
-        "exams.unscheduled",
         "exams.tests"
       ],
       "grades": [
         "grades.results",
-        "grades.plan"
+        "grades.plan",
+        "grades.plans"
       ],
       "matters": {
         "matters.paperwork": [
           "studies.papers",
           "studies.excuses",
-          "studies.status",
-          "studies.requests"
+          "studies.status"
         ],
         "matters.money": [
           "studies.money"
@@ -225,8 +237,7 @@
         "matters.future": [
           "studies.thesis",
           "studies.abroad",
-          "studies.internships",
-          "studies.nextdegree"
+          "studies.internships"
         ]
       },
       "campus": {
@@ -240,7 +251,6 @@
           "campus.library"
         ],
         "campus.info": [
-          "campus.plans",
           "campus.theses",
           "campus.about"
         ]
@@ -373,7 +383,7 @@
         "My loans and due dates",
         "Moje výpůjčky a termíny"
       ],
-      "campus.plans": [
+      "grades.plans": [
         "Study plans of all programmes",
         "Studijní plány všech programů"
       ],
@@ -652,7 +662,7 @@
       "en": "Departments",
       "cs": "Pracoviště"
     },
-    "campus.plans": {
+    "grades.plans": {
       "en": "Study plans",
       "cs": "Studijní plány"
     },
@@ -1303,7 +1313,7 @@
       ]
     },
     "/auth/katalog/plany.pl": {
-      "node": "campus.plans",
+      "node": "grades.plans",
       "also": [
         "grades.plan"
       ],

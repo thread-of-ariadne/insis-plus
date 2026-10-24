@@ -45,6 +45,9 @@ for group, entries in structure.items():
             errors += [f"structure entry.{key}: {path} is not a page of that node" for path in label
                        if path not in pages or (pages[path]["node"] != key and key not in pages[path].get("variants", {}).values())]
             continue
+        if group == "views":
+            errors += [f"structure views.{key}: unknown node {n}" for n in [key, *label] if n not in nodes]
+            continue
         if group == "tabs":
             members = [n for lst in label.values() for n in lst] if isinstance(label, dict) else label
             errors += [f"structure tabs.{key}: unknown node {n}" for n in members if n not in nodes]

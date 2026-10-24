@@ -88,6 +88,8 @@ html.ipx-generic #str1 table.portal_menu a {
 }
 html.ipx-generic #str1 table.portal_menu a:hover { color: var(--fg); }
 html.ipx-generic #str1 table.portal_menu b a { border-bottom-color: var(--accent); color: var(--fg); font-weight: 700; }
+/* InSIS's portal bar (My College · E-study record · …) repeats the sidebar: every link in it is a section there */
+html.ipx-generic #str1 table.portal_menu:has(a[href*="moje_studium.pl"]) { display: none; }
 /* InSIS's separators between tabs ("|") */
 html.ipx-generic #str1 table.portal_menu td:not(:has(a)) { display: none; }
 
