@@ -9,7 +9,7 @@
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui || !ipx.nav || !ipx.composed) return;
   const { lang, clean } = ipx;
-  const { h, icon, anchor, courseCard, emptyState, nextClasses, facultyFor, facultyColors, countdown, initials } = ipx.ui;
+  const { h, icon, anchor, courseCard, emptyState, nextClasses, facultyFor, facultyColors, countdown, deadlineTone, wallTime, initials } = ipx.ui;
   const nav = ipx.nav;
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -20,28 +20,40 @@
       filesN: (n) => `${n} ${n === 1 ? 'soubor' : n >= 2 && n <= 4 ? 'soubory' : 'souborů'}`, folderEmpty: 'Složka je zatím prázdná.',
       folderNote: 'Složky se otevírají v InSIS až na tvé kliknutí: otevření může označit soubory jako přečtené.', noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
       allFolders: 'Všechny složky', moodle: 'Někteří vyučující dávají materiály do Moodlu.', noBoxes: 'Pro tento předmět nejsou žádné odevzdávárny.',
-      allBoxes: 'Všechny odevzdávárny v InSIS', topics: 'Přihlašování na témata', result: 'Výsledek', attempts: 'Pokusy a termíny', points: 'Průběžné body',
+      topics: 'Přihlašování na témata', result: 'Výsledek', points: 'Průběžné body',
       pointsText: 'Body z průběžného hodnocení ukazuje InSIS v listu předmětu.', examDates: 'Termíny zkoušek', tests: 'Online testy a kvízy',
       classmates: 'Spolužáci', classmatesLoad: 'Načítám seznam…', classmatesNone: 'Seznam spolužáků se nepodařilo načíst.',
       classmatesAll: 'Celý seznam v InSIS', notMine: 'Tento předmět není mezi vašimi zapsanými předměty.',
       lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
       coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
-      insisViews: 'Dokumentový server v InSIS:', newDocs: 'Nové dokumenty', tree: 'Celý strom', search: 'Hledat', library: 'E-knihovna' },
+      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály',
+      library: 'E-knihovna', libraryText: 'Veřejné studijní materiály, které zveřejňují katedry.',
+      untilAt: (d) => `do ${d}`, closedOn: (d) => `uzavřeno ${d}`, confirmed: 'potvrzeno', submitted: 'odevzdáno', nothingIn: 'nic neodevzdáno', notOpen: (d) => `otevře se ${d}`,
+      noResult: 'Výsledek zatím není zapsaný.', entered: (d) => `zapsáno ${d}`, attemptN: (n) => `${n}. pokus`, allAttempts: 'Všechny pokusy ve Výsledcích',
+      examText: 'Termíny zkoušek tohoto předmětu a přihlašování na ně jsou v Termínech zkoušek.', examLink: 'Moje termíny',
+      testsText: 'Online testy a kvízy předmětu se spouštějí v seznamu testů v InSIS.', testsLink: 'Seznam testů',
+      sheetLink: 'List předmětu', statusLabel: 'Stav předmětu' },
     en: { inProgress: 'In progress', passed: 'Passed', failed: 'Not passed',
       next: 'Next classes', noClasses: 'No more classes of this course in the timetable.', waiting: 'What is coming', nothing: 'Nothing waiting.',
       folder: 'Course folder on the document server', newN: (n) => `${n} new`, openFolder: 'Open in InSIS',
       filesN: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, folderEmpty: 'The folder is empty so far.',
       folderNote: 'Folders open in InSIS only when you click: opening one may mark its files as read.', noFolder: 'The course folder could not be matched by its code.',
       allFolders: 'All folders', moodle: 'Some teachers put materials in Moodle.', noBoxes: 'There are no submission boxes for this course.',
-      allBoxes: 'All submission boxes in InSIS', topics: 'Topic sign-up', result: 'Result', attempts: 'Attempts and dates', points: 'Points so far',
+      topics: 'Topic sign-up', result: 'Result', points: 'Points so far',
       pointsText: 'InSIS shows the points of continuous assessment in the course sheet.', examDates: 'Exam dates', tests: 'Online tests and quizzes',
       classmates: 'Classmates', classmatesLoad: 'Loading the list…', classmatesNone: 'The list of classmates could not be loaded.',
       classmatesAll: 'Full list in InSIS', notMine: 'This course is not among your enrolled courses.',
       lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
       coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
-      insisViews: 'Document server in InSIS:', newDocs: 'New documents', tree: 'Whole tree', search: 'Search', library: 'e-Library' },
+      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials',
+      library: 'e-Library', libraryText: 'Public study materials published by departments.',
+      untilAt: (d) => `until ${d}`, closedOn: (d) => `closed ${d}`, confirmed: 'confirmed', submitted: 'submitted', nothingIn: 'nothing submitted', notOpen: (d) => `opens ${d}`,
+      noResult: 'No result has been entered yet.', entered: (d) => `entered ${d}`, attemptN: (n) => `attempt ${n}`, allAttempts: 'All attempts in Results',
+      examText: 'This course’s exam dates, and signing up for them, are in Exam dates.', examLink: 'My dates',
+      testsText: 'Online tests and quizzes of this course are started from InSIS’s list of tests.', testsLink: 'List of tests',
+      sheetLink: 'Course sheet', statusLabel: 'Course status' },
   }[lang];
 
   // ---------- the course model ----------
@@ -82,9 +94,6 @@
     return { tone: 'neutral', text: T.inProgress };
   }
 
-  const linkRow = (l) => anchor(l, { class: 'card glist-item' },
-    h('span', { class: 'glist-text' }, h('strong', {}, l.text), l.gloss && h('small', {}, l.gloss)),
-    h('span', { class: 'glist-go' }, icon('arrow')));
 
   // ---------- the syllabus of a course (read when the course page opens) ----------
 
@@ -153,6 +162,41 @@
       h('span', { class: `delta ${st.tone}` }, st.text));
   }
 
+  // The facts of the course card, under the header on every tab (teardowns/courses.md §2.1 "Summary"): the next
+  // class (→ My week), the nearest deadline still to hand in (→ the box's InSIS page), new files (→ Materials) and
+  // InSIS's result once there is one. A fact without data is left out; no facts, no line.
+  const stampOf = (d) => {
+    const w = wallTime(d);
+    return `${w.day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'numeric' })} ${w.time}`;
+  };
+  function nextDeadline(code, now) {
+    return boxesOf(code).map((b) => ({ ...b, at: b.closes && new Date(b.closes), from: b.opens && new Date(b.opens) }))
+      .filter((b) => b.at && b.at > now && (!b.from || b.from <= now) && b.submitted !== true && b.section !== 'done')
+      .sort((a, b) => a.at - b.at)[0] || null;
+  }
+  function statusLine(c) {
+    const now = new Date();
+    const done = c.passed === true;
+    const n = !done && eventsOf(c.code).filter((e) => e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
+      .sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`))[0];
+    const due = !done && nextDeadline(c.code, now);
+    const f = folderOf(c.code);
+    const fact = (href, ic, text, tone) => {
+      const body = [icon(ic), h('span', {}, text)];
+      const cls = 'cs-fact' + (tone ? ` tone-${tone}` : '');
+      return href ? anchor({ href }, { class: cls }, ...body) : h('span', { class: cls }, ...body);
+    };
+    const facts = [
+      n && fact(nav.target('schedule.week'), 'clock',
+        [`${T.nextShort} ${new Date(`${n.date}T${n.start}`).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'numeric' })} ${n.start}`, n.room].filter(Boolean).join(' · ')),
+      due && fact(nav.safe(due.href, 'link', { copied: true }) || nav.composedUrl('course.submissions', c.code), 'file',
+        `${T.dueShort} ${countdown(due.at, now)} · ${due.title || due.name}`, deadlineTone(due.at, false, now)),
+      f?.newCount > 0 && fact(nav.composedUrl('course.files', c.code), 'folder', T.newN(f.newCount), 'bad'),
+      c.result && fact(null, 'award', `${T.result}: ${c.result}`, statusOf(c).tone),
+    ].filter(Boolean);
+    return facts.length ? h('p', { class: 'course-status', 'aria-label': T.statusLabel }, facts) : null;
+  }
+
   const BUILD = {
     'course.overview': (c) => {
       const todo = ipx.todo ? ipx.todo.items({ course: c.code }) : [];
@@ -171,6 +215,8 @@
           box.replaceChildren(h('div', { class: 'cols' }, h('div', { class: 'stack' }, h('p', { class: 'muted' }, T.syllabusNone)), h('div', { class: 'stack rail' }, own)));
           return;
         }
+        // Teachers have one place, the People tab: the syllabus's lecturers card is hidden here by course.css
+        // (.course-syllabus … :has(> .people)). Dropping the fact instead would make syllabus.js print a stray "0".
         box.replaceChildren(sanitizeLinks(ipx.syllabus.build(d, { embedded: true, rail: own })));
       });
       const full = c.href && nav.safe(c.href, 'link', { copied: true });
@@ -205,31 +251,61 @@
       ];
     },
     'course.submissions': (c) => {
+      // This course's boxes, soonest deadline first; each row opens the box's own InSIS page (stored by
+      // pages/submissions.js: Insert files / Display files, else the list itself), where InSIS takes the upload.
       const now = new Date();
-      const boxes = boxesOf(c.code).map((b) => ({ ...b, at: b.closes && new Date(b.closes) })).sort((a, b) => (a.at || 0) - (b.at || 0));
+      const boxes = boxesOf(c.code).map((b) => ({ ...b, at: b.closes && new Date(b.closes), from: b.opens && new Date(b.opens) }))
+        .sort((a, b) => (a.at || Infinity) - (b.at || Infinity));
+      const stateOf = (b) => {
+        if (b.section === 'done') return { text: T.confirmed, tone: 'ok' };
+        if (b.from && b.from > now) return { text: T.notOpen(stampOf(b.from)), tone: 'neutral' };
+        if (b.at && b.at > now) return { text: countdown(b.at, now), tone: deadlineTone(b.at, b.submitted === true, now) };
+        return null;
+      };
+      const all = nav.target('courses.submissions');
+      const topics = portalLink('/auth/student/temata_prihlasovani.pl');
       return [
         boxes.length
-          ? h('div', { class: 'card todo-mini pad' }, boxes.map((b) => h('div', { class: 'todo-row' },
-              h('span', { class: 'todo-text' }, h('strong', {}, b.title || b.name), h('small', {}, [b.type, b.section].filter(Boolean).join(' · '))),
-              b.at && h('span', { class: `delta ${b.submitted ? 'ok' : b.at < now ? 'neutral' : 'warn'}` }, b.at > now ? countdown(b.at, now) : b.at.toLocaleDateString(locale)))))
+          ? h('div', { class: 'card todo-mini pad' }, boxes.map((b) => {
+              // A box without a page of its own (closed, nothing handed in) was stored with the list's address.
+              const href = nav.safe(b.href, 'link', { copied: true }) || all;
+              const st = stateOf(b);
+              const when = b.at && (b.at > now ? T.untilAt(stampOf(b.at)) : T.closedOn(stampOf(b.at)));
+              const files = b.submitted === true ? [T.submitted, b.files ? T.filesN(b.files) : null].filter(Boolean).join(' · ')
+                : b.submitted === false ? T.nothingIn : null;
+              const body = [
+                h('span', { class: 'todo-text' }, h('strong', {}, b.title || b.name), h('small', {}, [when, files].filter(Boolean).join(' · '))),
+                st && h('span', { class: `delta ${st.tone}` }, st.text),
+                href && h('span', { class: 'glist-go' }, icon('arrow')),
+              ];
+              return href ? anchor({ href }, { class: 'todo-row box-row' }, ...body) : h('div', { class: 'todo-row box-row' }, ...body);
+            }))
           : emptyState(T.noBoxes),
-        h('div', { class: 'glist-items' }, [
-          nav.target('courses.submissions') && { href: nav.target('courses.submissions'), text: T.allBoxes },
-          portalLink('/auth/student/temata_prihlasovani.pl') && { href: portalLink('/auth/student/temata_prihlasovani.pl'), text: T.topics },
-        ].filter(Boolean).map(linkRow)),
+        (all || topics) && h('p', { class: 'course-links' },
+          all && anchor({ href: all }, {}, nav.sectionLabel('courses.submissions')),
+          topics && anchor({ href: topics }, {}, T.topics)),
       ];
     },
     'course.points': (c) => {
+      // Decision 6 (03-pages.md §7): InSIS's result with the attempt (→ Results), then the way to this course's
+      // exam dates (→ Exam dates) and online tests, each a fact with its one link; no list of bare links, no past
+      // dates. Exam dates and tests are not read by InSIS+ yet, so their cards say where they are.
       const st = statusOf(c);
+      const results = nav.target('grades.results');
+      const exams = nav.target('exams.mine');
+      const tests = nav.target('exams.tests');
+      const sheet = c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });
+      const head = (title, link) => h('div', { class: 'card-head' }, h('h2', {}, title), link && anchor(link, { class: 'more' }, link.text));
       return [
-        h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.result),
-          h('p', { class: 'result-line' }, h('span', { class: `delta ${st.tone}` }, st.text), c.result && h('span', {}, c.result))),
-        h('div', { class: 'glist-items' }, [
-          c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 }) && { href: portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 }), text: T.points, gloss: T.pointsText },
-          nav.target('exams.signup') && { href: nav.target('exams.signup'), text: T.examDates },
-          nav.target('grades.results') && { href: nav.target('grades.results'), text: T.attempts },
-          nav.target('exams.tests') && { href: nav.target('exams.tests'), text: T.tests },
-        ].filter(Boolean).map(linkRow)),
+        h('section', { class: 'card pad' },
+          head(T.result, results && { href: results, text: T.allAttempts }),
+          h('p', { class: 'result-line' }, h('span', { class: `delta ${st.tone}` }, st.text), h('span', {}, c.result || T.noResult)),
+          (c.entered || c.attempt) && h('p', { class: 'muted result-meta' },
+            [c.attempt && T.attemptN(c.attempt), c.entered && T.entered(c.entered)].filter(Boolean).join(' · '))),
+        h('div', { class: 'course-grid' },
+          h('section', { class: 'card pad' }, head(T.points, sheet && { href: sheet, text: T.sheetLink }), h('p', { class: 'muted' }, T.pointsText)),
+          c.passed !== true && h('section', { class: 'card pad' }, head(T.examDates, exams && { href: exams, text: T.examLink }), h('p', { class: 'muted' }, T.examText)),
+          c.passed !== true && h('section', { class: 'card pad' }, head(T.tests, tests && { href: tests, text: T.testsLink }), h('p', { class: 'muted' }, T.testsText))),
       ];
     },
     'course.people': (c) => {
@@ -288,6 +364,7 @@
         subtitle: nav.label('courses'),
         build: () => h('div', { class: 'course-page' },
           c && header(c),
+          c && courseOf(code) && statusLine(c),
           courseTabs(code, node),
           !courseOf(code) && h('p', { class: 'notice' }, T.notMine),
           c && BUILD[node](c)),
@@ -346,14 +423,20 @@
 
   ipx.composed.register('courses.files', () => ({
     css: 'course.css',
-    title: nav.label('courses.files'),
+    title: nav.sectionLabel('courses.files'),
+    subtitle: nav.label('courses'),
     build: () => {
       const list = current();
-      const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link') && new URL(path, document.baseURI).href;
+      const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
+      // One row of view tabs for the whole section, the same as on the document server's pages (pages/docserver.js):
+      // this page (By course), then InSIS's views of the document server. The e-library is another tool: a link card.
+      const newCount = ipx.state.docserver?.newCount;
       const views = [
-        [T.newDocs, '/auth/dok_server/nove_dok.pl'], [T.tree, '/auth/dok_server/'], [T.search, '/auth/dok_server/vyhledavani.pl'],
-        [T.library, '/auth/eknihovna/'],
-      ].map(([text, path]) => at(path) && { text, href: at(path) }).filter(Boolean);
+        { href: nav.composedUrl('courses.files'), text: T.byCourse, on: true },
+        ...[[T.tree, '/auth/dok_server/'], [T.newDocs, '/auth/dok_server/nove_dok.pl', newCount ?? null], [T.search, '/auth/dok_server/vyhledavani.pl']]
+          .map(([text, path, count]) => at(path) && { text, href: at(path), count }).filter(Boolean),
+      ];
+      const library = at('/auth/eknihovna/');
       const section = (c) => {
         const f = folderOf(c.code);
         const fac = facultyFor(c.code);
@@ -372,9 +455,14 @@
                 !top.length && !(f.files > 0) && h('p', { class: 'muted' }, T.folderEmpty)));
       };
       return h('div', { class: 'course-page' },
+        ipx.ui.viewTabs(views, T.views),
         list.length ? list.map(section) : emptyState(T.coursesEmpty),
         list.length > 0 && h('p', { class: 'muted small' }, T.folderNote),
-        views.length > 0 && h('p', { class: 'course-links' }, h('span', { class: 'muted' }, T.insisViews), views.map((v) => anchor(v, {}, v.text))));
+        // Decision 3 (03-pages.md §7): the e-library lives here as a link card, never as a tab.
+        library && anchor({ href: library }, { class: 'card glist-item files-library' },
+          h('span', { class: 'ds-ico' }, icon('book')),
+          h('span', { class: 'glist-text' }, h('strong', {}, T.library), h('small', {}, T.libraryText)),
+          h('span', { class: 'glist-go' }, icon('arrow'))));
     },
   }));
 })();

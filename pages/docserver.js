@@ -1,14 +1,20 @@
 // InSIS+ — Document server (dok_server/): the folder tree ("Document tree", index.pl) and the list of new
-// documents (nove_dok.pl). One module, each page recognised by its content.
+// documents (nove_dok.pl). One module, each page recognised by its content. Both are views of Courses › Materials
+// (docs/ia/03-pages.md §1 rule 7, teardowns/courses.md §2.3): the title is the section ("Materials"), the views
+// are one row of view tabs (By course, InSIS+'s composed page, then InSIS's own Document tree · New documents ·
+// Searching), and InSIS's two non-views (DS settings, All my folders) are the page actions.
 //
 // Document tree: div.tree > ul > li > div.node-container + div.subtree > ul > li … Each node label holds the
 // folder link (slozka.pl?…id=N) and after it "(files)" or "(new/files)", the new number in bold; a bold folder
 // name means new documents somewhere below. Counts are per folder, so totals are summed over the subtree here.
-// Course folders are recognised by their code ("4SA471 Innovation …"). The page is rebuilt (no forms on it).
+// Course folders are recognised by their code ("4SA471 Innovation …"). The page is rebuilt (no forms on it); the
+// one place that answers "what is new" is the New documents view, so the tree has no list of news of its own.
 //
-// New documents: one table row per document (folder link, name, comment, author, date, info link, file link).
-// The rows sit inside InSIS's "mark as read" form, which stays the original one: #str1 is slotted below the
-// new list, everything but that form hidden, and shown only when the student asks for it. Never submitted here.
+// New documents: InSIS's list is a table inside its "mark as read" form (a checkbox per row), so it is treatment L
+// in place (03-pages.md §2 "Moving InSIS's elements"): the summary is drawn above it, the form itself stays
+// InSIS's (slotted, everything around it hidden), its rows are styled in place and get data-ipx-label attributes
+// for the phone layout; no row is rebuilt, moved or reordered, and nothing is ticked or submitted here. The file
+// and info links of the rows are InSIS's own elements (a download link does not pass the URL rule).
 //
 // Stored for the dashboard, plain values only:
 // ipx.state.docserver = {
@@ -20,44 +26,43 @@
 // }
 (() => {
   const ipx = globalThis.insisPlus;
-  if (!ipx?.ui) return;
+  if (!ipx?.ui || !ipx.nav) return;
 
   // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
   // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
   let doc = document;
   let here = location;
   const { clean, norm, lang } = ipx;
-  const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, cover, facultyColors, styleSlotted } = ipx.ui;
+  const { h, icon, anchor, takeover, kpi, emptyState, facultyColors, styleSlotted } = ipx.ui;
+  const nav = ipx.nav;
 
   const T = {
-    cs: { tag: 'nové', title: 'Dokumentový server', tree: 'Strom dokumentů', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${n === 1 ? 'nový' : n < 5 ? 'nové' : 'nových'}`,
+    cs: { tag: 'nové', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${n === 1 ? 'nový' : n < 5 ? 'nové' : 'nových'}`,
       inside: (n) => `${n} ${n === 1 ? 'nový dokument' : n < 5 ? 'nové dokumenty' : 'nových dokumentů'} v podsložkách`,
       files: (n) => `${n} ${n === 1 ? 'soubor' : n < 5 ? 'soubory' : 'souborů'}`,
-      courses: 'Předměty', coursesNews: 'Předměty s novinkami', courseSection: 'Moje předměty',
-      byCourse: 'Materiály podle předmětů', byCourseHint: 'Složky tvých předmětů na jednom místě.', byCourseNews: (c) => `Novinky v: ${c}`,
-      allFolders: 'Celý strom složek', allHint: 'Všechny složky, které InSIS na stránce ukazuje. Složky s novými dokumenty jsou rozbalené.',
+      byCourseTab: 'Podle předmětů', treeTab: 'Strom dokumentů', searchTab: 'Hledat', views: 'Pohledy na materiály', settings: 'Nastavení', myFolders: 'Moje složky',
+      byCourse: 'Novinky ve vašich předmětech', byCourseNews: (c) => `Nové soubory v: ${c}. Podle předmětů je máte pohromadě.`,
+      allHint: 'Všechny složky, které vám InSIS ukazuje. Složky s novými dokumenty jsou rozbalené.',
       expand: 'Rozbalit vše', collapse: 'Sbalit vše', filter: 'Hledat složku…', noMatch: 'Žádná složka neodpovídá.',
-      whereNew: 'Kde je nové', whereEmpty: 'Ve stromu teď nejsou žádné nové dokumenty.', allNew: 'Všechny nové →',
-      storage: 'Vaše úložiště', open: 'Rozbalit', close: 'Sbalit',
-      none: 'žádné', latest: 'Poslední', today: 'dnes', yesterday: 'včera', refresh: 'Aktualizovat →',
-      emptyNew: 'Nemáte žádné nové dokumenty.', other: 'Ostatní složky', details: 'Informace o dokumentu',
-      markTitle: 'Označit jako přečtené', markHint: 'Otevřený dokument se v seznamu už znovu neukáže. Hromadně je označíte v původním formuláři InSIS.',
-      markShow: 'Zobrazit formulář', markHide: 'Skrýt formulář', file: 'Soubor',
-      treeTip: 'Seskupení podle předmětů funguje, až jednou otevřete Strom dokumentů.', inCourse: 've složce předmětu' },
-    en: { tag: 'new', title: 'Document server', tree: 'Document tree', fresh: 'New documents', newBadge: (n) => `${n} new`,
+      storage: 'Vaše úložiště', open: 'Rozbalit',
+      latest: 'Poslední', today: 'dnes', yesterday: 'včera', refresh: 'Aktualizovat',
+      emptyNew: 'Nemáte žádné nové dokumenty.', inCourses: 'Ve složkách předmětů', ofCourses: (n) => `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'}`,
+      perCourse: 'Podle předmětů', otherFolders: (n) => `${n} v ostatních složkách (fakulta, škola)`,
+      markLead: 'Seznam je původní seznam InSIS. Otevřený dokument se v něm už znovu neukáže. Více dokumentů najednou označíte jako přečtené zaškrtnutím a tlačítkem InSIS pod seznamem.',
+      treeTip: 'Předměty u nových dokumentů InSIS+ pozná, až jednou otevřete Strom dokumentů.' },
+    en: { tag: 'new', fresh: 'New documents', newBadge: (n) => `${n} new`,
       inside: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in subfolders`,
       files: (n) => `${n} ${n === 1 ? 'file' : 'files'}`,
-      courses: 'Courses', coursesNews: 'Courses with news', courseSection: 'My courses',
-      byCourse: 'Materials by course', byCourseHint: 'The folders of your courses in one place.', byCourseNews: (c) => `News in: ${c}`,
-      allFolders: 'Whole folder tree', allHint: 'Every folder InSIS shows on this page. Folders with new documents are open.',
+      byCourseTab: 'By course', treeTab: 'Document tree', searchTab: 'Search', views: 'Views of your materials', settings: 'Settings', myFolders: 'My folders',
+      byCourse: 'News in your courses', byCourseNews: (c) => `New files in ${c}. By course shows them together.`,
+      allHint: 'Every folder InSIS shows you. Folders with new documents are open.',
       expand: 'Expand all', collapse: 'Collapse all', filter: 'Find a folder…', noMatch: 'No folder matches.',
-      whereNew: 'Where the news is', whereEmpty: 'No new documents in the tree right now.', allNew: 'All new →',
-      storage: 'Your storage', open: 'Expand', close: 'Collapse',
-      none: 'none', latest: 'Latest', today: 'today', yesterday: 'yesterday', refresh: 'Refresh →',
-      emptyNew: 'You have no new documents.', other: 'Other folders', details: 'Document information',
-      markTitle: 'Mark as read', markHint: 'A document you open no longer shows up here. To mark several at once, use the original InSIS form.',
-      markShow: 'Show the form', markHide: 'Hide the form', file: 'File',
-      treeTip: 'Open the Document tree once and new files get grouped by course.', inCourse: 'in the course folder' },
+      storage: 'Your storage', open: 'Expand',
+      latest: 'Latest', today: 'today', yesterday: 'yesterday', refresh: 'Refresh',
+      emptyNew: 'You have no new documents.', inCourses: 'In course folders', ofCourses: (n) => `${n} ${n === 1 ? 'course' : 'courses'}`,
+      perCourse: 'By course', otherFolders: (n) => `${n} in other folders (faculty, university)`,
+      markLead: 'This is InSIS\'s own list. A document you open no longer shows up in it. To mark several as read at once, tick them and press InSIS\'s button under the list.',
+      treeTip: 'InSIS+ can tell the courses of new documents once you have opened the Document tree.' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -193,13 +198,41 @@
         file: fileA?.href || null, info: infoA?.href || null, type: mime.toUpperCase(),
       });
     }
-    const refresh = [...doc.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
+    const refresh = [...doc.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl(\?lang=\w+)?$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
     return { kind: 'new', tabs, docs, form, refresh: refresh && { href: refresh.href, text: T.refresh } };
   }
 
   // ---------- shared bits ----------
 
-  const tabsNav = (tabs) => ipx.ui.viewTabs(tabs.map((t) => ({ href: t.href, text: t.text, on: t.active, count: t.count })), T.title);
+  // Every link shown goes through the URL rule; one that does not pass becomes text.
+  const safe = (href) => (href ? nav.safe(href, 'link', { copied: true }) : null);
+  const linkOr = (href, props, ...kids) => {
+    const to = safe(href);
+    return to ? h('a', { ...props, href: to }, ...kids) : h('span', props, ...kids);
+  };
+
+  // InSIS's tab row split by what each tab is: the views of the document server (Document tree, New documents,
+  // Searching) become view tabs after InSIS+'s "By course"; a form (DS settings) and a rarely used list of the
+  // student's own folders (All my folders, which has a tab row of its own) are page actions (03-pages.md §1 rule 1).
+  const ACTION = [[/nastaveni_stromu\.pl/, () => T.settings, 'gear'], [/moje_dok\.pl/, () => T.myFolders, 'folder']];
+
+  function tabsNav(tabs) {
+    // The same names as the row on Courses › Materials (course.js), in the student's words.
+    const name = (t) => (/nove_dok\.pl/.test(t.href) ? T.fresh : /vyhledavani\.pl/.test(t.href) ? T.searchTab
+      : /index\.pl|dok_server\/(\?|$)/.test(t.href) ? T.treeTab : t.text);
+    const views = tabs.filter((t) => !ACTION.some(([re]) => re.test(t.href)))
+      .map((t) => ({ href: safe(t.href), text: name(t), on: t.active, count: t.count })).filter((t) => t.href);
+    return ipx.ui.viewTabs([{ href: nav.composedUrl('courses.files'), text: T.byCourseTab }, ...views], T.views);
+  }
+
+  function pageActions(tabs) {
+    // On phones the top bar has one row: the actions shrink to their icons (the label stays as the accessible name).
+    return ACTION.map(([re, label, ic]) => {
+      const t = tabs.find((x) => re.test(x.href));
+      const to = t && safe(t.href);
+      return to && anchor({ href: to }, { class: 'btn ghost ds-action', title: t.text, 'aria-label': label() }, icon(ic), h('span', { class: 'ds-action-label' }, label()));
+    }).filter(Boolean);
+  }
 
   function when(d, text) {
     if (!d) return text || '';
@@ -227,7 +260,7 @@
       li.append(
         h('div', { class: 'ds-row' },
           btn, folderIcon(),
-          h('a', { class: 'ds-name', href: n.href, title: n.name }, n.name),
+          linkOr(n.href, { class: 'ds-name', title: n.name }, n.name),
           h('span', { class: 'ds-counts' },
             inside > 0 && h('span', { class: 'ds-dot', title: T.inside(inside), 'aria-label': T.inside(inside) }),
             newBadge(n.fresh),
@@ -247,8 +280,6 @@
     const tab = newTab(d.tabs);
     const newCount = tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0);
     const withNews = d.courses.filter((n) => n.allNew > 0);
-    const freshFolders = [];
-    walk(d.roots, (n) => { if (n.fresh > 0) freshFolders.push(n); });
 
     const els = new Map();
     const inCourse = (n) => n.course || ancestors(n).some((p) => p.course);
@@ -273,41 +304,24 @@
     filter.addEventListener('input', runFilter);
     const all = (on) => { filter.value = ''; runFilter(); els.forEach((li) => setOpen(li, on)); };
 
-    const main = h('div', { class: 'ds-main' },
+    // The quota as one quiet line, in InSIS's own words ("Quota 40 MiB · Occupied 0.0 B (0 %) · Free 40.0 MiB").
+    const quotaLine = d.quota && h('p', { class: 'muted ds-quota' }, `${T.storage}: `,
+      d.quota.map((r) => `${r.label} ${r.value}${r.extra ? ` ${r.extra}` : ''}`).join(' · '));
+
+    return h('div', { class: 'ds' },
       tabsNav(d.tabs),
-      // Course folders by course live on Courses › Materials (one card per course); this page is the whole tree.
-      ipx.nav.composedUrl && h('a', { class: 'card ds-pointer', href: ipx.nav.composedUrl('courses.files') },
-        h('span', { class: 'ds-pointer-text' }, h('strong', {}, T.byCourse), h('small', {},
-          withNews.length ? T.byCourseNews(withNews.map((n) => n.course.code).join(', ')) : T.byCourseHint)),
+      // Summary: which of the student's courses have new files; the files themselves are one tab away.
+      withNews.length > 0 && h('a', { class: 'card ds-pointer', href: nav.composedUrl('courses.files') },
+        h('span', { class: 'ds-pointer-text' }, h('strong', {}, T.byCourse),
+          h('small', {}, T.byCourseNews(withNews.map((n) => n.course.code).join(', ')))),
         newCount > 0 && newBadge(newCount), icon('arrow')),
-      sectionHead(T.allFolders, null, h('p', { class: 'muted ds-sub' }, T.allHint)),
       h('div', { class: 'ds-tools' },
         h('label', { class: 'ds-filter-wrap' }, icon('search'), filter),
         h('button', { class: 'ds-btn', type: 'button', onclick: () => all(true) }, T.expand),
         h('button', { class: 'ds-btn', type: 'button', onclick: () => all(false) }, T.collapse)),
-      h('div', { class: 'card ds-whole' }, whole, noMatch));
-
-    const rail = h('aside', { class: 'ds-rail' },
-      h('section', {},
-        h('div', { class: 'card-head' }, h('h2', {}, T.whereNew), tab && anchor({ href: tab.href }, { class: 'more' }, T.allNew)),
-        freshFolders.length
-          ? h('ul', { class: 'ds-fresh' }, freshFolders.map((n) => {
-              const up = ancestors(n);
-              const course = [n, ...up].find((p) => p.course);
-              const where = course && course !== n
-                ? [course.course.code, ...up.slice(up.indexOf(course) + 1).map((p) => p.name)].join(' › ')
-                : up.slice(-2).map((p) => p.name).join(' › ');
-              return h('li', {}, anchor({ href: n.href }, { class: 'ds-fresh-row' },
-                h('span', { class: 'ds-fresh-body' }, h('strong', {}, course === n ? `${n.course.code} ${n.course.name}` : n.name),
-                  where && h('small', {}, course === n ? T.inCourse : where)),
-                newBadge(n.fresh)));
-            }))
-          : h('p', { class: 'muted ds-rail-empty' }, T.whereEmpty)),
-      d.quota && h('section', { class: 'card ds-quota' },
-        h('div', { class: 'card-head' }, h('h2', {}, T.storage)),
-        h('dl', {}, d.quota.map((r) => [h('dt', {}, r.label), h('dd', {}, r.value, r.extra && h('small', {}, ` ${r.extra}`))]))));
-
-    return h('div', { class: 'ds' }, main, rail);
+      h('p', { class: 'muted ds-sub' }, T.allHint),
+      h('div', { class: 'card ds-whole' }, whole, noMatch),
+      quotaLine);
   }
 
   // ---------- new documents ----------
@@ -323,9 +337,7 @@
       const key = code ? `c:${code}` : `f:${f?.id || f?.name || '?'}`;
       if (!groups.has(key)) {
         const c = code && byCode[code];
-        groups.set(key, code
-          ? { code, faculty: facultyOfCode(code), name: c?.name || own?.[2] || code, href: c?.href || (own ? f.href : null), docs: [] }
-          : { folder: f, docs: [] });
+        groups.set(key, code ? { code, faculty: facultyOfCode(code), name: c?.name || own?.[2] || code, docs: [] } : { folder: f, docs: [] });
       }
       groups.get(key).docs.push(doc);
     }
@@ -333,78 +345,51 @@
     return [...groups.values()].sort((a, b) => (!!b.code - !!a.code) || latest(b) - latest(a));
   }
 
-  function docRow(doc, showFolder) {
-    const link = doc.file || doc.info;
-    return h('li', { class: 'ds-doc' },
-      h('span', { class: 'ds-type', title: doc.type || T.file }, doc.type ? doc.type.slice(0, 4) : icon('file')),
-      h('div', { class: 'ds-doc-body' },
-        link ? h('a', { class: 'ds-doc-name', href: link }, doc.name) : h('span', { class: 'ds-doc-name' }, doc.name),
-        doc.comment && h('p', { class: 'ds-doc-comment' }, doc.comment),
-        h('div', { class: 'ds-doc-meta' },
-          showFolder && doc.folder && h('a', { href: doc.folder.href, class: 'ds-doc-folder' }, folderIcon(), h('span', {}, doc.folder.name)),
-          doc.author && anchor({ href: doc.author.href, target: doc.author.target }, {}, doc.author.text),
-          doc.dateText && h('time', { title: doc.dateText }, when(doc.date, doc.dateText)))),
-      doc.info && h('a', { class: 'ds-info', href: doc.info, title: T.details, 'aria-label': T.details }, svgIcon('info', 'ds-info-icon')));
+  // One row per course with new documents: the course page's Materials tab (where its folders are), the count.
+  function courseRows(groups) {
+    return h('section', { class: 'card ds-percourse' },
+      h('div', { class: 'card-head' }, h('h2', {}, T.perCourse)),
+      h('ul', { class: 'ds-fresh' }, groups.map((g) => h('li', {},
+        anchor({ href: nav.composedUrl('course.files', g.code) }, { class: 'ds-fresh-row' },
+          h('span', { class: 'ds-fresh-body' },
+            h('small', { class: 'ds-fresh-code', style: `color: ${facultyColors(g.faculty)[1]}` }, [g.code, g.faculty].filter(Boolean).join(' · ')),
+            h('strong', {}, g.name)),
+          newBadge(g.docs.length), icon('arrow'))))));
   }
 
-  function groupCard(g) {
-    const head = g.code
-      ? [cover(g.code, g.faculty, 44, 44),
-          h('div', { class: 'ds-course-titles' },
-            h('span', { class: 'course-code', style: `color: ${facultyColors(g.faculty)[1]}` }, [g.code, g.faculty].filter(Boolean).join(' · ')),
-            g.href ? h('a', { class: 'ds-course-name', href: g.href }, g.name) : h('span', { class: 'ds-course-name' }, g.name))]
-      : [h('span', { class: 'tile-icon' }, folderIcon()),
-          h('div', { class: 'ds-course-titles' },
-            g.folder?.href ? h('a', { class: 'ds-course-name', href: g.folder.href }, g.folder.name) : h('span', { class: 'ds-course-name' }, g.folder?.name || '—'))];
-    // Inside a course card each document names its subfolder; a plain folder card already is the folder.
-    return h('article', { class: 'card ds-group' },
-      h('div', { class: 'ds-course-head' }, head, newBadge(g.docs.length)),
-      h('ul', { class: 'ds-docs' }, g.docs.map((doc) => docRow(doc, !!g.code))));
+  // The rows of InSIS's table get the column name as a data attribute, so on phones each row reads as a card
+  // (CSS only: the cells, links and checkboxes stay exactly where InSIS put them).
+  function labelCells(table) {
+    const heads = [...(table?.querySelectorAll('thead th, tr.zahlavi > th') || [])].map((th) => clean(th.textContent).replace(/\s*\(.*$/, ''));
+    for (const tr of table?.querySelectorAll('tbody tr') || []) {
+      [...tr.children].forEach((td, i) => { if (heads[i]) td.setAttribute('data-ipx-label', heads[i]); });
+    }
   }
 
-  function buildNew(d, state) {
+  function buildNew(d) {
     const groups = groupDocs(d.docs);
     const courseGroups = groups.filter((g) => g.code);
-    const otherGroups = groups.filter((g) => !g.code);
+    const otherDocs = groups.filter((g) => !g.code).reduce((s, g) => s + g.docs.length, 0);
+    const inCourses = d.docs.length - otherDocs;
     const tab = newTab(d.tabs);
     const count = d.docs.length || tab?.count || 0;
     const newest = d.docs.map((x) => x.date).filter(Boolean).sort((a, b) => b - a)[0];
     const mapped = !!ipx.state.docserver?.folders;
-    const treeTab = d.tabs.find((t) => /index\.pl$|dok_server\/?$/.test(t.href));
+    const treeTab = d.tabs.find((t) => /index\.pl|dok_server\/(\?|$)/.test(t.href));
+    const refresh = d.refresh && safe(d.refresh.href);
 
-    const toggle = h('button', { class: 'ds-btn primary', type: 'button', 'aria-expanded': 'false',
-      onclick: () => {
-        const on = !state.wrap.classList.contains('show-form');
-        state.wrap.classList.toggle('show-form', on);
-        toggle.setAttribute('aria-expanded', String(on));
-        toggle.textContent = on ? T.markHide : T.markShow;
-        if (on) requestAnimationFrame(() => d.form.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-      } }, T.markShow);
-
-    const main = h('div', { class: 'ds-main' },
+    return h('div', { class: 'ds' },
       tabsNav(d.tabs),
-      h('div', { class: 'kpis' },
-        kpi({ label: T.fresh, value: count, status: count > 0 && { tone: 'bad', text: T.tag } }),
-        kpi({ label: T.coursesNews, value: courseGroups.length, foot: courseGroups.map((g) => g.code).join(', ') || null }),
+      d.docs.length > 0 && h('div', { class: 'kpis' },
+        kpi({ label: T.fresh, value: count, status: { tone: 'bad', text: T.tag } }),
+        mapped && kpi({ label: T.inCourses, value: inCourses, foot: courseGroups.length ? T.ofCourses(courseGroups.length) : null }),
         newest && kpi({ label: T.latest, value: when(newest), isText: true, foot: newest.toLocaleDateString(locale) })),
-      !mapped && d.docs.length && treeTab && h('p', { class: 'muted ds-sub' }, T.treeTip, ' ', anchor({ href: treeTab.href }, { class: 'ds-inline' }, treeTab.text)),
-      d.docs.length
-        ? [courseGroups.length && [sectionHead(T.courseSection, d.refresh), h('div', { class: 'ds-groups' }, courseGroups.map(groupCard))],
-            otherGroups.length && [sectionHead(T.other, courseGroups.length ? null : d.refresh), h('div', { class: 'ds-groups' }, otherGroups.map(groupCard))]]
-        : emptyState(T.emptyNew, d.refresh));
-
-    const rail = h('aside', { class: 'ds-rail' },
-      d.form && d.docs.length && h('section', { class: 'card ds-mark' },
-        h('div', { class: 'card-head' }, h('h2', {}, T.markTitle)),
-        h('p', { class: 'muted' }, T.markHint),
-        toggle),
-      courseGroups.length > 0 && h('section', {},
-        h('div', { class: 'card-head' }, h('h2', {}, T.courses)),
-        h('ul', { class: 'ds-fresh' }, courseGroups.map((g) => h('li', {},
-          (g.href ? anchor : (l, p, ...k) => h('span', p, ...k))({ href: g.href }, { class: 'ds-fresh-row' },
-            h('span', { class: 'ds-fresh-body' }, h('strong', {}, g.code), h('small', {}, g.name)), newBadge(g.docs.length)))))));
-
-    return h('div', { class: 'ds' }, main, rail);
+      !mapped && d.docs.length > 0 && treeTab && safe(treeTab.href) && h('p', { class: 'muted ds-sub' }, T.treeTip, ' ',
+        anchor({ href: safe(treeTab.href) }, { class: 'ds-inline' }, treeTab.text)),
+      courseGroups.length > 0 && courseRows(courseGroups),
+      otherDocs > 0 && courseGroups.length > 0 && h('p', { class: 'muted ds-sub' }, T.otherFolders(otherDocs)),
+      !d.docs.length ? emptyState(T.emptyNew, refresh && { href: refresh, text: T.refresh })
+        : d.form && [h('p', { class: 'kit-note info ds-lead' }, icon('info'), h('span', {}, T.markLead)), h('slot')]);
   }
 
   // ---------- dashboard data ----------
@@ -449,24 +434,23 @@
     const data = parseTree() || parseNew();
     if (!data) return;
     remember(data);
-    const active = data.tabs.find((t) => t.active);
+    const common = { key: 'docserver', css: ['kit.css', 'pages/docserver.css'], title: nav.sectionLabel('courses.files'),
+      subtitle: nav.label('courses'), extra: pageActions(data.tabs) };
 
     if (data.kind === 'tree') {
-      takeover({ key: 'docserver', css: 'pages/docserver.css', title: T.title, subtitle: active?.text || T.tree,
-        build: () => buildTree(data) });
+      takeover({ ...common, build: () => buildTree(data) });
       return;
     }
 
     const page = doc.getElementById('str1');
     const slotted = page && data.form && data.docs.length && page.contains(data.form) ? [page] : null;
     if (slotted) {
-      // Only the original "mark as read" form stays visible, shown on demand.
+      // Only InSIS's own "mark as read" form (with its list) stays visible, in place; its rows are styled, not moved.
       ipx.ui.keepOnly(page, data.form);
+      labelCells(data.form.querySelector('table:has(input[name="oznacene"])') || data.form.querySelector('table'));
       document.documentElement.classList.add('ipx-ds');
       styleSlotted('pages/docserver.css');
     }
-    const state = {};
-    takeover({ key: 'docserver', css: 'pages/docserver.css', title: T.title, subtitle: active?.text || T.fresh, slotted,
-      build: () => (state.wrap = buildNew(data, state)) });
+    takeover({ ...common, slotted, build: () => buildNew(data) });
   });
 })();

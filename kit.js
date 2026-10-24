@@ -8,7 +8,7 @@
 // ipx.kit.keyValues(root)         → [{ label, value, links }] from two-column label/value tables
 // ipx.kit.messages(root)         → [{ tone, text }] of InSIS's message boxes
 // ipx.kit.looseText(root)        → InSIS's plain text outside tables/forms (its "nothing here" sentence)
-// ipx.kit.dateOf(text)           → Date from "d. m. yyyy [hh:mm]"
+// ipx.kit.dateOf(text)           → Date from "d. m. yyyy" or "dd/mm/yyyy" [hh:mm]
 // ipx.kit.insisTabs(root)         → [{ href, text, on, count }] of the page's own tab row (portal bar excluded)
 // ipx.kit.dataTable({ columns, rows, empty, label })  → a readable table; cards below 640 px
 // ipx.kit.facts(pairs)            → <dl> of label / value
@@ -85,7 +85,7 @@
   // InSIS's message boxes (div.uis_msg info / warning / error / success) → [{ tone, text }].
   function messages(root) {
     return [...root.querySelectorAll('.uis_msg')].map((m) => ({
-      tone: m.classList.contains('error') ? 'bad' : m.classList.contains('warning') ? 'warn' : m.classList.contains('success') ? 'ok' : 'info',
+      tone: m.classList.contains('error') || m.classList.contains('ko') ? 'bad' : m.classList.contains('warning') ? 'warn' : m.classList.contains('success') ? 'ok' : 'info',
       text: cellText(m.querySelector('.text') || m),
     })).filter((m) => m.text);
   }
@@ -98,9 +98,10 @@
     return clean(copy.textContent);
   }
 
-  // A dated cell ("12. 11. 2026", "12.11.2026 14:00") → Date, else null.
+  // A dated cell → Date, else null. InSIS writes "12. 11. 2026" (Czech) and "12/11/2026" (English, day first),
+  // either with an optional "hh:mm".
   function dateOf(text) {
-    const m = /(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(text || '');
+    const m = /(\d{1,2})(?:\.\s*|\/)(\d{1,2})(?:\.\s*|\/)(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(text || '');
     return m ? new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)) : null;
   }
 
@@ -121,7 +122,7 @@
       h('table', { class: 'dtable', 'aria-label': label || null },
         h('thead', {}, h('tr', {}, columns.map((c) => h('th', { scope: 'col', class: c.align === 'end' ? 'end' : null }, c.label)))),
         h('tbody', {}, rows.map((r) => h('tr', { class: r._tone ? `tone-${r._tone}` : null },
-          columns.map((c) => h('td', { class: [c.align === 'end' && 'end', c.main && 'main'].filter(Boolean).join(' ') || null, 'data-label': c.label },
+          columns.map((c) => h('td', { class: [c.align === 'end' && 'end', c.main && 'dt-main'].filter(Boolean).join(' ') || null, 'data-label': c.label },
             cellNode(r[c.key]))))))));
   }
 

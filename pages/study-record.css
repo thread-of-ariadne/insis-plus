@@ -13,10 +13,6 @@
 .sr-main .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 1320px) { .sr-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* Views of the record (original links) */
-.link-tabs { gap: 4px 18px; margin-top: 4px; }
-.link-tabs .tab { font-size: 14px; }
-
 .sr-sem-meta { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; font-weight: 600; }
 
 /* ---------- course rows ---------- */
@@ -151,7 +147,6 @@ a.sr-attempt:hover { text-decoration: underline; }
   .sr-main, .sr-rail { padding: 16px; }
   :host .content:has(> .sr) > slot { padding: 0 16px 16px; }
   .sr-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .link-tabs { margin: 0 -16px; padding: 0 16px 4px; }
   .sr-list { padding: 2px 14px; }
   .sr-row { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 6px 12px; }
   .sr-badge { width: 40px; height: 40px; font-size: 20px; }
@@ -163,3 +158,12 @@ a.sr-attempt:hover { text-decoration: underline; }
 
 /* ---------- original content that stays (light DOM, only when a view has unrecognised parts) ---------- */
 
+
+/* ---------- views, notes and the What's left link (shadow root) ---------- */
+
+.sr-main .view-tabs { margin-bottom: 2px; }
+.sr-note { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; line-height: 1.45; }
+.sr-note .icon { margin-top: 1px; color: var(--accent); }
+.sr-more-link, .sr-left { color: var(--fg); }
+.sr-left { padding: 14px 16px; }
+.sr-left .glist-text small { font-variant-numeric: tabular-nums; }

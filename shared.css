@@ -806,16 +806,13 @@ button.avatar { border: 0; cursor: pointer; }
 .notif-list .todo-row:not(.fresh) strong { font-weight: 600; color: var(--fg-2); }
 
 /* Messages: where do messages arrive? (pages/messages.js) */
-.msg-where { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; padding: 16px 18px; }
-.msg-text { display: flex; flex-direction: column; gap: 4px; max-width: 64ch; }
-.msg-text p { margin: 0; font-size: 14px; }
-.msg-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.msg-actions .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; line-height: 40px; }
 
 /* Buttons (InSIS+ controls only; InSIS's own buttons keep generic.css) */
 .btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink, #fff); font: 700 14px var(--font); cursor: pointer; }
 .btn.ghost { background: var(--chip); color: var(--fg); }
 .btn:hover { filter: brightness(1.06); }
+a.btn, button.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+.btn svg { width: 16px; height: 16px; }
 
 /* Segmented choice (InSIS+ settings › Appearance) */
 .segmented { display: flex; flex: none; gap: 4px; padding: 4px; border-radius: 12px; background: var(--chip); }
@@ -876,3 +873,9 @@ a.person:hover { border-color: var(--accent); }
 .else-list dt { font-weight: 700; color: var(--fg); }
 .else-list dd { margin: 0; color: var(--muted); line-height: 1.45; }
 @media (max-width: 640px) { .else-list { grid-template-columns: minmax(0, 1fr); } .else-list dd { margin-bottom: 6px; } }
+
+/* Page actions in the top bar: on narrow screens only their icons, so the bar keeps the search, mail, bell and avatar */
+@media (max-width: 900px) {
+  .top-actions > .btn > span, .top-actions > a.btn > span { display: none; }
+  .top-actions > .btn { padding: 0 11px; }
+}

@@ -41,3 +41,27 @@ a.folder-row:hover .glist-go { color: var(--accent); }
 .files-course .card-head { align-items: center; }
 .files-course .course-code { font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; }
 .files-course h2 a:hover { color: var(--accent); }
+
+/* Course page: the status line under the header (the facts of the course card), one chip per fact. */
+.course-status { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.cs-fact { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 12px; border-radius: 10px; background: var(--chip); color: var(--fg-2); font-size: 13.5px; font-weight: 600; }
+.cs-fact .icon svg { width: 15px; height: 15px; stroke-width: 2; }
+a.cs-fact:hover { color: var(--fg); background: color-mix(in srgb, var(--faint) 22%, var(--chip)); }
+.cs-fact.tone-bad .icon, .cs-fact.tone-bad { color: var(--bad); }
+.cs-fact.tone-warn .icon { color: var(--warn); }
+.cs-fact.tone-ok .icon { color: var(--ok); }
+
+/* Course › Submissions: each box a link to its InSIS page */
+.box-row { color: var(--fg); }
+a.box-row:hover strong { color: var(--accent); }
+.box-row .glist-go { flex: none; color: var(--faint); }
+a.box-row:hover .glist-go { color: var(--accent); }
+.result-meta { margin: 8px 0 0; font-size: 13.5px; }
+
+/* Materials: the e-library link card */
+.files-library { align-self: flex-start; min-width: min(100%, 420px); color: var(--fg); }
+.files-library .ds-ico { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.files-library .ds-ico svg { width: 18px; height: 18px; }
+
+/* Overview: the embedded syllabus's lecturers card is hidden (teachers have one place, the People tab). */
+.course-syllabus .rail > section.card:has(> .people) { display: none; }

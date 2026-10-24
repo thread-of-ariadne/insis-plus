@@ -239,14 +239,14 @@
         h('div', { class: 'stack' }, main.length > 2 && jump, main.map((b) => b.node)),
         h('div', { class: 'stack rail' },
           railTop,
-          people.length && h('section', { class: 'card' },
+          people.length > 0 && h('section', { class: 'card' },
             h('div', { class: 'card-head' }, h('h2', {}, T.lecturers)),
             h('div', { class: 'people' },
               people.map((p) => anchor(p, { class: 'person' },
                 h('span', { class: 'avatar sm' }, initials(p.text)),
                 h('span', { class: 'person-text' }, h('strong', {}, p.text), p.role && h('small', {}, p.role)))))),
           rail,
-          others.length && h('section', { class: 'card' },
+          others.length > 0 && h('section', { class: 'card' },
             h('div', { class: 'card-head' }, h('h2', {}, T.details)),
             h('dl', { class: 'details' }, others.map((f) => [h('dt', {}, f.label), h('dd', {}, content(f.el))]))))));
   }

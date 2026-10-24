@@ -21,7 +21,8 @@
       notifHint: 'Upozornění ukazují, co se v InSIS změnilo. Zprávy v InSIS najdete pod ikonou obálky.',
       somethingElse: 'Něco jiného?', myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
       studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
-      myTeachers: 'Tvoji vyučující v tomto semestru', findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
+      myTeachers: 'Tvoji vyučující v tomto semestru', myRooms: 'Tvoje místnosti tento týden',
+      checkedAt: (t) => `Načteno z InSIS v ${t}`, nextClass: (w, r) => `příště ${w}${r ? ` · ${r}` : ''}`, findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
       nextDegree: 'Přihlášky ke studiu (např. na navazující magisterské studium) se podávají elektronickou přihláškou VŠE; InSIS+ ji neotevírá. S postupem poradí studijní oddělení.' },
     en: { soon: 'This InSIS+ page is still being built.', open: 'Open in InSIS', settingsLead: 'Settings of the InSIS+ extension.',
       classic: 'Classic InSIS look', classicText: 'Switch the InSIS+ look off on any page with Classic view at the bottom of the sidebar.',
@@ -34,7 +35,8 @@
       notifHint: 'Notifications show what changed in InSIS. InSIS messages are under the envelope icon.',
       somethingElse: 'Something else?', myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
       studyUnknown: 'Your study details have not loaded yet.', toHandle: 'To handle', nothingToHandle: 'Nothing waiting.',
-      myTeachers: 'Your teachers this semester', findPerson: 'Find a person', teachersUnknown: 'Your teachers appear once your timetable has loaded.',
+      myTeachers: 'Your teachers this semester', myRooms: 'Your rooms this week',
+      checkedAt: (t) => `Read from InSIS at ${t}`, nextClass: (w, r) => `next ${w}${r ? ` · ${r}` : ''}`, findPerson: 'Find a person', teachersUnknown: 'Your teachers appear once your timetable has loaded.',
       nextDegree: 'Applications for study (e.g. a master’s programme) are made with VŠE’s electronic application; InSIS+ does not open it. The study department can advise you.' },
   }[lang];
 
@@ -60,30 +62,27 @@
     register(`dest.${dest}`, () => ({ title: nav.label(dest), build: () => groupedList(dest) }));
   }
 
-  // ---------- Study matters and Campus & people: what is going on first, then the sections ----------
-  // (docs/ia/02-redesign.md §3). The sections are also a submenu in the sidebar while you are in the destination.
-
-  // The destination's groups as compact columns: one card per group, a plain row per section with its gloss.
-  function groupColumns(dest) {
-    const groups = nav.tabs[dest];
-    return h('div', { class: 'gcols' }, Object.entries(groups).map(([group, nodes]) => {
-      const links = nodeLinks(nodes);
-      return links.length > 0 && h('section', { class: 'card gcol' },
-        h('h2', { class: 'card-title' }, nav.label(group)),
-        h('div', { class: 'gcol-items' }, links.map((l) => anchor(l, { class: 'gcol-item' },
-          h('span', { class: 'glist-text' }, h('strong', {}, l.text), l.gloss && h('small', {}, l.gloss)),
-          h('span', { class: 'glist-go' }, icon('arrow'))))));
-    }));
-  }
+  // ---------- Study matters and Campus & people: facts only (docs/ia/03-pages.md §7, decision 9) ----------
+  // The sections themselves are the sidebar's submenu while you are in the destination, so the overview repeats none
+  // of them: it shows what InSIS+ already knows from data it has read (no read of its own) and where to ask.
 
   const todoRows = (items) => h('div', { class: 'todo-mini' }, items.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
     h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
     it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))));
+  const clock = (ms) => new Date(ms).toLocaleTimeString(ipx.ui.locale, { hour: '2-digit', minute: '2-digit' });
+  // A link to another place as one compact card: icon, the place's label and its one-line explanation.
+  const linkCard = (node, iconName) => {
+    const href = nav.target(node);
+    return href && anchor({ href }, { class: 'card glist-item' }, icon(iconName),
+      h('span', { class: 'glist-text' }, h('strong', {}, nav.label(node)), nav.gloss(node) && h('small', {}, nav.gloss(node))),
+      h('span', { class: 'glist-go' }, icon('arrow')));
+  };
 
   register('dest.matters', () => ({
     title: nav.label('matters'),
     build: () => {
-      const s = ipx.state.portal?.study;
+      const portal = ipx.state.portal;
+      const s = portal?.study;
       const restricted = s?.restriction && !/^[-–—\s]*$/.test(s.restriction);
       const statusHref = nav.target('studies.status');
       // Things to handle that belong to no course: a restriction, InSIS's personal data check.
@@ -98,12 +97,13 @@
               h('p', { class: 'study-facts' },
                 s.faculty && h('span', { class: 'chip' }, s.faculty),
                 s.progress && h('span', { class: 'chip' }, s.progress),
-                h('span', { class: `delta ${restricted ? 'bad' : 'ok'}` }, restricted ? `${T.restricted}: ${s.restriction}` : T.noRestriction)),
+                h('span', { class: `delta ${restricted ? 'bad' : 'ok'}` }, restricted ? `${T.restricted}: ${s.restriction}` : T.noRestriction),
+                // When InSIS+ last read the study (the portal, refreshed by the background sync): the "stale" state.
+                portal.updated && h('span', { class: 'checked' }, T.checkedAt(clock(portal.updated)))),
             ] : h('p', { class: 'muted' }, T.studyUnknown)),
           h('section', { class: 'card pad' },
             h('h2', { class: 'card-title' }, T.toHandle),
             todo.length ? todoRows(todo) : h('p', { class: 'muted' }, T.nothingToHandle))),
-        groupColumns('matters'),
         // What InSIS has no page for: said here, with whom to ask (no dead-end sections in the navigation).
         h('section', { class: 'card pad else-card' },
           h('h2', { class: 'card-title' }, T.somethingElse),
@@ -113,31 +113,69 @@
     },
   }));
 
+  // Teachers of this semester's classes, from the personal timetable (ipx.state.timetable.events): name, the
+  // courses, their InSIS person page (copied through the URL rule) and the next class with them; soonest first.
+  // Also used by People (pages/persons.js) through ipx.composed.teachers() / teacherGrid().
+  const at = (date, hm) => {
+    const [y, m, d] = date.split('-').map(Number);
+    const [hh, mm] = hm.split(':').map(Number);
+    return new Date(y, m - 1, d, hh, mm);
+  };
+  function teachers(now = new Date()) {
+    const people = new Map();
+    for (const e of ipx.state.timetable?.events || []) {
+      const list = e.people?.length ? e.people : (e.teacher || '').split(/,\s*/).filter(Boolean).map((text) => ({ text }));
+      const start = e.date && e.start ? at(e.date, e.start) : null;
+      for (const p of list) {
+        const key = ipx.clean(p.text);
+        if (!key) continue;
+        const it = people.get(key) || { text: key, href: p.href && nav.safe(p.href, 'link', { copied: true }), codes: new Set(), next: null };
+        if (e.code) it.codes.add(e.code);
+        if (start && start > now && (!it.next || start < it.next.at)) it.next = { at: start, room: e.room || '' };
+        people.set(key, it);
+      }
+    }
+    return [...people.values()].sort((a, b) => ((a.next?.at ?? Infinity) - (b.next?.at ?? Infinity)) || a.text.localeCompare(b.text, lang));
+  }
+  const nextText = (n) => n && T.nextClass(`${n.at.toLocaleDateString(ipx.ui.locale, { weekday: 'short' })} ${n.at.toLocaleTimeString(ipx.ui.locale, { hour: '2-digit', minute: '2-digit' })}`, n.room);
+  // A person or room is a link when InSIS gave one, else plain text.
+  const linkOrText = (href, props, ...kids) => (href ? anchor({ href }, props, ...kids) : h('span', props, ...kids));
+  const teacherGrid = (list) => h('div', { class: 'people-grid' }, list.map((p) => linkOrText(p.href, { class: 'person' },
+    h('span', { class: 'avatar sm' }, ipx.ui.initials(p.text)),
+    h('span', { class: 'person-text' }, h('strong', {}, p.text),
+      h('small', {}, [[...p.codes].join(', '), nextText(p.next)].filter(Boolean).join(' · '))))));
+
+  // Rooms of this week's classes (every room of a weekly timetable), each with the room link the timetable gave.
+  function roomsThisWeek(now = new Date()) {
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+    const nextMonday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 7);
+    const rooms = new Map();
+    for (const e of ipx.state.timetable?.events || []) {
+      if (!e.room) continue;
+      if (e.date) {
+        const d = at(e.date, '00:00');
+        if (d < monday || d >= nextMonday) continue;
+      }
+      const r = rooms.get(e.room) || { text: e.room, href: e.roomHref && nav.safe(e.roomHref, 'link', { copied: true }), codes: new Set() };
+      if (e.code) r.codes.add(e.code);
+      rooms.set(e.room, r);
+    }
+    return [...rooms.values()].sort((a, b) => a.text.localeCompare(b.text, lang));
+  }
+
   register('dest.campus', () => ({
     title: nav.label('campus'),
     build: () => {
-      // Teachers of this semester's classes, from the personal timetable: name, the courses, their InSIS page.
-      const people = new Map();
-      for (const e of ipx.state.timetable?.events || []) {
-        const list = e.people?.length ? e.people : (e.teacher || '').split(/,\s*/).filter(Boolean).map((text) => ({ text }));
-        for (const p of list) {
-          const key = ipx.clean(p.text);
-          if (!key) continue;
-          const it = people.get(key) || { text: key, href: p.href && nav.safe(p.href, 'link', { copied: true }), codes: new Set() };
-          if (e.code) it.codes.add(e.code);
-          people.set(key, it);
-        }
-      }
-      const list = [...people.values()].sort((a, b) => a.text.localeCompare(b.text, lang));
+      const list = teachers();
+      const rooms = roomsThisWeek();
       return h('div', { class: 'dest-page' },
         h('section', { class: 'card pad' },
           h('div', { class: 'card-head' }, h('h2', {}, T.myTeachers), nav.target('campus.people') && anchor({ href: nav.target('campus.people') }, { class: 'more' }, T.findPerson)),
-          list.length ? h('div', { class: 'people-grid' }, list.map((p) => (p.href ? anchor : (l, props, ...k) => h('span', props, ...k))(
-            { href: p.href }, { class: 'person' },
-            h('span', { class: 'avatar sm' }, ipx.ui.initials(p.text)),
-            h('span', { class: 'person-text' }, h('strong', {}, p.text), p.codes.size > 0 && h('small', {}, [...p.codes].join(', '))))))
-            : h('p', { class: 'muted' }, T.teachersUnknown)),
-        groupColumns('campus'));
+          list.length ? teacherGrid(list) : h('p', { class: 'muted' }, T.teachersUnknown)),
+        rooms.length > 0 && h('section', { class: 'card pad' },
+          h('h2', { class: 'card-title' }, T.myRooms),
+          h('p', { class: 'study-facts' }, rooms.map((r) => linkOrText(r.href, { class: 'chip', title: [...r.codes].join(', ') || null }, r.text)))),
+        h('div', { class: 'glist-items' }, linkCard('campus.office', 'people')));
     },
   }));
 
@@ -245,6 +283,6 @@
   // Moving between InSIS+ pages only changes the hash: draw the new one.
   addEventListener('hashchange', () => { if (/^#ipx:/.test(location.hash)) location.reload(); });
 
-  ipx.composed = { register, show };
+  ipx.composed = { register, show, teachers, teacherGrid };
   ipx.notifications = { list: notifications, unseen };
 })();

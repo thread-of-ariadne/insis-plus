@@ -1,11 +1,13 @@
-// InSIS+ — Student's portal (student/moje_studium.pl), rebuilt around what students come here to do.
-// The original page mixes a table of studies (whose most important actions, exam and course registration, are
-// unlabelled icons), a row of 11 tabs and five blocks of ~30 icons. Here: the study on top, the six main actions
-// as labelled cards with live data, everything else as one short list in plain groups (with a filter), and the
-// week, next classes, deadlines and contacts on the side.
-// Only links are rebuilt (original hrefs); the page's form is not used and nothing is submitted.
+// InSIS+ — Study matters › Study status (student/moje_studium.pl). Treatment R (docs/ia/03-pages.md,
+// teardowns/study-matters.md §2.1).
+// InSIS's "Student's portal" is one wrapping form with a studies table (whose actions are unlabelled icons), the
+// portal bar and four blocks of ~30 icon links. Every one of those links is a section in the sidebar now, so the
+// page keeps only what is not navigation: the study itself (programme, form, faculty, progress, restriction), the
+// other studies when there are several, the links InSIS gives for this study (labelled), the ID card block and, on
+// the side, whom to ask. Links are InSIS's own addresses copied through the URL rule (nav.safe); they sit inside
+// InSIS's form, so they are copied, never moved. Nothing is filled in or submitted.
 //
-// Stored for the dashboard, the sidebar and the background sync (plain data, no HTML):
+// Stored for the dashboard, the sidebar and the background sync (plain data, no HTML; shape unchanged):
 // ipx.state.portal = {
 //   updated, source,
 //   study: { faculty, name, detail, progress, restriction } | null,
@@ -20,42 +22,43 @@
   // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
   let doc = document;
   let here = location;
-  const { clean, norm, lang } = ipx;
-  const { h, icon, anchor, takeover, PORTAL_ACTIONS, nextClasses, classDays, weekStrip, deadlineList,
-    facultyColors } = ipx.ui;
+  const { clean, lang } = ipx;
+  const { h, icon, anchor, takeover, viewTabs, PORTAL_ACTIONS, facultyColors } = ipx.ui;
 
   const T = {
-    cs: { title: 'Portál studenta', main: 'Hlavní', more: 'Všechno ostatní', filter: 'Hledat v portálu',
-      nothing: 'Nic takového tu není.', otherStudies: 'Další studia', schedule: 'Nejbližší hodiny', fullSchedule: 'Rozvrh →',
-      noSchedule: 'Rozvrh se načítá na pozadí, nebo ho otevřete v kartě Můj rozvrh.', deadlines: 'Termíny odevzdání',
-      allDeadlines: 'Odevzdávárny →', help: 'Kontakty a pomoc', insisHelp: 'Nápověda InSIS',
-      groups: { study: 'Studium', calendar: 'Kalendář a omluvenky', docs: 'Dokumenty a ankety', money: 'Finance', other: 'Ostatní' } },
-    en: { title: "Student's portal", main: 'Main', more: 'Everything else', filter: 'Search the portal',
-      nothing: 'Nothing like that here.', otherStudies: 'Other studies', schedule: 'Next classes', fullSchedule: 'Timetable →',
-      noSchedule: 'Your timetable is loading in the background, or open it from My timetable.', deadlines: 'Deadlines',
-      allDeadlines: 'Submissions →', help: 'Contacts and help', insisHelp: 'InSIS help',
-      groups: { study: 'Study', calendar: 'Calendar and excuses', docs: 'Documents and surveys', money: 'Money', other: 'Other' } },
+    cs: { title: 'Stav studia', status: 'Stav', history: 'Historie studia', views: 'Pohledy na studium',
+      noRestriction: 'Bez omezení', restriction: 'Omezení', period: 'Období',
+      restrictionText: (f) => `Omezení může zablokovat zápis předmětů i přihlašování na zkoušky. Ukládá a ruší ho studijní oddělení${f ? ` fakulty ${f}` : ''}.`,
+      inStudy: 'Pro toto studium', inStudyLead: 'Stránky InSIS, které patří k právě zvolenému studiu.',
+      studies: 'Vaše studia', active: 'Aktivní', workHere: 'Pracovat v tomto studiu',
+      card: 'Průkaz studenta', cardText: 'Průkaz ISIC nebo zaměstnanecký průkaz používá fotografii uloženou v InSIS.',
+      photo: 'Změnit fotografii', cardTypes: 'Typy průkazů', validity: 'Ověřit platnost průkazu',
+      ask: 'Na koho se obrátit', askText: 'Se studiem, omezením i průkazem poradí studijní oddělení vaší fakulty.',
+      requests: 'Formuláře kontaktního centra', noStudy: 'InSIS na této stránce neukazuje žádné studium.' },
+    en: { title: 'Study status', status: 'Status', history: 'History', views: 'Views of your study',
+      noRestriction: 'No restriction', restriction: 'Restriction', period: 'Period',
+      restrictionText: (f) => `A restriction can block course registration and exam sign-up. The study department${f ? ` of ${f}` : ''} sets and lifts it.`,
+      inStudy: 'For this study', inStudyLead: 'InSIS pages that belong to the study you are working in.',
+      studies: 'Your studies', active: 'Active', workHere: 'Work in this study',
+      card: 'Student card', cardText: 'Your ISIC or employee card uses the photo stored in InSIS.',
+      photo: 'Change photo', cardTypes: 'Card types', validity: 'Check a card’s validity',
+      ask: 'Who to ask', askText: 'The study department of your faculty helps with your study, a restriction or your card.',
+      requests: 'Contact centre forms', noStudy: 'InSIS shows no study on this page.' },
   }[lang];
 
-  // Our own groups for the remaining applications (by address; InSIS's own blocks mix unrelated things).
-  const GROUPS = [
-    ['calendar', /prehled_tydnu|harmonogram|omluvenk|mimosemestr/],
-    ['money', /financ|stip|bank/],
-    ['docs', /tisk|uloziste|anketk|dotaznik|evaluace/],
-    ['study', /student\/|studijni|elis|zp_|diplom|registrace|zkousk|terminy/],
-  ];
-  const CONTACTS = /stud_odd|kc\.pl/;
-
-  // Icon per application, by address.
-  const ICON_BY = [
-    [/terminy|zkousk/, 'check'], [/registrace|zapis/, 'list'], [/rozvrh|harmonogram|tydnu|mimosemestr/, 'calendar'],
-    [/omluvenk|tisk|list\.pl|diplom|zp_/, 'file'], [/spoluzaci|stud_odd/, 'people'], [/kc\.pl/, 'mail'], [/uloziste|mapa/, 'layers'],
-    [/anketk|evaluace|oblibene/, 'star'], [/praxe/, 'cpu'], [/financ|stip|bank/, 'award'], [/int\//, 'globe'],
-    [/fotk/, 'people'], [/osnov/, 'book'], [/temata/, 'list'], [/studium\.pl/, 'cap'],
-  ];
   // Addresses are compared without their query: many carry a link back to the portal (zpet=…/student/…).
   const path = (href) => new URL(href).pathname;
-  const iconFor = (href) => ICON_BY.find(([re]) => re.test(path(href)))?.[1] || 'layers';
+  // Icon for each link InSIS gives in the studies table, by address.
+  const ICON_BY = [[/terminy/, 'check'], [/vs_registrace/, 'layers'], [/registrace|zapis/, 'list'], [/mimosemestr/, 'calendar'], [/zp_temata/, 'file']];
+  const iconFor = (href) => ICON_BY.find(([re]) => re.test(path(href)))?.[1] || 'arrow';
+  // Every link shown on the page: InSIS's own address through the URL rule, or nothing.
+  const safe = (l) => {
+    const href = l?.href && ipx.nav?.safe(l.href, 'link', { copied: true });
+    return href ? { ...l, href, target: null } : null;
+  };
+  const restricted = (r) => !!r && !/^[-–—\s]*$/.test(r);
+  // "enrolled" / "řádně zapsán": the normal state of a running study.
+  const isEnrolled = (p) => /enrolled|zaps[aá]n|studuj/i.test(p || '');
 
   // ---------- reading the original page ----------
 
@@ -65,6 +68,17 @@
     text: clean(label || a.querySelector('.app-ikona-text')?.textContent || a.textContent || a.title ||
       a.querySelector('[aria-label]')?.getAttribute('aria-label')),
   });
+
+  // "Business Informatics<br>full-time<br>" → ['Business Informatics', 'full-time']. Split at the <br> elements, not
+  // with innerText: a page fetched by the background sync is never laid out, so innerText has no line breaks there.
+  function lines(el) {
+    const out = [''];
+    for (const n of el.childNodes) {
+      if (n.nodeName === 'BR') out.push('');
+      else out[out.length - 1] += n.textContent;
+    }
+    return out.map(clean).filter(Boolean);
+  }
 
   function parse() {
     const page = doc.getElementById('str1');
@@ -84,10 +98,11 @@
       const cells = [...tr.children];
       const status = cells[0]?.querySelector('[data-sysid]');
       return {
-        active: /aktivni/.test(status?.dataset.sysid || ''),
+        // The green bullet ("stav-aktivni"); compared whole, so that no other state containing the word matches.
+        active: status?.dataset.sysid === 'stav-aktivni',
         choose: cells[0]?.querySelector('a[href]') && linkOf(cells[0].querySelector('a[href]'), headers[0]),
         faculty: clean(cells[1]?.textContent),
-        name: [...(cells[2]?.querySelectorAll('b') || [])].flatMap((b) => b.innerText.split('\n')).map(clean).filter(Boolean),
+        name: [...(cells[2]?.querySelectorAll('b') || [])].flatMap(lines),
         progress: clean(cells[3]?.textContent),
         restriction: clean(cells[4]?.textContent),
         // Each action icon's own label (aria-label) is clearer than the column header.
@@ -97,36 +112,26 @@
     }).filter((s) => s.faculty || s.name.length) : [];
 
     const icons = [...page.querySelectorAll('.rada-ikon a.app-ikona[href]')].map((a) => linkOf(a));
-    const help = page.querySelector('.helpinbreadcrumbs a[href]');
     const study = studies.find((s) => s.active) || studies[0] || null;
 
-    // Every link once (the study's own icons first: their labels are the clearest), then sort them out.
+    // Every link once (the study's own icons first: their labels are the clearest).
     const seen = new Set([here.href.split('#')[0]]);
     const all = [...(study?.actions || []), ...tabsRow.filter((t) => !t.on), ...icons]
-      .filter((l) => l.text && !/moje_studium\.pl$/.test(new URL(l.href).pathname) && !seen.has(l.href) && seen.add(l.href));
-    const used = new Set();
+      .filter((l) => l.text && !/moje_studium\.pl$/.test(path(l.href)) && !seen.has(l.href) && seen.add(l.href));
     const links = {};
     for (const a of PORTAL_ACTIONS) {
       const l = all.find((x) => a.re.test(x.href));
-      if (l) {
-        links[a.id] = { href: l.href, text: l.text };
-        used.add(l.href);
-      }
+      if (l) links[a.id] = { href: l.href, text: l.text };
     }
-    // The e-index is the same page as the study record.
-    for (const l of all) if (/pruchod_studiem\.pl/.test(path(l.href))) used.add(l.href);
-    const contacts = all.filter((l) => !used.has(l.href) && CONTACTS.test(path(l.href)));
-    contacts.forEach((l) => used.add(l.href));
-    const rest = all.filter((l) => !used.has(l.href));
-    const groupOf = (l) => GROUPS.find(([, re]) => re.test(path(l.href)))?.[0] || 'other';
-    const groups = ['study', 'calendar', 'docs', 'money', 'other'].map((id) => ({
-      id,
-      title: T.groups[id],
-      items: rest.filter((l) => groupOf(l) === id),
-    })).filter((g) => g.items.length);
+    const byPath = (re) => all.find((l) => re.test(path(l.href)));
 
-    return { head, study, others: studies.filter((s) => s !== study), links, contacts, groups, all,
-      help: help && { href: help.href, target: '_blank' } };
+    return {
+      head, study, studies, links, all,
+      history: byPath(/\/student\/studium\.pl$/),
+      office: byPath(/stud_odd\.pl$/),
+      requests: byPath(/\/kc\//),
+      photo: byPath(/vkladani_fotky\.pl$/),
+    };
   }
 
   function remember(d) {
@@ -145,68 +150,99 @@
 
   // ---------- building the new page ----------
 
-  const row = (l) => anchor(l, { class: 'sp-link', title: l.text }, h('span', { class: 'sp-link-icon' }, icon(iconFor(l.href))), h('span', {}, l.text));
+  const linkRow = (l, iconName, sub) => anchor(l, { class: 'sp-link' },
+    h('span', { class: 'sp-link-icon' }, icon(iconName)),
+    h('span', { class: 'sp-link-text' }, h('strong', {}, l.text), sub && h('small', {}, sub)),
+    h('span', { class: 'sp-go' }, icon('arrow')));
 
-  function buildMore(d) {
-    const filter = h('input', { class: 'sp-filter', type: 'search', placeholder: T.filter, 'aria-label': T.filter, autocomplete: 'off' });
-    const body = h('div', { class: 'sp-cols' });
-    const render = () => {
-      const q = norm(filter.value);
-      const match = (l) => !q || q.split(' ').every((w) => norm(l.text).includes(w));
-      const groups = d.groups.map((g) => ({ ...g, items: g.items.filter(match) })).filter((g) => g.items.length);
-      body.replaceChildren(...(groups.length
-        ? groups.map((g) => h('section', { class: 'sp-col' }, h('h3', {}, g.title), g.items.map(row)))
-        : [h('p', { class: 'muted' }, T.nothing)]));
-    };
-    filter.addEventListener('input', render);
-    filter.addEventListener('keydown', (e) => e.stopPropagation());
-    render();
-    return h('section', { class: 'card sp-more' },
-      h('div', { class: 'card-head' }, h('h2', {}, T.more), h('span', { class: 'sp-filter-wrap' }, icon('search'), filter)),
-      body);
+  const statusChips = (s) => [
+    s.progress && h('span', { class: `delta ${isEnrolled(s.progress) ? 'ok' : 'neutral'}` }, s.progress),
+    h('span', { class: `delta ${restricted(s.restriction) ? 'bad' : 'ok'}` }, restricted(s.restriction) ? `${T.restriction}: ${s.restriction}` : T.noRestriction),
+  ];
+
+  function studyCard(d) {
+    const s = d.study;
+    return h('section', { class: 'card sp-study' },
+      h('span', { class: 'sp-badge', style: `--fac: ${facultyColors(s.faculty)[1]}` }, s.faculty || '—'),
+      h('span', { class: 'sp-study-text' },
+        h('strong', {}, s.name[0] || d.head[0] || ''),
+        h('small', {}, [s.name.slice(1).join(', '), d.head[1] && `${T.period} ${d.head[1]}`].filter(Boolean).join(' · '))),
+      h('span', { class: 'sp-study-side' }, statusChips(s)));
+  }
+
+  function restrictionNote(d) {
+    const s = d.study;
+    if (!restricted(s.restriction)) return null;
+    const office = safe(d.office);
+    return h('p', { class: 'kit-note bad sp-note' }, icon('alert'),
+      h('span', {}, T.restrictionText(s.faculty), ' ', office && anchor(office, { class: 'sp-note-link' }, ipx.nav.label('campus.office'))));
+  }
+
+  // The links InSIS gives in the study's row (exam sign-up, registration, …), each named by InSIS's own label.
+  function studyLinks(d) {
+    const list = (d.study.actions || []).map(safe).filter(Boolean);
+    if (!list.length) return null;
+    return h('section', { class: 'card sp-block' },
+      h('div', { class: 'card-head' }, h('h2', {}, T.inStudy)),
+      h('p', { class: 'muted sp-lead' }, T.inStudyLead),
+      h('div', { class: 'sp-links' }, list.map((l) => linkRow(l, iconFor(l.href)))));
+  }
+
+  // With two or more studies: one row each; the active one marked, the others with InSIS's Choose link (a GET the
+  // student clicks: it switches the study InSIS works with; InSIS+ never follows it itself).
+  function otherStudies(d) {
+    if (d.studies.length < 2) return null;
+    return h('section', { class: 'card sp-block' },
+      h('div', { class: 'card-head' }, h('h2', {}, T.studies)),
+      h('ul', { class: 'sp-studies' }, d.studies.map((s) => {
+        const choose = safe(s.choose);
+        return h('li', {},
+          h('span', { class: 'sp-fac', style: `--fac: ${facultyColors(s.faculty)[1]}` }, s.faculty || '—'),
+          h('span', { class: 'sp-study-text' }, h('strong', {}, s.name[0] || ''), s.name.length > 1 && h('small', {}, s.name.slice(1).join(', '))),
+          h('span', { class: 'sp-study-side' },
+            s.active && h('span', { class: 'delta ok' }, T.active),
+            s.progress && h('span', { class: 'delta neutral' }, s.progress),
+            restricted(s.restriction) && h('span', { class: 'delta bad' }, s.restriction),
+            choose && anchor(choose, { class: 'btn ghost sm' }, T.workHere)));
+      })));
+  }
+
+  function idCard(d) {
+    const at = (p) => ipx.nav?.safe(new URL(p, doc.baseURI).href, 'link');
+    const photo = safe(d.photo);
+    const quiet = [{ href: at('/auth/karty/typy_karet.pl'), text: T.cardTypes }, { href: at('/auth/karty/platnost.pl'), text: T.validity }].filter((l) => l.href);
+    return h('section', { class: 'card sp-block' },
+      h('div', { class: 'card-head' }, h('h2', {}, T.card)),
+      h('p', { class: 'muted sp-lead' }, T.cardText),
+      h('div', { class: 'sp-card-actions' },
+        photo && anchor({ ...photo, text: T.photo }, { class: 'btn ghost' }, icon('people'), h('span', {}, T.photo)),
+        quiet.map((l) => anchor(l, { class: 'sp-quiet' }, l.text))));
+  }
+
+  function rail(d) {
+    const office = safe(d.office);
+    const requests = safe(d.requests);
+    if (!office && !requests) return null;
+    return h('aside', { class: 'rail' },
+      h('section', {},
+        h('div', { class: 'card-head' }, h('h2', {}, T.ask)),
+        h('p', { class: 'muted rail-empty' }, T.askText),
+        h('div', { class: 'sp-contacts' },
+          office && linkRow({ ...office, text: ipx.nav.label('campus.office') }, 'people', d.study?.faculty),
+          requests && linkRow({ ...requests, text: ipx.nav.sectionLabel('studies.requests') }, 'mail', T.requests))));
   }
 
   function buildPage(d) {
-    const study = d.study;
-    const tt = ipx.state.timetable;
-    const ttHref = d.links.timetable?.href || tt?.source;
-    const upcoming = tt && nextClasses(tt.events, ttHref);
-    const sub = ipx.state.submissions;
-
+    const tabs = [
+      { href: here.href.split('#')[0], text: T.status, on: true },
+      safe(d.history) && { href: safe(d.history).href, text: T.history },
+    ].filter(Boolean);
     return h('div', { class: 'sp' },
       h('div', { class: 'sp-main' },
-        study && h('section', { class: 'card sp-study' },
-          h('span', { class: 'sp-badge', style: `--fac: ${facultyColors(study.faculty)[1]}` }, study.faculty || '—'),
-          h('span', { class: 'sp-study-text' },
-            h('strong', {}, study.name[0] || d.head[0] || ''),
-            h('small', {}, [study.name.slice(1).join(', '), d.head[1]].filter(Boolean).join(' · '))),
-          h('span', { class: 'sp-study-side' },
-            study.progress && h('span', { class: 'delta ' + (study.active ? 'ok' : 'neutral') }, study.progress),
-            study.restriction && h('span', { class: 'delta warn' }, study.restriction))),
-
-
-        buildMore(d),
-
-        d.others.length > 0 && h('section', { class: 'card sp-more' },
-          h('div', { class: 'card-head' }, h('h2', {}, T.otherStudies)),
-          h('ul', { class: 'sp-others' }, d.others.map((s) => h('li', {},
-            h('b', {}, s.faculty), h('span', {}, s.name.join(', ')), h('span', { class: 'delta neutral' }, s.progress),
-            s.choose && anchor(s.choose, { class: 'more' }, s.choose.text || '→')))))),
-
-      h('aside', { class: 'rail' },
-        weekStrip(new Date(), classDays(tt?.events)),
-        h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.schedule), ttHref && anchor({ href: ttHref }, { class: 'more' }, T.fullSchedule)),
-          upcoming || h('p', { class: 'muted rail-empty' }, T.noSchedule)),
-        sub && h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.deadlines), anchor({ href: d.links.submissions?.href || sub.source }, { class: 'more' }, T.allDeadlines)),
-          deadlineList(sub.boxes) || h('p', { class: 'muted rail-empty' }, lang === 'cs' ? 'Žádná otevřená odevzdávárna nečeká.' : 'No open submission box is waiting.')),
-        (d.contacts.length > 0 || d.help) && h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.help)),
-          h('div', { class: 'sp-contacts' },
-            d.contacts.map(row),
-            d.help && anchor({ ...d.help, text: T.insisHelp }, { class: 'sp-link' },
-              h('span', { class: 'sp-link-icon' }, icon('alert')), h('span', {}, T.insisHelp))))));
+        viewTabs(tabs, T.views),
+        d.study ? [studyCard(d), restrictionNote(d), otherStudies(d), studyLinks(d)] : h('div', { class: 'empty' }, h('p', {}, T.noStudy)),
+        idCard(d)),
+      rail(d));
   }
 
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
@@ -221,18 +257,11 @@
     remember(data);
     takeover({
       key: 'student-portal',
-      css: 'pages/student-portal.css',
-      // In the new structure the portal is Study matters › Study status (its links live in the navigation now).
-      title: ipx.nav ? ipx.nav.label('studies.status') : T.title,
-      subtitle: [T.title, data.head[1]].filter(Boolean).join(' · '),
-      build: () => {
-        // Redrawn when the background sync brings the timetable, credits or deadlines.
-        const wrap = h('div', {});
-        const render = () => wrap.replaceChildren(buildPage(data));
-        render();
-        ipx.onData(render);
-        return wrap;
-      },
+      css: ['kit.css', 'pages/student-portal.css'],
+      // Study matters › Study status: the section's own page (03-pages.md §1 rule 7).
+      title: ipx.nav ? ipx.nav.sectionLabel('studies.status') : T.title,
+      subtitle: ipx.nav ? ipx.nav.label('matters') : null,
+      build: () => buildPage(data),
     });
   });
 })();

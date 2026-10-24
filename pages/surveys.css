@@ -1,0 +1,76 @@
+/* InSIS+ course evaluation (pages/surveys.js). Loaded inside the shadow root (the summary, classes prefixed sv-)
+   and into the page itself for InSIS's own questionnaire list, styled in place (rules under html.ipx-generic). */
+
+/* ---------- summary (shadow root) ---------- */
+.sv-open { padding: 14px 18px 8px; }
+.sv-open .card-head { margin-bottom: 2px; }
+.sv-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.sv-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.sv-list li:last-child { border-bottom: 0; }
+.sv-body { display: flex; flex: 1; flex-direction: column; min-width: 180px; }
+.sv-body small { color: var(--muted); font-size: 12.5px; }
+.sv-body strong { font-size: 14.5px; font-weight: 650; }
+.sv-body a:hover { color: var(--accent); text-decoration: underline; }
+.sv-when { color: var(--fg-2); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.sv .kit-note { margin: 0; }
+
+/* ---------- InSIS's list, in place (light DOM) ---------- */
+html.ipx-generic #str1 table[data-ipx-surveys] { width: 100%; margin-top: 0; }
+html.ipx-generic #str1 table[data-ipx-surveys] td { vertical-align: middle; }
+html.ipx-generic #str1 table[data-ipx-surveys] td:nth-child(2) { color: var(--fg); font-weight: 600; }
+html.ipx-generic #str1 table[data-ipx-surveys] td:nth-child(n+4):nth-child(-n+5) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+html.ipx-generic #str1 tr[data-ipx-state="open"] > td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+html.ipx-generic #str1 tr[data-ipx-state="closed"] > td,
+html.ipx-generic #str1 tr[data-ipx-state="done"] > td { color: var(--muted); }
+
+/* The state in words instead of InSIS's icon (the icon carried it only as a picture). */
+html.ipx-generic #str1 td[data-ipx-chip] .uf-icon { display: none; }
+html.ipx-generic #str1 td[data-ipx-chip]::after {
+  content: attr(data-ipx-chip);
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* InSIS's own "Fill in" link, drawn as the row's primary control (the element and its address are InSIS's). */
+html.ipx-generic #str1 a[data-ipx-text] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 13.5px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+html.ipx-generic #str1 a[data-ipx-text]::after { content: attr(data-ipx-text); }
+html.ipx-generic #str1 a[data-ipx-text]:hover { filter: brightness(1.08); text-decoration: none; }
+html.ipx-generic #str1 a[data-ipx-text] .uf-icon svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* Phones: each InSIS row reads as a card, the column name before each value (from data-ipx-label). */
+@media (max-width: 640px) {
+  html.ipx-generic #str1 table[data-ipx-surveys] thead { display: none; }
+  html.ipx-generic #str1 table[data-ipx-surveys],
+  html.ipx-generic #str1 table[data-ipx-surveys] tbody,
+  html.ipx-generic #str1 table[data-ipx-surveys] tr { display: block; box-sizing: border-box; width: 100%; }
+  html.ipx-generic #str1 table[data-ipx-surveys] tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  html.ipx-generic #str1 table[data-ipx-surveys] tr:last-child { border-bottom: 0; }
+  html.ipx-generic #str1 table[data-ipx-surveys] td[data-ipx-label] {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 3px 0 !important; border: 0 !important;
+    text-align: right !important; white-space: normal !important; overflow-wrap: anywhere; box-shadow: none !important; background: none !important;
+  }
+  html.ipx-generic #str1 table[data-ipx-surveys] td[data-ipx-label]::before {
+    content: attr(data-ipx-label); flex: none; color: var(--muted); font-size: 12.5px; font-weight: 400; text-align: left;
+  }
+  html.ipx-generic #str1 table[data-ipx-surveys] td[data-ipx-chip]::after { margin-left: auto; }
+  html.ipx-generic #str1 tr[data-ipx-state="open"] { box-shadow: inset 3px 0 0 var(--accent); }
+}
