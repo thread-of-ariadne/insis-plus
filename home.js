@@ -10,13 +10,14 @@
     nextClasses, hoursChart, classDays, facultyColors, facultyFor } = ipx.ui;
   const nav = ipx.nav;
 
+  const list = (items, and) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} ${and} ${items.at(-1)}` : items[0] || '');
   const T = {
     cs: { morning: 'Dobré ráno', day: 'Dobrý den', evening: 'Dobrý večer', welcome: 'Vítejte zpět',
       loading: 'Načítám data z InSIS…', passed: 'splněno', failed: 'nesplněno', fullSchedule: 'Celý rozvrh →',
       scheduleEmpty: 'Váš rozvrh se zatím nenačetl.', scheduleDone: 'V tomto rozvrhu už žádné další hodiny nejsou.',
       allFiles: 'Všechny →', newN: (n) => `${n} nové`, noNewFiles: 'Žádné nové materiály.', filesNotRead: 'Materiály se zatím nenačetly.',
       allCourses: 'Všechny →', coursesEmpty: 'Zapsané předměty se zatím nenačetly.', nothingTodo: 'Nic nečeká. ✓',
-      checked: 'Zkontrolováno:', notChecked: 'zatím nekontrolováno',
+      watching: (l) => `Hlídáme ${list(l, 'a')}`, updated: (t) => `aktualizováno v ${t}`, notYet: (l) => `zatím nenačteno: ${l}`,
       sharedQ: 'Je to sdílený počítač?', sharedText: 'Na sdíleném počítači InSIS+ mezi návštěvami nic neukládá (připnuté stránky ani nastavení). Data z InSIS se vždy mažou po odhlášení a po 10 minutách nečinnosti.',
       sharedNo: 'Ne, můj počítač', sharedYes: 'Ano, nic neukládat' },
     en: { morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', welcome: 'Welcome back',
@@ -24,7 +25,7 @@
       scheduleEmpty: 'Your timetable has not loaded yet.', scheduleDone: 'No more classes in this timetable.',
       allFiles: 'All →', newN: (n) => `${n} new`, noNewFiles: 'No new materials.', filesNotRead: 'Materials have not loaded yet.',
       allCourses: 'All →', coursesEmpty: 'Your enrolled courses have not loaded yet.', nothingTodo: 'Nothing to do. ✓',
-      checked: 'Checked:', notChecked: 'not checked yet',
+      watching: (l) => `Watching ${list(l, 'and')}`, updated: (t) => `updated at ${t}`, notYet: (l) => `not read yet: ${l}`,
       sharedQ: 'Is this a shared computer?', sharedText: 'On a shared computer InSIS+ keeps nothing between visits (no pins, no settings). Data from InSIS is always wiped on logout and after 10 minutes without activity.',
       sharedNo: 'No, my computer', sharedYes: 'Yes, keep nothing' },
   }[lang];
@@ -199,7 +200,15 @@
 
     const shownNotices = notices.filter((n) => !todo.some((it) => it.id === 'datacheck' && /kontrol|check/i.test(n.text)));
     const news = (ds.courses || []).filter((c) => c.newCount > 0).sort((a, b) => b.newCount - a.newCount).slice(0, 6);
-    const lastChecked = checked.map((s) => (s.checked ? `${s.label} ${s.checked.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}` : `${s.label} — ${T.notChecked}`)).join(' · ');
+    // What To do watches, in words, and when that data was last read (one time: the oldest of them).
+    const read = checked.filter((s) => s.checked);
+    const oldest = read.length ? new Date(Math.min(...read.map((s) => s.checked.getTime()))) : null;
+    const missing = checked.filter((s) => !s.checked);
+    const lastChecked = [
+      T.watching(checked.map((s) => s.label)),
+      oldest && T.updated(oldest.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })),
+      missing.length > 0 && T.notYet(missing.map((s) => s.label).join(', ')),
+    ].filter(Boolean).join(' · ');
 
     return h('div', { class: 'dash' },
       h('div', { class: 'dash-main' },
@@ -212,13 +221,13 @@
                 h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
                 it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
             : h('div', { class: 'card todo-list empty-todo' }, h('p', {}, syncing ? T.loading : T.nothingTodo)),
-          h('p', { class: 'checked' }, T.checked, ' ', lastChecked)),
+          h('p', { class: 'checked' }, lastChecked)),
 
         h('section', {},
           sectionHead(nav.label('mycourses'), { href: ipx.nav.composedUrl('courses.mine'), text: T.allCourses }),
-          mine.length
+          ipx.courseCards?.() || (mine.length
             ? h('div', { class: 'course-list' }, mine.map(card))
-            : emptyState(syncing ? T.loading : T.coursesEmpty)),
+            : emptyState(syncing ? T.loading : T.coursesEmpty))),
 
         shownNotices.length > 0 && h('section', {}, sectionHead(nav.label('notices')), shownNotices.map(notice))),
 

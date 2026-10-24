@@ -14,15 +14,6 @@
 .ds-inline { color: var(--accent); font-weight: 600; }
 .ds-inline:hover { text-decoration: underline; }
 
-/* The document server's own views (Tree / All my folders / New / Settings / Search): a quiet underlined row on one
-   line, so it does not read as a second tab bar stacked under the destination tabs. */
-.ds-tabs { display: flex; flex-wrap: nowrap; gap: 22px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
-.ds-tab { display: inline-flex; align-items: center; gap: 6px; padding: 2px 0 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
-.ds-tab:hover { color: var(--fg); }
-.ds-tab.on { border-bottom-color: var(--accent); color: var(--fg); font-weight: 700; }
-.ds-tab-count { padding: 0 6px; border-radius: 6px; background: color-mix(in srgb, var(--faint) 22%, transparent); color: var(--fg-2); font-size: 11.5px; line-height: 18px; }
-.ds-tab-count.hot { background: var(--bad); color: #fff; }
-
 .ds-main .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ds-main .kpis:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 1320px) { .ds-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

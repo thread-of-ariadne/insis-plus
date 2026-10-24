@@ -194,12 +194,7 @@
 
   // ---------- shared bits ----------
 
-  function tabsNav(tabs) {
-    if (!tabs.length) return null;
-    return h('nav', { class: 'ds-tabs', 'aria-label': T.title }, tabs.map((t) =>
-      h('a', { href: t.href, class: 'ds-tab' + (t.active ? ' on' : ''), 'aria-current': t.active ? 'page' : null },
-        t.text, t.count != null && h('b', { class: 'ds-tab-count' + (t.count > 0 ? ' hot' : '') }, String(t.count)))));
-  }
+  const tabsNav = (tabs) => ipx.ui.viewTabs(tabs.map((t) => ({ href: t.href, text: t.text, on: t.active, count: t.count })), T.title);
 
   function when(d, text) {
     if (!d) return text || '';

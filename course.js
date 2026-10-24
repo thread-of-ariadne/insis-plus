@@ -14,7 +14,7 @@
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
   const T = {
-    cs: { inProgress: 'probíhá', passed: 'splněno', failed: 'nesplněno',
+    cs: { inProgress: 'Probíhá', passed: 'Splněno', failed: 'Nesplněno',
       next: 'Příští hodiny', noClasses: 'V rozvrhu nejsou žádné další hodiny tohoto předmětu.', waiting: 'Co tě čeká', nothing: 'Nic nečeká.',
       folder: 'Složka předmětu na dokumentovém serveru', newN: (n) => `${n} ${n === 1 ? 'nový' : n >= 2 && n <= 4 ? 'nové' : 'nových'}`, openFolder: 'Otevřít v InSIS',
       filesN: (n) => `${n} ${n === 1 ? 'soubor' : n >= 2 && n <= 4 ? 'soubory' : 'souborů'}`, folderEmpty: 'Složka je zatím prázdná.',
@@ -26,9 +26,9 @@
       classmatesAll: 'Celý seznam v InSIS', notMine: 'Tento předmět není mezi vašimi zapsanými předměty.',
       lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
-      coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: 'Předměty tohoto období podle e-indexu.',
+      coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
       insisViews: 'Dokumentový server v InSIS:', newDocs: 'Nové dokumenty', tree: 'Celý strom', search: 'Hledat', library: 'E-knihovna' },
-    en: { inProgress: 'in progress', passed: 'passed', failed: 'not passed',
+    en: { inProgress: 'In progress', passed: 'Passed', failed: 'Not passed',
       next: 'Next classes', noClasses: 'No more classes of this course in the timetable.', waiting: 'What is coming', nothing: 'Nothing waiting.',
       folder: 'Course folder on the document server', newN: (n) => `${n} new`, openFolder: 'Open in InSIS',
       filesN: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, folderEmpty: 'The folder is empty so far.',
@@ -40,7 +40,7 @@
       classmatesAll: 'Full list in InSIS', notMine: 'This course is not among your enrolled courses.',
       lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
-      coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: 'Courses of this period from your study record.',
+      coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
       insisViews: 'Document server in InSIS:', newDocs: 'New documents', tree: 'Whole tree', search: 'Search', library: 'e-Library' },
   }[lang];
 
@@ -53,6 +53,15 @@
     const seen = new Map();
     for (const e of ipx.state.timetable?.events || []) if (e.code && !seen.has(e.code)) seen.set(e.code, { code: e.code, name: e.name });
     return [...seen.values()];
+  }
+  // This period's courses: the study record may list several periods; keep the one it is set to (else the latest).
+  function current() {
+    const list = courses();
+    const terms = [...new Set(list.map((c) => c.semester).filter(Boolean))];
+    if (terms.length < 2) return list;
+    const period = ipx.state.studyRecord?.period;
+    const term = terms.includes(period) ? period : terms.at(-1);
+    return list.filter((c) => c.semester === term);
   }
   const courseOf = (code) => courses().find((c) => c.code === code) || null;
   const eventsOf = (code) => (ipx.state.timetable?.events || []).filter((e) => e.code === code);
@@ -133,9 +142,7 @@
   const TABS = nav.tabs.course;
 
   function courseTabs(code, active) {
-    return h('nav', { class: 'dest-tabs course-tabs', 'aria-label': code },
-      TABS.map((node) => h('a', { href: nav.composedUrl(node, code), class: node === active ? 'on' : null,
-        'aria-current': node === active ? 'page' : null }, nav.label(node))));
+    return ipx.ui.viewTabs(TABS.map((node) => ({ href: nav.composedUrl(node, code), text: nav.label(node), on: node === active })), code);
   }
 
   function header(c) {
@@ -295,30 +302,44 @@
   function card(c, tab = 'course.overview') {
     const now = new Date();
     const f = folderOf(c.code);
-    const n = eventsOf(c.code).filter((e) => e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
+    const done = c.passed === true;
+    const n = !done && eventsOf(c.code).filter((e) => e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
       .sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`))[0];
-    const due = ipx.todo?.items({ course: c.code }, now).find((it) => it.due);
-    const st = statusOf(c);
+    const due = !done && ipx.todo?.items({ course: c.code }, now).find((it) => it.due);
     return courseCard({
-      code: c.code, name: c.name, faculty: facultyFor(c.code), semester: c.semester, ects: c.ects ?? '',
-      href: nav.composedUrl(tab, c.code),
+      code: c.code, name: c.name, faculty: facultyFor(c.code), ects: c.ects ?? '',
+      href: nav.composedUrl(tab, c.code), done,
+      // A finished or failed course says so first; an ongoing one shows what is next.
+      status: c.passed != null && { ...statusOf(c), text: [statusOf(c).text, c.result].filter(Boolean).join(' · ') },
       tags: [
         n && `${T.nextShort} ${new Date(`${n.date}T${n.start}`).toLocaleDateString(locale, { weekday: 'short' })} ${n.start}`,
         due && `${T.dueShort} ${due.when}`,
         f?.newCount > 0 && T.newN(f.newCount),
-        c.passed != null && st.text,
       ],
     });
   }
+
+  // The courses of a list as cards: ongoing first, then the finished ones under their own heading.
+  function courseCards(list, tab) {
+    const done = list.filter((c) => c.passed === true);
+    const open = list.filter((c) => c.passed !== true);
+    return [
+      open.length > 0 && h('div', { class: 'course-list' }, open.map((c) => card(c, tab))),
+      done.length > 0 && h('div', { class: 'course-group-done' },
+        h('h3', { class: 'course-group-title' }, T.finished(done.length)),
+        h('div', { class: 'course-list' }, done.map((c) => card(c, tab)))),
+    ];
+  }
+  ipx.courseCards = (tab) => { const list = current(); return list.length ? courseCards(list, tab) : null; };
   ipx.courseCard = card;
 
   ipx.composed.register('courses.mine', () => ({
     css: 'course.css',
     title: nav.label('courses'),
     build: () => {
-      const list = courses();
+      const list = current();
       return h('div', { class: 'course-page' },
-        list.length ? [h('p', { class: 'muted' }, T.mineHint), h('div', { class: 'course-list' }, list.map(card))]
+        list.length ? [h('p', { class: 'muted' }, T.mineHint(list[0].semester)), courseCards(list)]
           : emptyState(ipx.state.sync?.running && Date.now() - ipx.state.sync.updated < 2 * 60e3 ? '…' : T.coursesEmpty));
     },
   }));
@@ -327,7 +348,7 @@
     css: 'course.css',
     title: nav.label('courses.files'),
     build: () => {
-      const list = courses();
+      const list = current();
       const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link') && new URL(path, document.baseURI).href;
       const views = [
         [T.newDocs, '/auth/dok_server/nove_dok.pl'], [T.tree, '/auth/dok_server/'], [T.search, '/auth/dok_server/vyhledavani.pl'],

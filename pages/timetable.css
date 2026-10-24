@@ -182,3 +182,9 @@ a.tt-next-row.first:hover { background: var(--fg); filter: brightness(1.15); }
 /* ---------- the original display-mode form, slotted into the page (light DOM) ---------- */
 /* Hiding the rest and the card look come from keepOnly() + generic.css; only the colour scheme is page-specific. */
 html.ipx-takeover.ipx-tt #str1 [data-ipx-keep="node"] { color-scheme: light dark; }
+
+/* Export and print: the calendar transfer as a row, then InSIS's own form */
+.tt-export { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+.tt-export-ico { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+.tt-export-ico svg { width: 18px; height: 18px; }
+.tt-export .glist-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
