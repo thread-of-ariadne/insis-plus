@@ -16,7 +16,7 @@
       scheduleEmpty: 'Váš rozvrh se zatím nenačetl.', scheduleDone: 'V tomto rozvrhu už žádné další hodiny nejsou.',
       allFiles: 'Všechny →', newN: (n) => `${n} nové`, noNewFiles: 'Žádné nové materiály.', filesNotRead: 'Materiály se zatím nenačetly.',
       allCourses: 'Všechny →', coursesEmpty: 'Zapsané předměty se zatím nenačetly.', nothingTodo: 'Nic nečeká. ✓',
-      checked: 'Zkontrolováno:', notChecked: 'zatím nekontrolováno', next: 'příště', due: 'odevzdat', newFiles: (n) => `${n} nových materiálů`,
+      checked: 'Zkontrolováno:', notChecked: 'zatím nekontrolováno',
       sharedQ: 'Je to sdílený počítač?', sharedText: 'Na sdíleném počítači InSIS+ mezi návštěvami nic neukládá (připnuté stránky ani nastavení). Data z InSIS se vždy mažou po odhlášení a po 10 minutách nečinnosti.',
       sharedNo: 'Ne, můj počítač', sharedYes: 'Ano, nic neukládat' },
     en: { morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', welcome: 'Welcome back',
@@ -24,7 +24,7 @@
       scheduleEmpty: 'Your timetable has not loaded yet.', scheduleDone: 'No more classes in this timetable.',
       allFiles: 'All →', newN: (n) => `${n} new`, noNewFiles: 'No new materials.', filesNotRead: 'Materials have not loaded yet.',
       allCourses: 'All →', coursesEmpty: 'Your enrolled courses have not loaded yet.', nothingTodo: 'Nothing to do. ✓',
-      checked: 'Checked:', notChecked: 'not checked yet', next: 'next', due: 'due', newFiles: (n) => `${n} new materials`,
+      checked: 'Checked:', notChecked: 'not checked yet',
       sharedQ: 'Is this a shared computer?', sharedText: 'On a shared computer InSIS+ keeps nothing between visits (no pins, no settings). Data from InSIS is always wiped on logout and after 10 minutes without activity.',
       sharedNo: 'No, my computer', sharedYes: 'Yes, keep nothing' },
   }[lang];
@@ -194,26 +194,8 @@
         h('button', { type: 'button', class: 'btn', onclick: () => ipx.setShared(false).then(state.render) }, T.sharedNo),
         h('button', { type: 'button', class: 'btn ghost', onclick: () => ipx.setShared(true).then(state.render) }, T.sharedYes)));
 
-    // Per course: next class, nearest deadline, new files (only data matched by exact course code).
-    const nextOf = (code) => (tt?.events || []).filter((e) => e.code === code && e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
-      .sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`))[0];
-    const dueOf = (code) => todo.find((it) => it.code === code && it.due);
-    const filesOf = (code) => (ds.courses || []).find((c) => c.code === code)?.newCount || 0;
-    const card = (c) => {
-      const n = nextOf(c.code);
-      const due = dueOf(c.code);
-      const files = filesOf(c.code);
-      return courseCard({
-        ...c,
-        href: ipx.nav.composedUrl('course.overview', c.code),
-        aims: null,
-        tags: [
-          n && `${T.next} ${new Date(`${n.date}T${n.start}`).toLocaleDateString(locale, { weekday: 'short' })} ${n.start}`,
-          due && `${T.due} ${due.when}`,
-          files > 0 && T.newFiles(files),
-        ],
-      });
-    };
+    // The same course card as My courses and Materials (course.js).
+    const card = (c) => (ipx.courseCard ? ipx.courseCard(c) : courseCard({ ...c, href: ipx.nav.composedUrl('course.overview', c.code) }));
 
     const shownNotices = notices.filter((n) => !todo.some((it) => it.id === 'datacheck' && /kontrol|check/i.test(n.text)));
     const news = (ds.courses || []).filter((c) => c.newCount > 0).sort((a, b) => b.newCount - a.newCount).slice(0, 6);

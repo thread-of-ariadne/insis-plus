@@ -33,7 +33,12 @@
       try { value = decodeURIComponent(value.replace(/\+/g, ' ')); } catch {}
       params.set(i < 0 ? part : part.slice(0, i), value);
     }
-    const path = u.pathname.replace(/\/index\.pl$/, '/');
+    let path = u.pathname.replace(/\/index\.pl$/, '/');
+    // Public pages (/lide/…, /katalog/…) are the same pages as their logged-in versions under /auth/.
+    if (u.origin === ORIGIN && !path.startsWith('/auth/') && D.pages[`/auth${path}`]) {
+      path = `/auth${path}`;
+      u.pathname = `/auth${u.pathname}`;
+    }
     return { u, path, params };
   }
 
@@ -91,11 +96,12 @@
     if (p.u.origin !== ORIGIN) return kind === 'link' && externalAllowed(p.u, copied) ? p.u.href : null;
     if (/^#ipx:/.test(p.u.hash)) return kind === 'link' ? p.u.href : null;
     const page = D.pages[p.path];
+    url = p.u.href;
     if (!page || page.verify) return null;
     if (kind === 'link' && page.link !== 'shell') return null;
     if (kind === 'fetch' && page.read === 'never') return null;
     const names = [];
-    let out = p.u.href;
+    let out = url;
     for (const [name, value] of p.params) {
       if (TRANSIENT.has(name)) {
         if (!copied) return null;

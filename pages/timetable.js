@@ -501,7 +501,7 @@
       to: d.to ? iso(d.to) : null,
       events: d.events.map((e) => ({
         date: e.date, weekday: e.weekday, start: e.start, end: e.end, code: e.code, name: e.name,
-        type: e.type, room: e.room, teacher: e.teacher, note: e.note,
+        type: e.type, room: e.room, teacher: e.teacher, note: e.note, people: e.people,
       })),
     };
     ipx.save();

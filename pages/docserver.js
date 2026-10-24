@@ -14,7 +14,8 @@
 // ipx.state.docserver = {
 //   updated: Date.now(), source: location.href,
 //   newCount: number | null,                      // "New documents (N)" from the tab row (or the list length)
-//   courses: [{ code, name, href, newCount, semester }],   // course folders from the tree, href = the folder
+//   courses: [{ code, name, href, newCount, semester, files, allFiles, tree }],   // course folders from the tree, href = the folder;
+//            tree = its subfolders [{ name, href, files, fresh, allFiles, allNew, children }]
 //   folders: { [folderId]: courseCode },          // every folder inside a course, to group new documents by course
 // }
 (() => {
@@ -27,11 +28,12 @@
     cs: { tag: 'nové', title: 'Dokumentový server', tree: 'Strom dokumentů', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${n === 1 ? 'nový' : n < 5 ? 'nové' : 'nových'}`,
       inside: (n) => `${n} ${n === 1 ? 'nový dokument' : n < 5 ? 'nové dokumenty' : 'nových dokumentů'} v podsložkách`,
       files: (n) => `${n} ${n === 1 ? 'soubor' : n < 5 ? 'soubory' : 'souborů'}`,
-      courses: 'Předměty', coursesNews: 'Předměty s novinkami', courseFiles: 'Soubory v předmětech', courseSection: 'Moje předměty',
+      courses: 'Předměty', coursesNews: 'Předměty s novinkami', courseSection: 'Moje předměty',
+      byCourse: 'Materiály podle předmětů', byCourseHint: 'Složky tvých předmětů na jednom místě.', byCourseNews: (c) => `Novinky v: ${c}`,
       allFolders: 'Celý strom složek', allHint: 'Všechny složky, které InSIS na stránce ukazuje. Složky s novými dokumenty jsou rozbalené.',
       expand: 'Rozbalit vše', collapse: 'Sbalit vše', filter: 'Hledat složku…', noMatch: 'Žádná složka neodpovídá.',
       whereNew: 'Kde je nové', whereEmpty: 'Ve stromu teď nejsou žádné nové dokumenty.', allNew: 'Všechny nové →',
-      storage: 'Vaše úložiště', noCourses: 'Ve stromu nejsou žádné složky předmětů.', open: 'Rozbalit', close: 'Sbalit',
+      storage: 'Vaše úložiště', open: 'Rozbalit', close: 'Sbalit',
       none: 'žádné', latest: 'Poslední', today: 'dnes', yesterday: 'včera', refresh: 'Aktualizovat →',
       emptyNew: 'Nemáte žádné nové dokumenty.', other: 'Ostatní složky', details: 'Informace o dokumentu',
       markTitle: 'Označit jako přečtené', markHint: 'Otevřený dokument se v seznamu už znovu neukáže. Hromadně je označíte v původním formuláři InSIS.',
@@ -40,11 +42,12 @@
     en: { tag: 'new', title: 'Document server', tree: 'Document tree', fresh: 'New documents', newBadge: (n) => `${n} new`,
       inside: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in subfolders`,
       files: (n) => `${n} ${n === 1 ? 'file' : 'files'}`,
-      courses: 'Courses', coursesNews: 'Courses with news', courseFiles: 'Files in courses', courseSection: 'My courses',
+      courses: 'Courses', coursesNews: 'Courses with news', courseSection: 'My courses',
+      byCourse: 'Materials by course', byCourseHint: 'The folders of your courses in one place.', byCourseNews: (c) => `News in: ${c}`,
       allFolders: 'Whole folder tree', allHint: 'Every folder InSIS shows on this page. Folders with new documents are open.',
       expand: 'Expand all', collapse: 'Collapse all', filter: 'Find a folder…', noMatch: 'No folder matches.',
       whereNew: 'Where the news is', whereEmpty: 'No new documents in the tree right now.', allNew: 'All new →',
-      storage: 'Your storage', noCourses: 'There are no course folders in the tree.', open: 'Expand', close: 'Collapse',
+      storage: 'Your storage', open: 'Expand', close: 'Collapse',
       none: 'none', latest: 'Latest', today: 'today', yesterday: 'yesterday', refresh: 'Refresh →',
       emptyNew: 'You have no new documents.', other: 'Other folders', details: 'Document information',
       markTitle: 'Mark as read', markHint: 'A document you open no longer shows up here. To mark several at once, use the original InSIS form.',
@@ -240,30 +243,12 @@
     li.querySelector(':scope > .ds-row > .ds-toggle')?.setAttribute('aria-expanded', String(on));
   }
 
-  function courseCard(n) {
-    const c = n.course;
-    const ink = facultyColors(c.faculty)[1];
-    return h('article', { class: 'card ds-course' + (n.allNew ? ' has-new' : '') },
-      h('div', { class: 'ds-course-head' },
-        cover(c.code, c.faculty, 56, 56),
-        h('div', { class: 'ds-course-titles' },
-          h('span', { class: 'course-code', style: `color: ${ink}` }, [c.code, c.faculty].filter(Boolean).join(' · ')),
-          h('a', { class: 'ds-course-name', href: n.href }, c.name),
-          h('span', { class: 'ds-course-meta' }, [T.files(n.allFiles), c.semester].filter(Boolean).join(' · '))),
-        newBadge(n.allNew)),
-      n.children.length ? folderTree(n.children, (x) => x.allNew > 0) : null);
-  }
-
   function buildTree(d) {
     const tab = newTab(d.tabs);
     const newCount = tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0);
     const withNews = d.courses.filter((n) => n.allNew > 0);
     const freshFolders = [];
     walk(d.roots, (n) => { if (n.fresh > 0) freshFolders.push(n); });
-
-    // Courses with news first, otherwise in the tree's order; grouped by semester.
-    const sorted = [...d.courses].sort((a, b) => (b.allNew > 0) - (a.allNew > 0));
-    const semesters = [...new Set(d.courses.map((n) => n.course.semester))];
 
     const els = new Map();
     const inCourse = (n) => n.course || ancestors(n).some((p) => p.course);
@@ -290,17 +275,11 @@
 
     const main = h('div', { class: 'ds-main' },
       tabsNav(d.tabs),
-      h('div', { class: 'kpis' },
-        kpi({ label: T.fresh, value: newCount, href: tab?.href, status: newCount > 0 && { tone: 'bad', text: T.tag } }),
-        kpi({ label: T.coursesNews, value: withNews.length, foot: withNews.map((n) => n.course.code).join(', ') || null }),
-        kpi({ label: T.courses, value: d.courses.length, foot: semesters.filter(Boolean).join(', ') || null }),
-        kpi({ label: T.courseFiles, value: d.courses.reduce((s, n) => s + n.allFiles, 0) })),
-      d.courses.length
-        ? semesters.map((sem) => [
-            sectionHead(semesters.length > 1 && sem ? sem : T.courseSection, null,
-              semesters.length === 1 && sem ? h('p', { class: 'muted ds-sub' }, sem) : null),
-            h('div', { class: 'ds-courses' }, sorted.filter((n) => n.course.semester === sem).map(courseCard))])
-        : emptyState(T.noCourses),
+      // Course folders by course live on Courses › Materials (one card per course); this page is the whole tree.
+      ipx.nav.composedUrl && h('a', { class: 'card ds-pointer', href: ipx.nav.composedUrl('courses.files') },
+        h('span', { class: 'ds-pointer-text' }, h('strong', {}, T.byCourse), h('small', {},
+          withNews.length ? T.byCourseNews(withNews.map((n) => n.course.code).join(', ')) : T.byCourseHint)),
+        newCount > 0 && newBadge(newCount), icon('arrow')),
       sectionHead(T.allFolders, null, h('p', { class: 'muted ds-sub' }, T.allHint)),
       h('div', { class: 'ds-tools' },
         h('label', { class: 'ds-filter-wrap' }, icon('search'), filter),
@@ -430,6 +409,9 @@
 
   // ---------- dashboard data ----------
 
+  // The course's subfolders as plain data (no parent links), so the course page can show them without opening InSIS.
+  const slim = (nodes) => nodes.map((n) => ({ name: n.name, href: n.href, files: n.files, fresh: n.fresh, allFiles: n.allFiles, allNew: n.allNew, children: slim(n.children) }));
+
   function remember(d) {
     const prev = ipx.state.docserver || {};
     const tab = newTab(d.tabs);
@@ -437,7 +419,8 @@
       ipx.state.docserver = {
         updated: Date.now(), source: location.href,
         newCount: tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0),
-        courses: d.courses.map((n) => ({ code: n.course.code, name: n.course.name, href: n.href, newCount: n.allNew, semester: n.course.semester })),
+        courses: d.courses.map((n) => ({ code: n.course.code, name: n.course.name, href: n.href, newCount: n.allNew, semester: n.course.semester,
+          files: n.files, fresh: n.fresh, allFiles: n.allFiles, tree: slim(n.children) })),
         folders: d.folders,
       };
     } else {

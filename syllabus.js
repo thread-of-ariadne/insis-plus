@@ -1,5 +1,7 @@
 // InSIS+ — readable course syllabus (katalog/syllabus.pl).
 // The original page is one long two-column table of "Label: value" rows and "Label:" + content rows.
+// ipx.syllabus.parse(doc) / ipx.syllabus.build(data, { embedded, rail }) also draw a syllabus inside the course page
+// (course.js), from the syllabus page read when the course is opened.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
@@ -31,10 +33,10 @@
 
   // ---------- reading the original page ----------
 
-  function parse() {
-    const title = document.querySelector('#titulek h1');
-    const labels = [...document.querySelectorAll('td > b > span.nowrap')];
-    const isSyllabus = document.querySelector('table.portal_menu a[href*="syllabus.pl"]');
+  function parse(doc = document) {
+    const title = doc.querySelector('#titulek h1');
+    const labels = [...doc.querySelectorAll('td > b > span.nowrap')];
+    const isSyllabus = doc.querySelector('table.portal_menu a[href*="syllabus.pl"]');
     if (!title || !isSyllabus || labels.length < 5) return null;
 
     const main = labels[0].closest('table');
@@ -57,8 +59,8 @@
 
     // "Course syllabus 4IT431 - Digital Transformation (FIS - SS 2026/2027)"
     const m = clean(title.textContent).match(/(\S+)\s+-\s+(.+?)\s*\(([^)]*)\)\s*$/);
-    const crumbs = [...document.querySelectorAll('.breadcrumb-item a')];
-    const versions = [...document.querySelectorAll('table.portal_menu a[href*="syllabus.pl"]')].map((a) => ({
+    const crumbs = [...doc.querySelectorAll('.breadcrumb-item a')];
+    const versions = [...doc.querySelectorAll('table.portal_menu a[href*="syllabus.pl"]')].map((a) => ({
       href: a.href, text: clean(a.textContent), active: !!a.closest('b') || !!a.querySelector('b'),
     }));
 
@@ -188,7 +190,9 @@
     ipx.save();
   }
 
-  function buildPage(d) {
+  // embedded: inside the course page (no back link, no language switch); rail: nodes to put on top of the right
+  // column (the course page's next classes and to-do).
+  function buildPage(d, { embedded = false, rail: railTop = [] } = {}) {
     const fact = (key) => d.facts.find((f) => f.key === key);
     const text = (key) => clean(fact(key)?.el.textContent);
 
@@ -218,7 +222,7 @@
       main.map((b) => h('button', { type: 'button', onclick: () => b.node.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, b.label)));
 
     return h('div', {},
-      h('div', { class: 'page-row' },
+      !embedded && h('div', { class: 'page-row' },
         d.back && anchor(d.back, { class: 'back' }, icon('back'), d.back.text),
         d.versions.length > 1 && h('div', { class: 'versions' },
           h('span', {}, T.syllabusLang),
@@ -234,6 +238,7 @@
       h('div', { class: 'cols' },
         h('div', { class: 'stack' }, main.length > 2 && jump, main.map((b) => b.node)),
         h('div', { class: 'stack rail' },
+          railTop,
           people.length && h('section', { class: 'card' },
             h('div', { class: 'card-head' }, h('h2', {}, T.lecturers)),
             h('div', { class: 'people' },
@@ -245,6 +250,8 @@
             h('div', { class: 'card-head' }, h('h2', {}, T.details)),
             h('dl', { class: 'details' }, others.map((f) => [h('dt', {}, f.label), h('dd', {}, content(f.el))]))))));
   }
+
+  ipx.syllabus = { parse, build: buildPage };
 
   ipx.ready.then(() => {
     const data = parse();

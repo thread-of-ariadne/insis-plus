@@ -178,9 +178,16 @@
     function render() {
       const items = DESTS.map((d) => {
         const on = where.dest === d.id;
-        return h('a', { class: 'nav-item has-icon' + (on ? ' active' : ''), href: destHref(d), title: nav().label(d.id),
-          'aria-current': on ? 'page' : null }, icon(d.icon), h('span', { class: 'label' }, nav().label(d.id)));
-      });
+        // Destinations without a tab row (Study matters, Campus & people) open their sections as a submenu.
+        const groups = d.landing && on && nav().tabs[d.id];
+        const subs = groups && !Array.isArray(groups) ? nodeLinks(Object.values(groups).flat()) : [];
+        const inSub = subs.some((l) => l.node === where.node);
+        const item = h('a', { class: 'nav-item has-icon' + (on ? (inSub ? ' parent' : ' active') : ''), href: destHref(d), title: nav().label(d.id),
+          'aria-current': on && !inSub ? 'page' : null }, icon(d.icon), h('span', { class: 'label' }, nav().label(d.id)));
+        if (!subs.length) return item;
+        return [item, h('div', { class: 'nav-sub' }, subs.map((l) => anchor(l, { class: 'nav-item sub' + (where.node === l.node ? ' active' : ''),
+          'aria-current': where.node === l.node ? 'page' : null, title: l.text }, h('span', { class: 'label' }, l.text))))];
+      }).flat();
       const pinned = ipx.state.fav.map((url) => ipx.state.links[url] && { href: url, text: ipx.state.links[url].t }).filter(Boolean);
       body.replaceChildren(...[
         h('div', { class: 'dests' }, items),
@@ -364,10 +371,11 @@
     root.append(
       ...[
         sharedCss,
-        css && h('link', { rel: 'stylesheet', href: chrome.runtime.getURL(css) }),
+        // One page stylesheet, or several (the course page uses the syllabus styles too).
+        [].concat(css || []).map((file) => h('link', { rel: 'stylesheet', href: chrome.runtime.getURL(file) })),
         shellEl,
         pill,
-      ].filter(Boolean),
+      ].flat().filter(Boolean),
     );
     // Remember where slotted nodes came from, before apply() moves them into the shell.
     slotted?.forEach((n) => {

@@ -208,6 +208,13 @@ button { font: inherit; color: inherit; }
 .nav-item.active > .icon { color: var(--accent); }
 .nav-item.active > .icon svg { stroke-width: 2; }
 .nav-item.top { margin-bottom: 4px; }
+/* Submenu of the current destination (Study matters, Campus & people): its sections, indented under it */
+.nav-item.parent { color: var(--fg); font-weight: 700; }
+.nav-item.parent > .icon { color: var(--accent); }
+.nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 6px 21px; padding-left: 10px; border-left: 1px solid var(--line); }
+.nav-item.sub { min-height: 30px; padding-top: 5px; padding-bottom: 5px; font-size: 13.5px; color: var(--muted); }
+.nav-item.sub.active { color: var(--fg); }
+.shell.collapsed .nav-sub { display: none; }
 .nav-item .label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
 .side-label {
@@ -830,3 +837,36 @@ button.avatar { border: 0; cursor: pointer; }
   .segmented { width: 100%; }
   .segmented button { flex: 1; padding: 0 8px; }
 }
+
+/* ---------- people (course People tab, syllabus lecturers, Campus & people) ---------- */
+.people { display: flex; flex-direction: column; gap: 8px; }
+.person { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; color: var(--fg); }
+a.person:hover { border-color: var(--accent); }
+.avatar.sm { width: 38px; height: 38px; font-size: 13px; flex: none; }
+.person-text { min-width: 0; }
+.person strong { display: block; font-size: 14px; font-weight: 650; }
+.person small { color: var(--muted); font-size: 12.5px; }
+.person small::first-letter { text-transform: uppercase; }
+.people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+
+/* ---------- destination overview pages (Study matters, Campus & people) ---------- */
+.dest-page { display: flex; flex-direction: column; gap: 18px; max-width: 1100px; }
+.dest-page .pad { padding: 16px 18px; }
+.dest-page .card-title { margin: 0 0 10px; font-size: 15.5px; font-weight: 700; }
+.dest-top { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; }
+.study-name { margin: 0 0 4px; font: 700 20px/1.25 var(--display); color: var(--fg); }
+.study-card .muted { margin: 0; }
+.study-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 0; }
+.chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; background: var(--chip); color: var(--fg-2); font-size: 12.5px; font-weight: 600; }
+.gcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+.gcol { padding: 16px 10px 10px; }
+.gcol .card-title { padding: 0 8px; }
+.gcol-items { display: flex; flex-direction: column; }
+.gcol-item { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 10px; color: var(--fg); }
+.gcol-item + .gcol-item { border-top: 1px solid var(--line); }
+.gcol-item:hover { background: var(--hover); }
+.gcol-item:hover .glist-go { color: var(--accent); }
+.gcol-item .glist-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gcol-item strong { font-size: 14px; font-weight: 650; }
+.gcol-item small { color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+@media (max-width: 860px) { .dest-top { grid-template-columns: minmax(0, 1fr); } }

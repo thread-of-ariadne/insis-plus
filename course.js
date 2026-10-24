@@ -9,33 +9,39 @@
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui || !ipx.nav || !ipx.composed) return;
   const { lang, clean } = ipx;
-  const { h, icon, anchor, courseCard, emptyState, nextClasses, facultyFor, facultyColors, countdown } = ipx.ui;
+  const { h, icon, anchor, courseCard, emptyState, nextClasses, facultyFor, facultyColors, countdown, initials } = ipx.ui;
   const nav = ipx.nav;
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
   const T = {
-    cs: { credits: 'kreditů', completion: 'Zakončení', status: 'Stav', inProgress: 'probíhá', passed: 'splněno', failed: 'nesplněno',
+    cs: { inProgress: 'probíhá', passed: 'splněno', failed: 'nesplněno',
       next: 'Příští hodiny', noClasses: 'V rozvrhu nejsou žádné další hodiny tohoto předmětu.', waiting: 'Co tě čeká', nothing: 'Nic nečeká.',
-      open: 'Otevřít', folder: 'Složka předmětu na dokumentovém serveru', newN: (n) => `${n} nových`, noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
-      allFolders: 'Všechny složky', moodle: 'Někteří vyučující dávají materiály do Moodlu.', boxes: 'Odevzdávárny předmětu', noBoxes: 'Pro tento předmět nejsou žádné odevzdávárny.',
+      folder: 'Složka předmětu na dokumentovém serveru', newN: (n) => `${n} ${n === 1 ? 'nový' : n >= 2 && n <= 4 ? 'nové' : 'nových'}`, openFolder: 'Otevřít v InSIS',
+      filesN: (n) => `${n} ${n === 1 ? 'soubor' : n >= 2 && n <= 4 ? 'soubory' : 'souborů'}`, folderEmpty: 'Složka je zatím prázdná.',
+      folderNote: 'Složky se otevírají v InSIS až na tvé kliknutí: otevření může označit soubory jako přečtené.', noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
+      allFolders: 'Všechny složky', moodle: 'Někteří vyučující dávají materiály do Moodlu.', noBoxes: 'Pro tento předmět nejsou žádné odevzdávárny.',
       allBoxes: 'Všechny odevzdávárny v InSIS', topics: 'Přihlašování na témata', result: 'Výsledek', attempts: 'Pokusy a termíny', points: 'Průběžné body',
       pointsText: 'Body z průběžného hodnocení ukazuje InSIS v listu předmětu.', examDates: 'Termíny zkoušek', tests: 'Online testy a kvízy',
-      teachers: 'Vyučující (podle rozvrhu)', classmates: 'Spolužáci', classmatesLoad: 'Načítám seznam…', classmatesNone: 'Seznam spolužáků se nepodařilo načíst.',
-      classmatesAll: 'Celý seznam v InSIS', syllabus: 'Otevřít sylabus', passRates: 'Úspěšnost předmětu', notMine: 'Tento předmět není mezi vašimi zapsanými předměty.',
-      lectures: 'List předmětu (InSIS)', due: 'odevzdat', allCourses: 'Moje předměty', coursesEmpty: 'Zapsané předměty se zatím nenačetly.',
-      mineHint: 'Předměty tohoto období podle e-indexu.', myFolders: 'Moje předměty', insisViews: 'Dokumentový server', newDocs: 'Nové dokumenty',
-      myAll: 'Všechny moje složky', tree: 'Celý strom', search: 'Hledat', library: 'E-knihovna', settings: 'Nastavení' },
-    en: { credits: 'credits', completion: 'Completion', status: 'Status', inProgress: 'in progress', passed: 'passed', failed: 'not passed',
+      classmates: 'Spolužáci', classmatesLoad: 'Načítám seznam…', classmatesNone: 'Seznam spolužáků se nepodařilo načíst.',
+      classmatesAll: 'Celý seznam v InSIS', notMine: 'Tento předmět není mezi vašimi zapsanými předměty.',
+      lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
+      teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
+      coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: 'Předměty tohoto období podle e-indexu.',
+      insisViews: 'Dokumentový server v InSIS:', newDocs: 'Nové dokumenty', tree: 'Celý strom', search: 'Hledat', library: 'E-knihovna' },
+    en: { inProgress: 'in progress', passed: 'passed', failed: 'not passed',
       next: 'Next classes', noClasses: 'No more classes of this course in the timetable.', waiting: 'What is coming', nothing: 'Nothing waiting.',
-      open: 'Open', folder: 'Course folder on the document server', newN: (n) => `${n} new`, noFolder: 'The course folder could not be matched by its code.',
-      allFolders: 'All folders', moodle: 'Some teachers put materials in Moodle.', boxes: 'Submission boxes of this course', noBoxes: 'There are no submission boxes for this course.',
+      folder: 'Course folder on the document server', newN: (n) => `${n} new`, openFolder: 'Open in InSIS',
+      filesN: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, folderEmpty: 'The folder is empty so far.',
+      folderNote: 'Folders open in InSIS only when you click: opening one may mark its files as read.', noFolder: 'The course folder could not be matched by its code.',
+      allFolders: 'All folders', moodle: 'Some teachers put materials in Moodle.', noBoxes: 'There are no submission boxes for this course.',
       allBoxes: 'All submission boxes in InSIS', topics: 'Topic sign-up', result: 'Result', attempts: 'Attempts and dates', points: 'Points so far',
       pointsText: 'InSIS shows the points of continuous assessment in the course sheet.', examDates: 'Exam dates', tests: 'Online tests and quizzes',
-      teachers: 'Teachers (from the timetable)', classmates: 'Classmates', classmatesLoad: 'Loading the list…', classmatesNone: 'The list of classmates could not be loaded.',
-      classmatesAll: 'Full list in InSIS', syllabus: 'Open the syllabus', passRates: 'Pass rates', notMine: 'This course is not among your enrolled courses.',
-      lectures: 'Course sheet (InSIS)', due: 'due', allCourses: 'My courses', coursesEmpty: 'Your enrolled courses have not loaded yet.',
-      mineHint: 'Courses of this period from your study record.', myFolders: 'My courses', insisViews: 'Document server', newDocs: 'New documents',
-      myAll: 'All my folders', tree: 'Whole tree', search: 'Search', library: 'e-Library', settings: 'Settings' },
+      classmates: 'Classmates', classmatesLoad: 'Loading the list…', classmatesNone: 'The list of classmates could not be loaded.',
+      classmatesAll: 'Full list in InSIS', notMine: 'This course is not among your enrolled courses.',
+      lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
+      teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
+      coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: 'Courses of this period from your study record.',
+      insisViews: 'Document server in InSIS:', newDocs: 'New documents', tree: 'Whole tree', search: 'Search', library: 'e-Library' },
   }[lang];
 
   // ---------- the course model ----------
@@ -71,7 +77,58 @@
     h('span', { class: 'glist-text' }, h('strong', {}, l.text), l.gloss && h('small', {}, l.gloss)),
     h('span', { class: 'glist-go' }, icon('arrow')));
 
+  // ---------- the syllabus of a course (read when the course page opens) ----------
+
+  const syllabi = new Map();
+  // The syllabus page is public and read-only (read: on-open). Its content is shown inside the course page, so every
+  // link in it goes through the URL rule; anything else becomes plain text.
+  function syllabusOf(c) {
+    if (!c.href) return Promise.resolve(null);
+    if (!syllabi.has(c.code)) {
+      const url = nav.safe(c.href, 'fetch', { copied: true });
+      // Test pages map InSIS addresses to local snapshots (test/make_fixture.py); the extension never does.
+      const from = url && (globalThis.__ipxFixtureFor?.(url) || url);
+      syllabi.set(c.code, !url ? Promise.resolve(null) : fetch(from, { credentials: 'include' }).then((r) => r.text()).then((html) => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        doc.head.prepend(Object.assign(doc.createElement('base'), { href: url }));
+        return ipx.syllabus?.parse(doc) || null;
+      }).catch(() => null));
+    }
+    return syllabi.get(c.code);
+  }
+  function sanitizeLinks(root) {
+    for (const a of root.querySelectorAll('a[href]')) {
+      const href = a.getAttribute('href');
+      if (/^mailto:/i.test(href)) continue;
+      const ok = nav.safe(a.href, 'link', { copied: true });
+      if (ok) {
+        a.setAttribute('href', ok);
+        continue;
+      }
+      // Not allowed: keep what the link showed, without the link.
+      const span = h('span', { class: a.className || null });
+      span.append(...a.childNodes);
+      a.replaceWith(span);
+    }
+    return root;
+  }
+
   // ---------- the course page ----------
+
+  // One folder of the document server tree as a row (indented by depth), then its subfolders. The tree comes from the
+  // tree page (read in the background); the folders themselves open in InSIS on the student's click, because opening
+  // one may mark its files as read.
+  function folderRow(n, depth) {
+    const to = nav.safe(n.href, 'link', { copied: true });
+    const inner = [
+      h('span', { class: 'ds-ico' }, icon('folder')),
+      h('span', { class: 'glist-text' }, h('strong', {}, n.name), h('small', {}, T.filesN(n.allFiles))),
+      n.allNew > 0 && h('span', { class: 'delta bad' }, T.newN(n.allNew)),
+      to && h('span', { class: 'glist-go' }, icon('arrow')),
+    ];
+    const props = { class: 'folder-row' + (n.allFiles ? '' : ' is-empty'), style: `--depth: ${depth}` };
+    return [to ? anchor({ href: to }, props, ...inner) : h('span', props, ...inner), ...(n.children || []).flatMap((k) => folderRow(k, depth + 1))];
+  }
 
   const TABS = nav.tabs.course;
 
@@ -86,39 +143,57 @@
     const st = statusOf(c);
     return h('div', { class: 'course-head' },
       h('span', { class: 'course-code', style: `color: ${facultyColors(fac)[1]}` }, [c.code, fac].filter(Boolean).join(' · ')),
-      h('div', { class: 'course-facts' },
-        c.ects != null && c.ects !== '' && h('span', { class: 'fact' }, h('b', {}, String(c.ects)), ' ', T.credits),
-        c.completion && h('span', { class: 'fact' }, T.completion, ' ', h('b', {}, c.completion)),
-        h('span', { class: `delta ${st.tone}` }, st.text)));
+      h('span', { class: `delta ${st.tone}` }, st.text));
   }
 
   const BUILD = {
     'course.overview': (c) => {
       const todo = ipx.todo ? ipx.todo.items({ course: c.code }) : [];
       const upcoming = nextClasses(eventsOf(c.code), nav.target('schedule.week'), 3);
+      const own = [
+        h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.next), upcoming || h('p', { class: 'muted' }, T.noClasses)),
+        h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.waiting),
+          todo.length ? h('div', { class: 'todo-mini' }, todo.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
+            h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
+            it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
+            : h('p', { class: 'muted' }, T.nothing)),
+      ];
+      const box = h('div', { class: 'course-syllabus' }, h('p', { class: 'muted' }, T.syllabusLoad));
+      syllabusOf(c).then((d) => {
+        if (!d) {
+          box.replaceChildren(h('div', { class: 'cols' }, h('div', { class: 'stack' }, h('p', { class: 'muted' }, T.syllabusNone)), h('div', { class: 'stack rail' }, own)));
+          return;
+        }
+        box.replaceChildren(sanitizeLinks(ipx.syllabus.build(d, { embedded: true, rail: own })));
+      });
+      const full = c.href && nav.safe(c.href, 'link', { copied: true });
+      const sheet = c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });
       return [
-        h('div', { class: 'course-grid' },
-          h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.next), upcoming || h('p', { class: 'muted' }, T.noClasses)),
-          h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.waiting),
-            todo.length ? h('div', { class: 'todo-mini' }, todo.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
-              h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
-              it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
-              : h('p', { class: 'muted' }, T.nothing))),
-        h('div', { class: 'glist-items' }, [
-          c.href && nav.safe(c.href, 'link', { copied: true }) && { href: c.href, text: T.syllabus },
-          c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 }) && { href: portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 }), text: T.lectures },
-        ].filter(Boolean).map(linkRow)),
+        box,
+        h('p', { class: 'course-links' },
+          full && anchor({ href: full }, {}, T.syllabusFull),
+          sheet && anchor({ href: sheet }, {}, T.lectures)),
       ];
     },
     'course.files': (c) => {
       const f = folderOf(c.code);
       const href = f && nav.safe(f.href, 'link', { copied: true });
+      if (!href) return [emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }), h('p', { class: 'muted' }, T.moodle)];
+      const tree = f.tree || [];
+      const row = folderRow;
       return [
-        href
-          ? anchor({ href }, { class: 'card glist-item big' },
-              h('span', { class: 'glist-text' }, h('strong', {}, T.folder), h('small', {}, f.name || c.name)),
-              f.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)), h('span', { class: 'glist-go' }, icon('arrow')))
-          : emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }),
+        h('section', { class: 'card pad' },
+          h('div', { class: 'card-head' },
+            h('h2', {}, T.folder),
+            f.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)),
+            anchor({ href }, { class: 'more' }, T.openFolder)),
+          h('div', { class: 'folder-list' },
+            f.files > 0 && row({ name: f.name || c.name, href: f.href, allFiles: f.files, allNew: f.fresh || 0 }, 0),
+            tree.flatMap((n) => row(n, 0)),
+            !tree.length && !(f.files > 0) && (f.tree ? h('p', { class: 'muted' }, T.folderEmpty) : anchor({ href }, { class: 'folder-row' },
+              h('span', { class: 'ds-ico' }, icon('folder')), h('span', { class: 'glist-text' }, h('strong', {}, f.name || c.name)),
+              h('span', { class: 'glist-go' }, icon('arrow'))))),
+          h('p', { class: 'muted small' }, T.folderNote)),
         h('p', { class: 'muted' }, T.moodle),
       ];
     },
@@ -151,23 +226,31 @@
       ];
     },
     'course.people': (c) => {
-      const teachers = [...new Set(eventsOf(c.code).map((e) => clean(e.teacher)).filter(Boolean))];
+      const teachers = h('div', { class: 'people' }, h('p', { class: 'muted' }, T.syllabusLoad));
+      syllabusOf(c).then((d) => {
+        const fact = d?.facts.find((f) => f.key === 'lecturers');
+        const people = fact ? [...fact.el.querySelectorAll('a[href]')].map((a) => ({
+          href: nav.safe(a.href, 'link', { copied: true }), text: clean(a.textContent),
+          role: /\(([^)]+)\)/.exec(a.nextSibling?.nodeValue || '')?.[1] || '',
+        })).filter((p) => p.text) : [];
+        const fromTimetable = [...new Set(eventsOf(c.code).map((e) => clean(e.teacher)).filter(Boolean))].map((text) => ({ text }));
+        const list = people.length ? people : fromTimetable;
+        teachers.replaceChildren(...(list.length ? list.map((p) => (p.href ? anchor : (l, props, ...k) => h('span', props, ...k))(
+          { href: p.href }, { class: 'person' }, h('span', { class: 'avatar sm' }, initials(p.text)),
+          h('span', { class: 'person-text' }, h('strong', {}, p.text), p.role && h('small', {}, p.role))))
+          : [h('p', { class: 'muted' }, T.noTeachers)]));
+      });
       const list = h('div', { class: 'people-list' }, h('p', { class: 'muted' }, T.classmatesLoad));
       const all = c.predmet && portalLink('/auth/student/spoluzaci.pl', { predmet: c.predmet });
       if (all) loadClassmates(all, list);
       else list.replaceChildren(h('p', { class: 'muted' }, T.classmatesNone));
       return [
-        teachers.length > 0 && h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.teachers),
-          h('ul', { class: 'plain' }, teachers.map((t) => h('li', {}, t)))),
+        h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, T.teachersTitle), teachers),
         h('section', { class: 'card pad' },
           h('div', { class: 'card-head' }, h('h2', {}, T.classmates), all && anchor({ href: all }, { class: 'more' }, T.classmatesAll)),
           list),
       ];
     },
-    'course.syllabus': (c) => [h('div', { class: 'glist-items' }, [
-      c.href && nav.safe(c.href, 'link', { copied: true }) && { href: c.href, text: T.syllabus },
-      nav.target('courses.catalogue') && { href: nav.target('courses.catalogue'), text: T.passRates },
-    ].filter(Boolean).map(linkRow))],
   };
 
   // Classmates of a course: read when the People tab opens (read: on-open), first page only, never stored.
@@ -193,7 +276,7 @@
       const code = route.arg;
       const c = courseOf(code) || (code ? { code, name: code } : null);
       return {
-        css: 'course.css',
+        css: ['syllabus.css', 'course.css'],
         title: c?.name || code || nav.label('courses'),
         subtitle: nav.label('courses'),
         build: () => h('div', { class: 'course-page' },
@@ -207,14 +290,27 @@
 
   // ---------- Courses › My courses and Materials ----------
 
-  function card(c) {
+  // The one course card used everywhere (Home, My courses, Materials): same look, same facts — next class, nearest
+  // deadline, new files, and the result once there is one.
+  function card(c, tab = 'course.overview') {
+    const now = new Date();
     const f = folderOf(c.code);
+    const n = eventsOf(c.code).filter((e) => e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
+      .sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`))[0];
+    const due = ipx.todo?.items({ course: c.code }, now).find((it) => it.due);
+    const st = statusOf(c);
     return courseCard({
       code: c.code, name: c.name, faculty: facultyFor(c.code), semester: c.semester, ects: c.ects ?? '',
-      href: nav.composedUrl('course.overview', c.code),
-      tags: [c.completion, statusOf(c).text, f?.newCount > 0 && T.newN(f.newCount)],
+      href: nav.composedUrl(tab, c.code),
+      tags: [
+        n && `${T.nextShort} ${new Date(`${n.date}T${n.start}`).toLocaleDateString(locale, { weekday: 'short' })} ${n.start}`,
+        due && `${T.dueShort} ${due.when}`,
+        f?.newCount > 0 && T.newN(f.newCount),
+        c.passed != null && st.text,
+      ],
     });
   }
+  ipx.courseCard = card;
 
   ipx.composed.register('courses.mine', () => ({
     css: 'course.css',
@@ -231,23 +327,33 @@
     css: 'course.css',
     title: nav.label('courses.files'),
     build: () => {
-      const mine = courses().map((c) => ({ c, f: folderOf(c.code) })).filter(({ f }) => f && nav.safe(f.href, 'link', { copied: true }));
+      const list = courses();
       const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link') && new URL(path, document.baseURI).href;
       const views = [
-        [T.newDocs, '/auth/dok_server/nove_dok.pl'], [T.myAll, '/auth/dok_server/moje_dok.pl'], [T.tree, '/auth/dok_server/'],
-        [T.search, '/auth/dok_server/vyhledavani.pl'], [T.library, '/auth/eknihovna/'], [T.settings, '/auth/dok_server/nastaveni_stromu.pl'],
+        [T.newDocs, '/auth/dok_server/nove_dok.pl'], [T.tree, '/auth/dok_server/'], [T.search, '/auth/dok_server/vyhledavani.pl'],
+        [T.library, '/auth/eknihovna/'],
       ].map(([text, path]) => at(path) && { text, href: at(path) }).filter(Boolean);
-      return h('div', { class: 'glist' },
-        h('section', { class: 'glist-group' }, h('h2', { class: 'section-title' }, T.myFolders),
-          mine.length
-            ? h('div', { class: 'glist-items' }, mine.map(({ c, f }) => anchor({ href: f.href }, { class: 'card glist-item' },
-                h('span', { class: 'glist-text' }, h('strong', {}, `${c.code} ${c.name}`), h('small', {}, T.folder)),
-                f.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)), h('span', { class: 'glist-go' }, icon('arrow')))))
-            : emptyState(T.noFolder)),
-        h('section', { class: 'glist-group' }, h('h2', { class: 'section-title' }, T.insisViews),
-          h('div', { class: 'glist-items' }, views.map(linkRow))),
-        h('p', { class: 'muted' }, T.moodle));
+      const section = (c) => {
+        const f = folderOf(c.code);
+        const fac = facultyFor(c.code);
+        const own = f && nav.safe(f.href, 'link', { copied: true });
+        const top = (f?.tree || []).map((n) => ({ ...n, children: [] }));
+        return h('section', { class: 'card pad files-course' },
+          h('div', { class: 'card-head' },
+            h('span', { class: 'course-code', style: `color: ${facultyColors(fac)[1]}` }, c.code),
+            h('h2', {}, anchor({ href: nav.composedUrl('course.files', c.code) }, {}, c.name)),
+            f?.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)),
+            own && anchor({ href: own }, { class: 'more' }, T.openFolder)),
+          !f ? h('p', { class: 'muted' }, T.noFolder)
+            : h('div', { class: 'folder-list' },
+                f.files > 0 && folderRow({ name: f.name || c.name, href: f.href, allFiles: f.files, allNew: f.fresh || 0 }, 0),
+                top.flatMap((n) => folderRow(n, 0)),
+                !top.length && !(f.files > 0) && h('p', { class: 'muted' }, T.folderEmpty)));
+      };
+      return h('div', { class: 'course-page' },
+        list.length ? list.map(section) : emptyState(T.coursesEmpty),
+        list.length > 0 && h('p', { class: 'muted small' }, T.folderNote),
+        views.length > 0 && h('p', { class: 'course-links' }, h('span', { class: 'muted' }, T.insisViews), views.map((v) => anchor(v, {}, v.text))));
     },
   }));
-
 })();
