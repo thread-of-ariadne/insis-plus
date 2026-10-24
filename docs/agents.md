@@ -14,6 +14,23 @@ maintainers' design canvas.
 - Never commit, push or publish. Never send page content anywhere: no `fetch` outside `insis.vse.cz`, no external
   libraries, no analytics. Fonts are already loaded by the shell.
 
+## The new structure (read first)
+
+InSIS+ shows InSIS in a new structure: seven destinations, a course page, To do / Notifications / Messages
+(`docs/ia/02-redesign.md`). Where every InSIS page belongs, what InSIS+ may read and link to, and every label come
+from `docs/ia/mapping.json` (generated into `nav-data.js` by `scripts/build_nav.py`; checked by
+`scripts/ia_check.py`). In code:
+
+- `ipx.nav.target(node)`: where a section or tab leads (InSIS page through the student's own links, or an InSIS+
+  page `#ipx:<node>` on the main page's address). Never hard-code InSIS addresses with parameters.
+- `ipx.nav.safe(url, 'link' | 'fetch', { copied })`: every link you show and every page you read goes through it.
+  A link taken from an InSIS page is `copied: true`. If it returns null, show nothing (no fallback that builds a URL).
+- `ipx.nav.label(id)`: labels (Czech/English) of nodes and structure.
+- New InSIS+-only pages register in `composed.js` (`ipx.composed.register(node, route => ({ title, css, build }))`).
+- To do items come from sources registered with `ipx.todo.add({ id, label, key, items(state, now) })`.
+- Personal data lives only for the session (`content.js`); settings per user. Store page data in `ipx.state.<key>`
+  with `updated`, as before; keys of personal data are listed in `PERSONAL` in `content.js`.
+
 ## How a module works
 
 Every InSIS page already gets the shell from `generic.js` (sidebar, top bar, original `#str1` moved into the raised
@@ -45,7 +62,7 @@ page, takes over instead. Template:
 ```
 
 `takeover()` options: `key` (remembers the "classic view" choice per page type), `css` (your stylesheet inside the
-shadow root), `active` (`'home'` only for the dashboard), `title`, `subtitle` (one short eyebrow line), and either
+shadow root), `title`, `subtitle` (one short eyebrow line), and either
 `build` (returns your DOM, rendered in the closed shadow root) or `slotted` (original nodes moved into the panel,
 styled in the page's own DOM by `generic.css` + your css via `styleSlotted`). Both can be combined: build a summary
 on top, slot the original below.
@@ -84,7 +101,7 @@ on top, slot the original below.
   - `keepOnly(page, node)` shows one original node (a form) as a card and hides the rest of a slotted `#str1`;
     `hideInSlot(nodes)` hides parts you already show your own way. Both only while InSIS+ is on.
   - Icons: `cap calendar file mail book check people list search alert star layout back chevron panel burger
-    clock globe award layers flask gear shield phone cpu arrow home folder info`
+    clock globe award layers flask gear shield phone cpu arrow home folder info bell`
   - `h(tag, props, ...children)`, `icon(name)`, `anchor(link, props, ...children)`, `initials(name)`
 - **Copy.** Czech and English (`ipx.lang`), short and plain. No invented data: if something is missing, show an
   empty state, never placeholder numbers.
@@ -121,8 +138,11 @@ on top, slot the original below.
 - **Background sync.** `sync.js` loads the portal, personal timetable, study record, submissions and document
   server in a hidden frame; there `ipx.syncOnly` is true and `takeover()` does nothing, so your module must call
   its `remember()` **before** `takeover()` and must not depend on layout (sizes, visibility). Pages that show
-  synced data redraw with `ipx.onData(render)`. The portal's links are in `ipx.state.portal.links`
-  (`exams enrol timetable record submissions plan`), drawn by `quickActions(links)`.
+  synced data redraw with `ipx.onData(render)`. The portal's links are in `ipx.state.portal.paths` (every portal
+  link by page path); `nav.target()` uses them.
+- **Recognise your page by its own markers.** The mail box also has a folder tree; the document server module once
+  took it for its own and wiped the stored data. Check a marker only your page has (a form action, a path in the
+  links you rely on).
 
 ## Report (your final message)
 
