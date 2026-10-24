@@ -1,0 +1,55 @@
+/* InSIS+ Account pages (pages/account.js). One file, two places: the html.ipx-generic rules style what stays InSIS's
+   own in the page's DOM (the apps list, the approvals form, the access-point tree); the rest styles the InSIS+ parts
+   in the shadow root. Shared parts come from pages/rebuild.css. */
+
+/* ---------- InSIS+ parts (shadow root) ---------- */
+
+.acc-cross { margin: 0; }
+.acc-cross a { color: var(--accent); font-weight: 600; }
+.acc-server .rb-badge .icon svg { width: 17px; height: 17px; }
+.acc-name { color: var(--fg); font-size: 15px; font-weight: 700; }
+.acc-name:hover { color: var(--accent); }
+.acc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.acc-link { color: var(--accent); font-size: 13px; font-weight: 650; }
+.acc-link:hover { text-decoration: underline; }
+.acc-about { align-self: flex-start; }
+.acc-tree { padding: 10px 12px; }
+
+/* ---------- InSIS's apps list, in place (page DOM) ---------- */
+
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] { display: block; width: 100%; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] > thead { display: none; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] > tbody { display: block; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] > tbody > tr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 12px 16px; border-top: 1px solid var(--line); }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] > tbody > tr:first-child { border-top: 0; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td { padding: 0 !important; border: 0 !important; background: none !important; text-align: left !important; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="num"] { display: none; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="app"] { order: 1; flex: 1 1 180px; color: var(--fg); font-size: 14.5px; font-weight: 650; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="provider"] { order: 2; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="status"] { order: 3; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="detail"] { order: 4; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="action"] { order: 5; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="status"] .uf-icon[data-ipx-label]::after { display: inline-block; padding: 2px 8px; border-radius: 6px; background: var(--chip); font-size: 11.5px; font-weight: 800; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="status"] [data-sysid="stav-povoleno"][data-ipx-label]::after { background: color-mix(in srgb, #1f8a55 16%, transparent); color: #1f8a55; }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] td[data-ipx-col="action"] a[data-ipx-label] { background: var(--accent-soft); }
+html.ipx-generic.ipx-acc-apps #str1 table[data-ipx-apps] a[data-ipx-label]::first-letter { text-transform: uppercase; }
+
+/* ---------- InSIS's approvals form, in place (page DOM) ---------- */
+
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] table.souhlasy_table { width: 100%; border: 0; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] table.souhlasy_table > tbody > tr > td { padding: 0 !important; border: 0 !important; background: none !important; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] table.souhlasy_table > tbody > tr:has(> td > br:only-child) { display: none; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] .bunka_seda { padding: 12px 14px !important; border-radius: 12px; background: var(--chip) !important; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] .bunka_seda td { text-align: left !important; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] .bunka_seda br { display: none; }
+html.ipx-generic.ipx-acc-approvals #str1 form[data-ipx-approvals] .bunka_seda input[type="submit"] { margin: 8px 8px 0 0; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] { margin: 10px 0; padding: 14px 16px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval="granted"] { box-shadow: inset 3px 0 0 #1f8a55, inset 0 0 0 1px var(--line); }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval="missing"] { box-shadow: inset 3px 0 0 #b26a00, inset 0 0 0 1px var(--line); }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .data_row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .souhlas_nazev { flex: 1 1 240px; color: var(--fg); font-size: 15px; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .souhlas_nazev .uf-icon { display: none; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .souhlas_status_text { color: var(--fg-2); font-size: 13px; line-height: 1.45; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .souhlas_obrazek { display: none; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .hiding_place { color: var(--fg-2); font-size: 13.5px; line-height: 1.55; }
+html.ipx-generic.ipx-acc-approvals #str1 [data-ipx-approval] .souhlas_cudliky .uf-icon svg { width: 34px; height: 20px; }

@@ -1,0 +1,13 @@
+/* InSIS+ Rooms (pages/rooms.js). Shadow root, after kit.css and pages/rebuild.css. */
+
+.rm-card { position: relative; }
+.rm-open { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.rm-card.has-open:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-card); }
+.rm-card.has-open:hover strong { color: var(--accent); }
+.rm-badge { min-width: 46px; }
+.rm-badge .icon svg { width: 17px; height: 17px; }
+.rm-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rm-details { position: relative; z-index: 2; color: var(--accent); font-size: 13px; font-weight: 650; }
+.rm-details:hover { text-decoration: underline; }
+.rm-mine .muted.small { margin: 0 0 8px; }
+.rm-mine .rb-list { padding: 0; }

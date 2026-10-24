@@ -54,7 +54,7 @@
 
 /* InSIS mail (pages/messages.js) */
 .msg-status { align-items: center; }
-.msg-status > span { flex: 1; }
+.msg-status > span:not(.icon) { flex: 1; }
 .msg-change { color: var(--accent); font-weight: 600; white-space: nowrap; }
 .msg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .msg-foot a { color: var(--accent); }

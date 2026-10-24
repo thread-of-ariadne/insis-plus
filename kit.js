@@ -39,7 +39,9 @@
   const cellText = (el) => clean([...el.childNodes].map((n) => (n.nodeType === 3 ? n.textContent
     : n.nodeName === 'IMG' || n.hidden || n.getAttribute?.('aria-hidden') === 'true' ? '' : n.innerText ?? n.textContent)).join(' '));
 
-  const isHeaderRow = (tr) => tr.classList.contains('zahlavi') || tr.closest('thead') || (tr.cells.length && [...tr.cells].every((c) => c.tagName === 'TH'));
+  // A header row: InSIS's tr.zahlavi, a thead row, or a row of only th cells or only td.zahlavi cells (ca/ucet.pl).
+  const isHeaderRow = (tr) => tr.classList.contains('zahlavi') || tr.closest('thead') ||
+    (tr.cells.length && [...tr.cells].every((c) => c.tagName === 'TH' || c.classList.contains('zahlavi')));
 
   function readTable(table) {
     const rows = [...table.rows].filter((tr) => tr.closest('table') === table);
@@ -69,7 +71,7 @@
       if (cells.length !== 2 || tr.querySelector('table')) continue;
       const label = cellText(cells[0]).replace(/:$/, '');
       const value = cellText(cells[1]);
-      if (label && value && label.length < 60) out.push({ label, value, links: [...cells[1].querySelectorAll('a[href]')].map(linkOf).filter(Boolean) });
+      if (label && value && label.length < 140) out.push({ label, value, links: [...cells[1].querySelectorAll('a[href]')].map(linkOf).filter(Boolean) });
     }
     return out;
   }

@@ -1630,13 +1630,10 @@
     "/auth/posta/forwardy.pl": {
       "node": "messages.mail",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
       "also": [
         "account.email"
-      ],
-      "fetch": [
-        ""
       ],
       "links": [
         ""

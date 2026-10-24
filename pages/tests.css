@@ -4,7 +4,8 @@
 /* ---------- shadow root ---------- */
 
 .ot-empty { display: flex; flex-direction: column; gap: 6px; padding: 32px 24px; }
-.ot-empty p { max-width: 520px; margin: 0 auto; line-height: 1.5; }
+/* shared.css sets .empty p:last-child { margin: 0 }, which is more specific: centred here explicitly. */
+.ot-empty p, .ot-empty p:last-child { max-width: 520px; margin: 0 auto; line-height: 1.5; }
 .ot-empty .ot-empty-title { color: var(--fg); font: 800 22px/1.15 var(--display); font-stretch: 80%; }
 .kit-page > .kpis { grid-template-columns: repeat(auto-fill, minmax(200px, 260px)); }
 

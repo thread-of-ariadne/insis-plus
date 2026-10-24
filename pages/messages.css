@@ -1,0 +1,7 @@
+/* InSIS+ Messages (pages/messages.js). Shadow root, after kit.css (which has the mail box's base styles). */
+
+/* The status line: the icon keeps its size, the sentence takes the rest (kit.css grows every span of the line). */
+.msg-status > .icon { flex: none; }
+.msg-status > span:not(.icon) { flex: 1; }
+.msg-foot { margin: 0; }
+.msg-foot a { font-weight: 600; }

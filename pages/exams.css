@@ -1,0 +1,173 @@
+/* InSIS+ — Exams › Exam dates (pages/exams.js). One file, two places:
+   1. injected into the page itself: InSIS's own list (tables, links, controls, the Restrict form) styled in place,
+      scoped to html.ipx-generic.ipx-exams #str1; nothing is moved out of InSIS's markup;
+   2. loaded in the shadow root (section css): the summary above the list (.ex-…) and the page of one date. */
+
+/* ======================= 1. InSIS's list, in place ======================= */
+
+html.ipx-generic.ipx-exams #str1 [data-ipx-exams] { display: flex; flex-direction: column; gap: 16px; }
+html.ipx-generic.ipx-exams #str1 [data-ipx-part="hide"] { display: none !important; }
+/* InSIS's chrome inside the list, also when InSIS's scripts redraw it after load: help lines, column toggles,
+   table toolboxes, the key */
+/* (never a block with a form control or a link in it: exams.js hides those only after checking the links are not
+   InSIS actions) */
+html.ipx-generic.ipx-exams #str1 [data-ipx-exams] > :is(div.small, br, p, b, .jstm-toolbox, .uisLegend):not(:has(input:not([type="hidden"]), select, button, textarea, a[href])),
+html.ipx-generic.ipx-exams #str1 [data-ipx-exams] > .clm_main { display: none !important; }
+/* The Available view puts the dates open for sign-up first (CSS order only; InSIS's DOM order is unchanged). */
+html.ipx-generic.ipx-exams[data-ipx-exams-view="signup"] #str1 [data-ipx-block="open"] { order: -3; }
+html.ipx-generic.ipx-exams[data-ipx-exams-view="signup"] #str1 [data-ipx-block="closed"] { order: -2; }
+
+/* InSIS's Restrict form: collapsed under the Filter button above the list */
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] { display: none; order: -10; margin: 0; padding: 14px 16px; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter][data-ipx-open] { display: block; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] > p { display: none; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit,
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit tbody { display: block; width: 100%; margin: 0; box-shadow: none; background: none; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit tr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit td { display: block; padding: 0 !important; border: 0 !important; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit td:has(select) { margin-right: 8px; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] select { max-width: 280px; height: 36px; font-size: 13.5px; }
+html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] input[type="submit"] { height: 36px; }
+
+/* ---------- each list: a card with its title, rows without a header ---------- */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] { display: block; width: 100%; margin: 0; border: 0; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list]::before { content: attr(data-ipx-title) "\2003" attr(data-ipx-count); display: block; padding: 14px 16px 10px;
+  color: var(--fg); font: 700 15.5px var(--font, "Figtree", sans-serif); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] > thead { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] > tbody { display: block; }
+
+/* An empty list: InSIS's "No suitable data found." row becomes the kit's empty state, with InSIS+'s words */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-empty] { padding-bottom: 14px; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-empty] > tbody > tr { display: block; padding: 0 16px; border: 0; background: none !important; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list][data-ipx-empty] > tbody > tr > td { display: block; padding: 18px !important; border: 1.5px dashed color-mix(in srgb, var(--faint) 40%, transparent) !important;
+  border-radius: 14px; background: none !important; color: var(--muted); font-size: 0; text-align: center; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-empty] > tbody > tr > td > * { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-empty] > tbody > tr > td::before { content: attr(data-ipx-empty-text); font-size: 14px; }
+
+/* ---------- a date row: [date] course / code · form · room · kind · places / deadlines / InSIS's controls ---------- */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list]:not([data-ipx-empty]) > tbody > tr { position: relative; display: flex; flex-wrap: wrap; align-items: baseline;
+  column-gap: 0; row-gap: 3px; min-height: 52px; padding: 12px 16px 12px 88px; align-items: center; border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] > tbody > tr > td { display: block; padding: 0 !important; border: 0 !important; background: none !important;
+  color: var(--muted); font-size: 13px; text-align: left !important; white-space: normal !important; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] > tbody > tr[data-ipx-link]:hover { background: color-mix(in srgb, var(--accent) 5%, transparent) !important; cursor: pointer; }
+/* Columns no row shows. A cell with a form control or an InSIS action link gets the column "act" in exams.js, so it
+   is never among these; the :has() guard also covers controls InSIS's scripts add after load. */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list]:not([data-ipx-empty]) > tbody > tr > td:not([data-ipx-col]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="num"],
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="period"],
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="by"],
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] .UISTMNumberCell { display: none !important; }
+/* InSIS's favourite star (its own control) and other decoration icons in the text cells */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="name"] .uf-icon { display: none; }
+
+/* Rows without a date (courses not scheduled yet) need no room for the date block */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] > tbody > tr:not(:has(td[data-ipx-col="date"])) { padding-left: 16px !important; }
+/* The date block on the left */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="date"] { position: absolute; left: 16px; top: 12px; width: 56px; padding: 6px 0 !important;
+  border-radius: 12px; background: var(--chip) !important; color: var(--fg-2); font-size: 0; line-height: 1.15; text-align: center !important; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="date"]::before { content: attr(data-ipx-day); display: block; color: var(--fg);
+  font: 800 22px/1 var(--display, "Bricolage Grotesque", sans-serif); font-stretch: 80%; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="date"]::after { content: attr(data-ipx-mon) "\A" attr(data-ipx-time); display: block; margin-top: 2px;
+  font-size: 11px; font-weight: 600; white-space: pre; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] tr[data-ipx-past] td[data-ipx-col="date"] { opacity: .6; }
+
+/* The course: the first line, full width */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="name"] { flex: 1 1 100%; order: 1; color: var(--fg); font-size: 15px; font-weight: 650; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="name"] a { position: relative; z-index: 2; color: var(--fg); text-decoration: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="name"] a:hover { color: var(--accent); }
+/* The facts line: code · form · room · kind · places · status */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="code"] { order: 2; font-variant-numeric: tabular-nums; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="form"] { order: 3; }
+/* "examination<br>(e-test)" on one line with a space: InSIS's text stays (transparent, keeping its width) and the
+   same words are drawn over it from data-ipx-text */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="form"][data-ipx-text] { position: relative; padding-right: 5px !important; color: transparent; white-space: nowrap !important; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="form"][data-ipx-text] br { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="form"][data-ipx-text]::before { display: inline-block; width: 18px; margin: 0 !important; text-align: center; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="form"][data-ipx-text]::after { content: attr(data-ipx-text); position: absolute; left: 18px; top: 0; color: var(--muted); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="where"] { order: 4; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="kind"] { order: 5; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="attempt"] { order: 6; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="places"] { order: 7; font-variant-numeric: tabular-nums; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="status"] { order: 8; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="supervisor"] { order: 3; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="form"], td[data-ipx-col="where"], td[data-ipx-col="kind"], td[data-ipx-col="attempt"],
+  td[data-ipx-col="places"], td[data-ipx-col="status"], td[data-ipx-col="supervisor"])::before { content: "·"; margin: 0 7px; color: var(--faint); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="where"] a,
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="supervisor"] a { position: relative; z-index: 2; color: var(--fg-2); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="where"] a:hover,
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="supervisor"] a:hover { color: var(--accent); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="places"]::after { content: "\00a0" attr(data-ipx-unit); }
+/* Icon-only cells (kind of sitting, attempt): InSIS's own words from its key, or nothing */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="kind"], td[data-ipx-col="attempt"]) .uf-icon { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="kind"], td[data-ipx-col="attempt"]):not([data-ipx-text]):not(:has(input:not([type="hidden"]), select, button, textarea, a[href])) { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="kind"], td[data-ipx-col="attempt"])[data-ipx-text]::after { content: attr(data-ipx-text); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="status"]:empty { display: none; }
+
+/* The deadlines in words (InSIS's three-line cell keeps its text, hidden) */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="deadlines"] { flex: 1 1 100%; order: 10; font-size: 0; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="deadlines"]::before { content: attr(data-ipx-dl); color: var(--fg-2); font-size: 12.5px; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list="attended"] td[data-ipx-col="deadlines"],
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list="realised"] td[data-ipx-col="deadlines"] { display: none; }
+/* A deadline within two days */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] tr[data-ipx-due] { box-shadow: inset 3px 0 0 var(--warn); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] tr[data-ipx-due] td[data-ipx-col="deadlines"]::before { color: var(--warn); font-weight: 700; }
+
+/* ---------- InSIS's links and controls, in their cells ---------- */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="info"], td[data-ipx-col="actions"], td[data-ipx-col="act"], td:not([data-ipx-col])) { order: 11; display: flex; flex-wrap: wrap; gap: 6px;
+  flex: 1 1 100%; }
+/* The info cell holding only the row's own link has nothing to show; one with any other link or a control (InSIS
+   may put a button there when sign-up opens) stays */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="info"], td[data-ipx-col="actions"]):not(:has(a:not([data-ipx-main]), input:not([type="hidden"]), select, button, textarea)) { display: none; }
+/* The date's details link opens the whole row */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] a[data-ipx-main] { position: static; display: inline; width: 0; overflow: hidden; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] a[data-ipx-main] .uf-icon { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] a[data-ipx-main]::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+/* Courses without dates: the course name is the row's link */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td[data-ipx-col="name"] a[data-ipx-main] { position: static; width: auto; overflow: visible; }
+/* Other icon links (why not, vacancy watch, …): small labelled chips above the row link */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td a[data-ipx-label]:not([data-ipx-main]) { position: relative; z-index: 2; display: inline-flex; align-items: center;
+  min-height: 28px; padding: 0 10px; border-radius: 8px; background: var(--chip); color: var(--fg-2); font-size: 12.5px; font-weight: 600; text-decoration: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td a[data-ipx-label]:not([data-ipx-main]) .uf-icon { display: none; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td a[data-ipx-label]:not([data-ipx-main])::after { content: attr(data-ipx-label); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] td a[data-ipx-label]:not([data-ipx-main]):hover { color: var(--accent); }
+/* InSIS's Register / Log out control: on the right of the row, above the row link */
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) { position: absolute; right: 16px; top: 12px; z-index: 2; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] tr:has(:is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) :is(a, input, button)) { padding-right: 150px; }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) a[data-ipx-label] { background: var(--accent); color: var(--accent-ink, #fff); }
+html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) a:not([data-ipx-label]) .uf-icon svg { width: 22px; height: 22px; }
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-exams #str1 table[data-ipx-list]:not([data-ipx-empty]) > tbody > tr { padding-left: 80px; }
+  html.ipx-generic.ipx-exams #str1 table[data-ipx-list] tr:has(:is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) :is(a, input, button)) { padding-right: 16px; }
+  html.ipx-generic.ipx-exams #str1 table[data-ipx-list] :is(td[data-ipx-col="register"], td[data-ipx-col="logout"]) { position: relative; right: auto; top: auto; order: 12;
+    flex: 1 1 100%; margin-top: 6px; }
+  html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] select { max-width: 100%; width: 100%; }
+  html.ipx-generic.ipx-exams #str1 form[data-ipx-filter] table.form-edit td { flex: 1 1 100%; }
+}
+
+/* ======================= 2. In the shadow root ======================= */
+
+/* The summary above the list */
+.ex-lead { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2px; }
+.ex-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 0; color: var(--fg-2); font-size: 14.5px; font-weight: 600; }
+.ex-dot { color: var(--faint); }
+.ex-next strong { color: var(--fg); }
+.ex-tools { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.ex-filter-btn { min-height: 34px; padding: 0 12px; font-size: 13px; }
+.ex-filter-btn[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+.ex-how { flex: 1 1 260px; color: var(--muted); font-size: 13.5px; }
+.ex-how summary { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; color: var(--muted); font-weight: 600; cursor: pointer; list-style: none; }
+.ex-how summary::-webkit-details-marker { display: none; }
+.ex-how summary:hover { color: var(--accent); }
+.ex-how summary .icon svg { width: 16px; height: 16px; }
+.ex-how ul { margin: 4px 0 0; padding-left: 20px; line-height: 1.5; }
+
+/* The page of one date */
+.ex-who summary { cursor: pointer; }
+.ex-who[open] summary { margin-bottom: 12px; }
+
+/* InSIS's Key legend: its contents are in How it works; its toggle is a script link, not an action. */
+html.ipx-generic.ipx-exams #str1 .uisLegend { display: none; }

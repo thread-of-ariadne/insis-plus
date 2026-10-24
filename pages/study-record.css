@@ -167,3 +167,39 @@ a.sr-attempt:hover { text-decoration: underline; }
 .sr-more-link, .sr-left { color: var(--fg); }
 .sr-left { padding: 14px 16px; }
 .sr-left .glist-text small { font-variant-numeric: tabular-nums; }
+
+/* ---------- pass rates: the period and course steps ---------- */
+.sr-path { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: 14px; }
+.sr-path a { color: var(--accent); font-weight: 600; }
+.sr-path strong { color: var(--fg); }
+.sr-path-sep { color: var(--faint); }
+.sr-step-list { display: flex; flex-direction: column; margin: 0; padding: 4px 0; list-style: none; }
+.sr-step-list > li { border-top: 1px solid var(--line); }
+.sr-step-list > li:first-child { border-top: 0; }
+.sr-step { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 18px; font-size: 14px; }
+.sr-step:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.sr-step > .icon { flex: none; color: var(--faint); }
+.sr-step > .icon svg { width: 15px; height: 15px; }
+.sr-step:hover > .icon, .sr-step:hover .sr-step-main > strong, .sr-step-link:hover strong { color: var(--accent); }
+.sr-step-main { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.sr-step-main strong { color: var(--fg); font-weight: 650; }
+.sr-step-meta { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sr-step-code { flex: none; width: 64px; color: var(--muted); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sr-step-link::after { content: ""; position: absolute; inset: 0; }
+.sr-step-sup { position: relative; z-index: 1; flex-basis: 100%; color: var(--muted); font-size: 13px; }
+a.sr-step-sup:hover { color: var(--accent); }
+.sr-step-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.sr-filter { flex: 1 1 260px; max-width: 420px; height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--chip); color: var(--fg); font: 14px var(--font); }
+.sr-filter:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.sr-letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.sr-letters a { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 8px; border-radius: 9px; background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 700; }
+.sr-letters a:hover { color: var(--accent); }
+.sr-letters a.on { background: var(--accent); color: var(--accent-ink, #fff); }
+@media (max-width: 640px) {
+  .sr-step { gap: 10px; padding: 12px 14px; }
+  .sr-course-step { flex-wrap: wrap; }
+  .sr-step-code { width: auto; }
+  .sr-course-step .sr-step-main { flex-basis: 100%; order: 2; }
+  .sr-course-step .sr-step-meta { order: 1; margin-left: auto; }
+  .sr-course-step > .icon { display: none; }
+}

@@ -125,7 +125,8 @@
       if (grid.contains(tr)) continue;
       const tds = tr.querySelectorAll(':scope > td');
       const key = tds.length === 2 && clean(tds[0].textContent).match(/^\((\d+)\)$/)?.[1];
-      if (key) out[key] = clean(tds[1].textContent);
+      // Several notes in one cell are separated by <br> only ("Public holiday: …<br>Innovation day: …").
+      if (key) out[key] = [...tds[1].childNodes].map((n) => (n.nodeName === 'BR' ? ' · ' : n.textContent)).join('').split(' · ').map(clean).filter(Boolean).join(' · ');
     }
     return out;
   }
@@ -179,10 +180,12 @@
     };
   }
 
-  function parse() {
-    const personal = /rozvrh_student=/.test(here.href) || doc.querySelector('input[name="rozvrh_student"]');
+  // `search: true` also reads the grids of the timetable search (a teacher's timetable, a course's, a room's …):
+  // the same markup, but never stored (not the student's own timetable).
+  function parse({ search = false } = {}) {
+    const personal = !!(/rozvrh_student=/.test(here.href) || doc.querySelector('input[name="rozvrh_student"]'));
     const found = findGrid();
-    if (!personal || !found) return null;
+    if ((!personal && !search) || !found) return null;
     const { table, head, cols } = found;
     const notes = footnotes(table);
     const types = typeLabels(table);
@@ -230,10 +233,11 @@
     const val = (name) => clean(doc.querySelector(`input[name="${name}"]`)?.value);
     const from = parseDate(val('konani_od'));
     const to = parseDate(val('konani_do'));
-    const form = doc.querySelector('form input[name="rozvrh_student"]')?.form || null;
+    const form = (personal ? doc.querySelector('form input[name="rozvrh_student"]') : doc.querySelector('form input[name="typ_vypisu"]'))?.form || null;
     const changed = doc.body.innerText.match(/(?:Last change|Poslední změna)\s*:\s*([0-9./: ]+)/i)?.[1]?.trim() || '';
 
     return {
+      personal,
       events,
       weekly: !events.some((e) => e.date),
       from,
@@ -508,14 +512,14 @@
   // Export and print (one place per job): a side sheet on this page. (a) the transfer to the university calendar
   // (a link to InSIS's settings page, which only the student changes there); (b) InSIS's display-mode form, which
   // shows in the sheet through the <slot> (the form element itself, slotted; never copied or submitted here).
-  function exportSheet(calendar, withForm) {
+  function exportSheet(calendar, withForm, heading = T.options, hint = T.optionsHint) {
     const sheet = h('dialog', { class: 'tt-sheet', 'aria-labelledby': 'tt-sheet-title' });
     const close = () => sheet.close();
     // A click on the backdrop (outside the panel) closes the sheet, like Escape.
     sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
     sheet.append(h('div', { class: 'tt-sheet-body' },
       h('div', { class: 'tt-sheet-head' },
-        h('h2', { id: 'tt-sheet-title' }, T.options),
+        h('h2', { id: 'tt-sheet-title' }, heading),
         h('button', { type: 'button', class: 'btn ghost tt-sheet-close', onclick: close }, T.close)),
       calendar && h('section', { class: 'tt-sheet-part' },
         h('h3', {}, T.calendarTitle),
@@ -525,7 +529,7 @@
           h('span', { class: 'glist-go' }, icon('arrow')))),
       withForm && h('section', { class: 'tt-sheet-part' },
         h('h3', {}, T.printTitle),
-        h('p', { class: 'muted tt-options-hint' }, T.optionsHint),
+        h('p', { class: 'muted tt-options-hint' }, hint),
         h('slot'))));
     return sheet;
   }
@@ -545,15 +549,218 @@
     ipx.save();
   }
 
+  // ---------- the timetable search (teardowns/exams-grades-schedule.md §2.8) ----------
+  // Every other page of rozvrhy_view.pl: the criteria page (F: InSIS's "Other timetables" form in a form card; its
+  // "Personal timetable" form is hidden, because that job is My week), the steps choosing which published timetables
+  // are searched (konf: link lists → R; the checkbox step → F, InSIS's table styled in place), and the result grids
+  // (a teacher's timetable …: R with the week view above, InSIS's display-mode form only in the Display options
+  // sheet). InSIS's forms are slotted, never copied, filled in or submitted; links pass the URL rule. Titles follow
+  // 03-pages.md rule 7: the criteria page is the section (Timetable search, eyebrow Schedule); the steps and the
+  // results are pages below it (eyebrow Timetable search).
+
+  const TS = {
+    cs: { search: 'Hledání v rozvrzích', choose: 'Výběr rozvrhů', timetable: 'Rozvrh',
+      searchLead: 'Najděte rozvrh vyučujícího, předmětu nebo studijního programu. Rozvrhy místností jsou v sekci Místnosti.',
+      mine: 'Váš vlastní rozvrh', mineText: 'Vaše hodiny, týden po týdnu, jsou v Mém týdnu.',
+      formTitle: 'Další rozvrhy', formLead: 'Zvolte jedno nebo více kritérií a stiskněte tlačítko Zobrazit (InSIS). Tlačítko Individuální výběr umožní vybrat víc vyučujících, předmětů nebo místností.',
+      who: 'Kdo', what: 'Co a kdy', where: 'Kde', programme: 'Program a skupina',
+      scope: 'V kterých rozvrzích se hledá', scopeText: 'Obvykle je vybrán aktuální semestr; měnit to potřebujete jen výjimečně.',
+      chooseLead: 'V kterých zveřejněných rozvrzích hledat. Obvykle je aktuální semestr už vybrán; měnit to potřebujete jen výjimečně.',
+      pickTitle: 'Rozvrhy k prohledání', pickLead: 'Zaškrtněte rozvrhy a stiskněte tlačítko Vybrat zaškrtnuté rozvrhy (InSIS). Tlačítka pod seznamem zaškrtnou rozvrhy podle fakulty nebo formy studia.',
+      byPeriod: 'Podle období platnosti', byDept: 'Podle pracoviště', allPeriods: 'Zobrazit všechna období',
+      count: (n) => `${n} ${ipx.kit.plural(n, 'rozvrh', 'rozvrhy', 'rozvrhů')}`, now: 'teď', filter: 'Hledat období (např. 2026)', noMatch: 'Nic neodpovídá hledání.',
+      options: 'Možnosti zobrazení', optionsHint: 'Zvolte typ výpisu a formát a stiskněte tlačítko Zobrazit (InSIS). PDF se stáhne jako soubor; seznam a HTML znovu načtou tuto stránku.' },
+    en: { search: 'Timetable search', choose: 'Choose timetables', timetable: 'Timetable',
+      searchLead: 'Find the timetable of a teacher, a course or a programme. Room timetables are in Rooms.',
+      mine: 'Your own timetable', mineText: 'Your classes, week by week, are in My week.',
+      formTitle: 'Other timetables', formLead: "Pick one or more criteria and press InSIS's Display button. Individual selection lets you pick several teachers, courses or rooms.",
+      who: 'Who', what: 'What and when', where: 'Where', programme: 'Programme and group',
+      scope: 'Which timetables are searched', scopeText: 'Usually the current semester is already chosen; you rarely need to change it.',
+      chooseLead: 'Which published timetables to search in. Usually the current semester is already chosen; you rarely need this.',
+      pickTitle: 'Timetables to search', pickLead: "Tick the timetables and press InSIS's Select ticked timetables button. The buttons under the list tick them by faculty or form of study.",
+      byPeriod: 'By period of validity', byDept: 'By department', allPeriods: 'Show all periods',
+      count: (n) => `${n} ${n === 1 ? 'timetable' : 'timetables'}`, now: 'now', filter: 'Find a period (e.g. 2026)', noMatch: 'Nothing matches.',
+      options: 'Display options', optionsHint: "Choose the type of list and the format, then press InSIS's Display button. PDF downloads a file; List and HTML reload this page." },
+  }[lang];
+
+  // The row groups of the criteria form, by the names of InSIS's selects (CSS draws the group labels).
+  const CRITERIA = { mistnost: 'where', garant: 'who', ucitel: 'who', predmet: 'what', ustav: 'what', den: 'what',
+    stupen: 'programme', program: 'programme', obor: 'programme', k_skupina: 'programme' };
+  // Columns of the checkbox step, by InSIS's header text.
+  const PICK_COLS = [['select', /^(sel|ozn)/], ['name', /^(timetable|rozvrh)/], ['period', /^(study period|obdobi)/],
+    ['dept', /^(department|pracoviste|fakulta)/], ['form', /^(form|forma)/], ['from', /^(beginning|zacatek|od)/], ['to', /^(end|konec|do)/]];
+
+  const crumbLinks = (page) => [...page.querySelectorAll('.breadcrumb-item a[href]')].map(ipx.kit.linkOf).filter(Boolean);
+  const kind = (page) => {
+    if (page.querySelector('form select[name="ucitel"], form select[name="garant"]')) return 'criteria';
+    if (page.querySelector('form input[type="checkbox"][name="rozvrh"]')) return 'pick';
+    if (ipx.kit.findTables(page).some((t) => t.querySelector('a[href*="konf="]'))) return 'konf';
+    return null;
+  };
+
+  function criteriaPage(page) {
+    const form = page.querySelector('form select[name="ucitel"], form select[name="garant"]').form;
+    form.setAttribute('data-ipx-criteria', '');
+    const seen = new Set();
+    for (const tr of form.querySelectorAll('tr')) {
+      const sel = tr.querySelector('select[name]');
+      const grp = sel && CRITERIA[sel.name];
+      if (grp) {
+        tr.setAttribute('data-ipx-grp', grp);
+        if (!seen.has(grp)) { seen.add(grp); tr.setAttribute('data-ipx-grp-label', TS[grp]); }
+      } else if (sel?.name === 'format') tr.setAttribute('data-ipx-grp', 'format');
+      else if (!sel && /^\*/.test(clean(tr.textContent))) tr.setAttribute('data-ipx-grp', 'note');
+    }
+    document.documentElement.classList.add('ipx-tts');
+    styleSlotted('pages/timetable.css');
+    const week = ipx.nav.target('schedule.week');
+    const scope = crumbLinks(page).filter((l) => /konf=/.test(l.href)).at(-1);
+    ipx.kit.page({
+      key: 'timetable-search', css: 'pages/timetable.css', title: ipx.nav.sectionLabel('schedule.search') || TS.search, subtitle: ipx.nav.label('schedule'), form,
+      build: ({ formCard }) => [
+        h('p', { class: 'muted tts-lead' }, TS.searchLead),
+        week && anchor({ href: week }, { class: 'card glist-item tts-card' },
+          h('span', { class: 'tt-export-ico' }, icon('calendar')),
+          h('span', { class: 'glist-text' }, h('strong', {}, TS.mine), h('small', {}, TS.mineText)),
+          h('span', { class: 'glist-go' }, icon('arrow'))),
+        formCard({ title: TS.formTitle, lead: TS.formLead }),
+        scope && anchor({ href: scope.href }, { class: 'card glist-item tts-card' },
+          h('span', { class: 'tt-export-ico' }, icon('layers')),
+          h('span', { class: 'glist-text' }, h('strong', {}, TS.scope), h('small', {}, TS.scopeText)),
+          h('span', { class: 'glist-go' }, icon('arrow'))),
+      ],
+    });
+  }
+
+  function pickPage(page) {
+    const form = page.querySelector('form input[type="checkbox"][name="rozvrh"]').form;
+    const table = [...form.querySelectorAll('table')].find((t) => t.querySelector('input[type="checkbox"][name="rozvrh"]'));
+    form.setAttribute('data-ipx-pick', '');
+    table.setAttribute('data-ipx-list', 'pick');
+    const heads = [...(table.tHead?.rows[0]?.cells || [])];
+    const roles = heads.map((th) => (th.classList.contains('UISTMNumberCell') ? 'num' : PICK_COLS.find(([, re]) => re.test(norm(th.textContent)))?.[0] || null));
+    const mark = () => {
+      for (const tr of table.tBodies[0]?.rows || []) {
+        // InSIS's table script may add a (hidden) row-number cell in front after load: the roles shift by it.
+        const offset = Math.max(0, tr.cells.length - roles.length);
+        [...tr.cells].forEach((td, i) => td.setAttribute('data-ipx-col', i < offset ? 'num' : roles[i - offset] || 'other'));
+        // The row reads as: name · dates / period · department · form. Department, form and end date are shown
+        // by CSS from these attributes (InSIS's cells stay where they are).
+        const cell = (role) => tr.querySelector(`[data-ipx-col="${role}"]`);
+        const extra = [cell('dept'), cell('form')].map((td) => clean(td?.textContent)).filter(Boolean).join(' · ');
+        if (extra) cell('period')?.setAttribute('data-ipx-extra', ` · ${extra}`);
+        const to = clean(cell('to')?.textContent);
+        if (to) cell('from')?.setAttribute('data-ipx-to', ` – ${to}`);
+      }
+    };
+    mark();
+    // InSIS's script runs after this module on some loads; mark again once it has added its cells.
+    setTimeout(mark, 800);
+    form.querySelectorAll(':scope > input[type="button"]').forEach((b) => b.setAttribute('data-ipx-part', 'tick'));
+    document.documentElement.classList.add('ipx-tts');
+    styleSlotted('pages/timetable.css');
+    ipx.kit.page({
+      key: 'timetable-search', css: 'pages/timetable.css', title: TS.choose, subtitle: ipx.nav.sectionLabel('schedule.search'), form,
+      build: ({ formCard }) => [h('p', { class: 'muted tts-lead' }, TS.chooseLead), formCard({ title: TS.pickTitle, lead: TS.pickLead })],
+    });
+  }
+
+  function konfPage(page) {
+    const lists = ipx.kit.findTables(page).filter((t) => t.querySelector('a[href*="konf="]')).map((t) => {
+      const { rows } = ipx.kit.readTable(t);
+      const items = rows.map((r) => {
+        const link = r.cells.flatMap((c) => c.links).find((l) => /konf=/.test(l.href));
+        const texts = r.cells.map((c) => c.text);
+        const from = ipx.kit.dateOf(texts[0]);
+        const to = from && ipx.kit.dateOf(texts[1]);
+        const n = texts.slice(1).find((x) => /^\d+$/.test(x));
+        return link && { href: link.href, from, to, name: from ? null : texts[0], n: n != null ? Number(n) : null };
+      }).filter(Boolean);
+      return { dated: items.some((i) => i.from), items };
+    }).filter((l) => l.items.length);
+    if (!lists.length) return;
+    const all = [...page.querySelectorAll('a[href*="vse=1"]')].filter((a) => !a.closest('table')).map(ipx.kit.linkOf).find(Boolean);
+    const now = new Date();
+    const isNow = (i) => i.from && i.to && i.from <= now && now < addDays(i.to, 1);
+    const row = (i) => anchor({ href: i.href }, { class: 'tts-row' + (isNow(i) ? ' now' : '') },
+      h('span', { class: 'tts-row-main' }, i.from ? rangeLong(i.from, i.to || i.from) : i.name),
+      isNow(i) && h('span', { class: 'delta ok' }, TS.now),
+      i.n != null && h('small', { class: 'tts-row-n' }, TS.count(i.n)),
+      h('span', { class: 'tts-go' }, icon('chevron')));
+    const block = (l) => {
+      // Periods newest first; a long list gets a filter (InSIS lists every period since 2009 on "all").
+      const items = l.dated ? [...l.items].sort((a, b) => b.from - a.from) : l.items;
+      const box = h('div', { class: 'card tts-list' }, items.map(row));
+      const empty = h('p', { class: 'muted tts-nomatch', hidden: '' }, TS.noMatch);
+      const filter = items.length > 30 && h('input', { type: 'search', class: 'tts-filter', placeholder: TS.filter, 'aria-label': TS.filter,
+        oninput: (e) => {
+          const q = norm(e.target.value.trim());
+          let shown = 0;
+          [...box.children].forEach((a) => { const hit = !q || norm(a.textContent).includes(q); a.hidden = !hit; shown += hit ? 1 : 0; });
+          empty.hidden = shown > 0;
+        } });
+      return h('section', { class: 'tts-block' },
+        sectionHead(l.dated ? TS.byPeriod : TS.byDept, l.dated && all ? { href: all.href, text: TS.allPeriods } : null), filter, box, empty);
+    };
+    ipx.kit.page({
+      key: 'timetable-search', css: 'pages/timetable.css', title: TS.choose, subtitle: ipx.nav.sectionLabel('schedule.search'),
+      build: () => [h('p', { class: 'muted tts-lead' }, TS.chooseLead), lists.map(block)],
+    });
+  }
+
+  // A result grid (a teacher's timetable …): the week view of My week, with InSIS's display-mode form in the sheet.
+  function resultPage(data) {
+    const page = doc.getElementById('str1');
+    const heading = clean(page.querySelector('#titulek h1')?.textContent || page.querySelector('#titulek')?.textContent);
+    // "Timetable for teacher doc. … / Rozvrh učitele …" → the person or thing it is for.
+    const what = heading.replace(/^(timetable|rozvrh)\s+(for\s+)?(teacher|učitele|vyučujícího|of)?\s*/i, '') || heading;
+    const slotted = data.form && page.contains(data.form) ? [page] : null;
+    if (slotted) {
+      keepOnly(page, data.form);
+      document.documentElement.classList.add('ipx-tt');
+      styleSlotted('pages/timetable.css');
+    }
+    const sheet = slotted ? exportSheet(null, true, TS.options, TS.optionsHint) : null;
+    const start = initialWeek(data, new Date());
+    takeover({
+      key: 'timetable-search',
+      css: 'pages/timetable.css',
+      title: what ? `${TS.timetable} · ${what}` : TS.timetable,
+      subtitle: ipx.nav.sectionLabel('schedule.search'),
+      extra: [sheet && h('button', { type: 'button', class: 'tt-action', title: TS.options, 'aria-haspopup': 'dialog',
+        onclick: () => sheet.showModal() }, icon('gear'), h('span', {}, TS.options))],
+      slotted,
+      build: () => {
+        const view = h('div', { class: 'tt-view' });
+        const state = { monday: start.monday, initial: start.monday, reason: start.reason,
+          render: () => view.replaceChildren(...buildPage(data, state)) };
+        state.render();
+        return h('div', { class: 'tt tt-result' }, view, sheet);
+      },
+    });
+  }
+
+  function search() {
+    if (ipx.nav.route(document.baseURI.split('#')[0]).path !== '/auth/katalog/rozvrhy_view.pl') return;
+    const page = doc.getElementById('str1');
+    if (!page || !ipx.kit) return;
+    const grid = parse({ search: true });
+    if (grid && !grid.personal) { resultPage(grid); return; }
+    const k = kind(page);
+    if (k === 'criteria') criteriaPage(page);
+    else if (k === 'pick') pickPage(page);
+    else if (k === 'konf') konfPage(page);
+  }
+
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
   (ipx.readers ||= {}).timetable = (fetched, url) => {
     doc = fetched; here = new URL(url);
-    try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
+    try { const data = parse(); if (data?.personal) remember(data); } finally { doc = document; here = location; }
   };
 
   ipx.ready.then(() => {
     const data = parse();
-    if (!data) return;
+    if (!data) { search(); return; }
     remember(data);
 
     const page = doc.getElementById('str1');

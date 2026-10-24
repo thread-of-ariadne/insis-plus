@@ -1,0 +1,20 @@
+/* InSIS+ All services pages (pages/services.js). One file, two places: the html.ipx-generic rules style InSIS's own
+   forms in the page's DOM (slotted, never moved); the rest styles the shadow root. Shared parts: pages/rebuild.css. */
+
+/* ---------- InSIS's forms, in place (page DOM) ---------- */
+
+/* News channels: one row per channel, the checkbox first */
+html.ipx-generic.ipx-svc-news #str1 form[data-ipx-news] > p { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 10px 0; border-top: 1px solid var(--line); color: var(--fg); font-size: 14px; line-height: 1.45; }
+html.ipx-generic.ipx-svc-news #str1 form[data-ipx-news] > p:first-of-type { border-top: 0; }
+html.ipx-generic.ipx-svc-news #str1 form[data-ipx-news] > p > input[type="checkbox"] { order: -1; flex: none; margin-top: 2px; }
+html.ipx-generic.ipx-svc-news #str1 form[data-ipx-news] input[type="submit"] { margin-top: 12px; }
+
+/* Thematic search: the field and its button on one line */
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] input.uisSearchInput { width: min(100%, 420px); }
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] > table { width: 100%; margin-top: 10px; }
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] > table td { padding: 4px 8px 4px 0 !important; color: var(--fg-2); font-size: 14px; }
+/* InSIS writes the captions "Searched string" and "Search areas" as bare text in the form: the lead above the form
+   and the "Where to search" disclosure say them instead (the text is set to size 0; every control keeps its size). */
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] { font-size: 0 !important; }
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] > * { font-size: 14px; }
+html.ipx-generic.ipx-svc-search #str1 form[data-ipx-search] > input.uisSearchButton { margin-left: 8px; }

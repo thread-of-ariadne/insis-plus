@@ -37,8 +37,8 @@ between sessions, no settings, no pins, no record.
   running it: no InSIS script runs (so neither does the analytics InSIS embeds in its pages), no image or
   stylesheet is loaded, nothing is clicked, submitted or changed. The reads may appear in InSIS's own log of your
   operations ("My operations").
-- **When you open a page that needs it**: the list of classmates on a course's People tab, and InSIS's mail
-  forwarding page when the mail box does not say where mail is forwarded. Not stored.
+- **When you open a page that needs it**: the list of classmates on a course's People tab. Not stored. Settings
+  pages (such as InSIS's mail forwarding) are never read in the background; the mail box links to them instead.
 - **Never**: pages or links that do something (sign up, sign off, mark as read, generate a document, delete,
   change settings), opening a stored document, questionnaires, messages; and pages with credentials or sensitive
   personal data (the mobile-app pairing code, the personal data check, bank accounts, card passes, the log of your

@@ -1,54 +1,58 @@
-/* InSIS+ course catalogue, on top of generic.css (tokens, tabs, form controls, tables come from there).
-   Injected into the page and scoped to html.ipx-cat. */
+/* InSIS+ course catalogue (catalog.js). One file in two places:
+   - in the page itself (html.ipx-generic.ipx-cat …): InSIS's own search form, slotted, styled in place on top of generic.css;
+   - in the shadow root (cat-…): the lead, the result cards, the rail. */
 
-/* The search form as a card */
-html.ipx-cat #str1 form {
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  color: var(--fg-2);
-  font-size: 14px;
-  font-weight: 600;
-}
-html.ipx-cat #str1 input.uisSearchInput { width: min(560px, 100%); height: 46px; margin: 8px 6px 8px 0; font-size: 16px; }
-html.ipx-cat #str1 input.uisSearchButton { height: 46px; padding: 0 24px; font-size: 15px; }
+/* ---------- InSIS's form, in place ---------- */
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] { display: block; max-width: 1100px; padding: 18px 20px; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); color: var(--fg-2); box-sizing: border-box;
+  /* InSIS writes its label, the spacing and the result lines as loose text in the form: that text is hidden here
+     (the results are drawn again under the form), every element gets its size back. */
+  font-size: 0; }
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] > * { font-size: 14px; }
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat]::before { content: attr(data-ipx-cat); display: block; margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] > br, html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] > p:empty { display: none; }
+html.ipx-generic.ipx-cat #str1 input.uisSearchInput { width: min(560px, calc(100% - 130px)); height: 46px; margin: 0 8px 0 0; font-size: 16px; box-sizing: border-box; }
+html.ipx-generic.ipx-cat #str1 input.uisSearchButton { height: 46px; padding: 0 24px; font-size: 15px; }
 
-/* Results: one row per course, a mini cover, semesters as a segmented strip */
-html.ipx-cat .ipx-results { display: grid; gap: 8px; margin: 18px 0 20px; font-weight: 400; }
-html.ipx-cat .ipx-count { margin: 0 0 4px; color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
-html.ipx-cat .ipx-course {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-  padding: 8px 12px 8px 8px;
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: 0 1px 0 rgba(16, 19, 31, 0.06);
-  transition: box-shadow 0.2s;
-}
-html.ipx-cat .ipx-course:hover { box-shadow: var(--shadow-card); }
-html.ipx-cat #str1 .ipx-main { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; min-width: 0; color: var(--fg); text-decoration: none; }
-html.ipx-cat .ipx-main .cover { display: block; flex: none; overflow: hidden; border-radius: 9px; line-height: 0; }
-html.ipx-cat .ipx-code { font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; }
-html.ipx-cat .ipx-name { font-size: 15px; font-weight: 700; }
-html.ipx-cat .ipx-main:hover .ipx-name { color: var(--accent); }
-html.ipx-cat .ipx-fac { color: var(--muted); font-size: 13px; }
-html.ipx-cat .ipx-sems { display: flex; flex-wrap: wrap; margin-left: auto; padding: 3px; border-radius: 10px; background: var(--chip); }
-html.ipx-cat #str1 .ipx-sem {
-  padding: 4px 10px;
-  border-radius: 7px;
-  color: var(--fg-2);
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-html.ipx-cat #str1 .ipx-sem:hover { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-raised); }
+/* The faculty and period checkboxes: folded until the Filters button opens them */
+html.ipx-generic.ipx-cat:not(.ipx-cat-open) #str1 table[data-ipx-cat-filters] { display: none; }
+html.ipx-generic.ipx-cat #str1 table[data-ipx-cat-filters] { display: block; margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--line); border-radius: 0;
+  background: none; box-shadow: none; overflow-x: auto; }
+/* InSIS draws checkboxes with appearance: none and a dark hairline (invisible on the dark theme): the browser's own here */
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] input[type="checkbox"] { appearance: auto !important; }
+html.ipx-generic.ipx-cat #str1 table[data-ipx-cat-filters] td { padding: 4px 16px 4px 0; color: var(--fg-2); font-size: 13.5px; vertical-align: top; }
 
-/* Filters */
-html.ipx-cat .ipx-filters { margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: var(--chip); font-weight: 400; }
-html.ipx-cat .ipx-filters summary { color: var(--fg); font-weight: 700; cursor: pointer; }
-html.ipx-cat .ipx-filters[open] summary { margin-bottom: 10px; }
-html.ipx-cat .ipx-filters td { color: var(--fg-2); }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] { padding: 14px; }
+  html.ipx-generic.ipx-cat #str1 input.uisSearchInput { width: 100%; margin: 0 0 8px; }
+  html.ipx-generic.ipx-cat #str1 input.uisSearchButton { width: 100%; }
+}
+
+/* ---------- shadow root ---------- */
+.cat-lead { margin: 0; font-size: 14px; }
+.cat-filters { align-self: flex-start; }
+.cat-filters[aria-expanded="true"] svg { transform: rotate(180deg); }
+.cat-results { display: flex; flex-direction: column; gap: 8px; }
+.cat-count { margin: 0 0 2px; color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.cat-course { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 10px 14px 10px 10px; }
+.cat-main { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 260px; color: var(--fg); text-decoration: none; }
+.cat-main .cover { flex: none; overflow: hidden; border-radius: 10px; line-height: 0; }
+.cat-text { display: flex; flex-direction: column; min-width: 0; }
+.cat-text strong { font-size: 15px; font-weight: 700; }
+a.cat-main:hover strong { color: var(--accent); }
+.cat-code { font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.cat-sems { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 10px; background: var(--chip); }
+.cat-sem { padding: 4px 10px; border-radius: 7px; color: var(--fg-2); font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+a.cat-sem:hover { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-raised); }
+
+.cat-recent { display: flex; flex-direction: column; }
+.cat-recent-row { display: flex; flex-direction: column; gap: 1px; padding: 8px 0; border-top: 1px solid var(--line); color: var(--fg); font-size: 14px; font-weight: 600; text-decoration: none; }
+.cat-recent-row:first-child { border-top: 0; padding-top: 0; }
+.cat-recent-row:hover span:last-child { color: var(--accent); }
+.cat-pass { display: grid; grid-template-columns: 22px minmax(0, 1fr) 16px; align-items: center; gap: 12px; color: var(--fg); text-decoration: none; }
+.cat-pass svg { width: 20px; height: 20px; color: var(--accent); }
+.cat-pass strong { display: block; font-size: 14.5px; }
+.cat-pass small { display: block; color: var(--muted); font-size: 13px; }
+
+/* InSIS's empty paragraphs and wrappers between its hidden help, tab row and the form */
+html.ipx-generic.ipx-cat #str1 p:empty { display: none; }

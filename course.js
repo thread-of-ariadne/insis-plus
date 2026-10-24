@@ -27,7 +27,7 @@
       lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
       coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
-      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky', courseFiles: 'Soubory předmětu', newInCourse: 'Nové v tomto předmětu', newInCourses: 'Nové ve vašich předmětech', fromList: (t) => `Podle seznamu Nové z ${t}`, openNew: 'Otevřít Nové', emptyFolders: (n) => `${n} ${ipx.kit.plural(n, 'prázdná složka', 'prázdné složky', 'prázdných složek')}`, noFiles: 'K tomuto předmětu zatím na dokumentovém serveru nejsou žádné soubory.', foldersTitle: 'Složky', openFolderHint: 'Složka se otevře v InSIS, v rámci tohoto předmětu.', earlier: 'Dřívější období', filesShort: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`, newShort: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`, noNewYet: 'Nové dokumenty se ukážou, když otevřete Nové.', materials: 'Materiály', allFoldersTab: 'Všechny složky', displaySettings: 'E-mail a zobrazení', yourFolders: 'Vaše složky', settingsNote: 'InSIS+ čte strom dokumentů: když ho v nastavení necháte začínat níž, můžou se tu vaše předměty přestat ukazovat.',
+      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky', courseFiles: 'Soubory předmětu', newInCourse: 'Nové v tomto předmětu', newInCourses: 'Nové ve vašich předmětech', fromList: (t) => `Podle seznamu Nové z ${t}`, openNew: 'Otevřít Nové', emptyFolders: (n) => `${n} ${ipx.kit.plural(n, 'prázdná složka', 'prázdné složky', 'prázdných složek')}`, noFiles: 'K tomuto předmětu zatím na dokumentovém serveru nejsou žádné soubory.', foldersTitle: 'Složky', openFolderHint: 'Složka se otevře v InSIS, v rámci tohoto předmětu.', earlier: 'Dřívější období', filesShort: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`, newShort: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`, noNewYet: 'Nové dokumenty se ukážou, když otevřete Nové.', materials: 'Materiály', allFoldersTab: 'Všechny složky', displaySettings: 'E-mail a zobrazení', yourFolders: 'Vaše složky', settingsNote: 'InSIS+ čte strom dokumentů: když ho v nastavení necháte začínat níž, můžou se tu vaše předměty přestat ukazovat.', foldersEmpty: (v) => `${v}: zatím nic`, foldersHelp: 'Složky, které jste si na dokumentovém serveru sami založili (máte k nim plné právo SUPER). Studenti je obvykle nemají.',
       library: 'E-knihovna', libraryText: 'Veřejné studijní materiály, které zveřejňují katedry.',
       untilAt: (d) => `do ${d}`, closedOn: (d) => `uzavřeno ${d}`, confirmed: 'potvrzeno', submitted: 'odevzdáno', nothingIn: 'nic neodevzdáno', notOpen: (d) => `otevře se ${d}`,
       noResult: 'Výsledek zatím není zapsaný.', entered: (d) => `zapsáno ${d}`, attemptN: (n) => `${n}. pokus`, allAttempts: 'Všechny pokusy ve Výsledcích',
@@ -47,7 +47,7 @@
       lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
       coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
-      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders', courseFiles: 'Course files', newInCourse: 'New in this course', newInCourses: 'New in your courses', fromList: (t) => `From the New list at ${t}`, openNew: 'Open New', emptyFolders: (n) => `${n} empty ${n === 1 ? 'folder' : 'folders'}`, noFiles: 'There are no files on the document server for this course yet.', foldersTitle: 'Folders', openFolderHint: 'A folder opens in InSIS, inside this course.', earlier: 'Earlier periods', filesShort: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, newShort: (n) => `${n} new`, noNewYet: 'New documents show here once you open New.', materials: 'Materials', allFoldersTab: 'All folders', displaySettings: 'E-mail and display', yourFolders: 'Your folders', settingsNote: 'InSIS+ reads the document tree: starting it lower in these settings can hide your courses here.',
+      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders', courseFiles: 'Course files', newInCourse: 'New in this course', newInCourses: 'New in your courses', fromList: (t) => `From the New list at ${t}`, openNew: 'Open New', emptyFolders: (n) => `${n} empty ${n === 1 ? 'folder' : 'folders'}`, noFiles: 'There are no files on the document server for this course yet.', foldersTitle: 'Folders', openFolderHint: 'A folder opens in InSIS, inside this course.', earlier: 'Earlier periods', filesShort: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, newShort: (n) => `${n} new`, noNewYet: 'New documents show here once you open New.', materials: 'Materials', allFoldersTab: 'All folders', displaySettings: 'E-mail and display', yourFolders: 'Your folders', settingsNote: 'InSIS+ reads the document tree: starting it lower in these settings can hide your courses here.', foldersEmpty: (v) => `${v}: nothing yet`, foldersHelp: 'Folders you set up yourself on the document server (you hold the full SUPER right to them). Students usually have none.',
       library: 'e-Library', libraryText: 'Public study materials published by departments.',
       untilAt: (d) => `until ${d}`, closedOn: (d) => `closed ${d}`, confirmed: 'confirmed', submitted: 'submitted', nothingIn: 'nothing submitted', notOpen: (d) => `opens ${d}`,
       noResult: 'No result has been entered yet.', entered: (d) => `entered ${d}`, attemptN: (n) => `attempt ${n}`, allAttempts: 'All attempts in Results',
@@ -516,6 +516,42 @@
       chain.flatMap(([fid, name], i) => [' › ', i === chain.length - 1 ? h('strong', {}, folderLabel(name)) : step(fid, name)]));
   }
 
+  // Materials › Settings › Your folders (moje_dok.pl): InSIS's help paragraph is said in one line by InSIS+, and an
+  // empty list ("No suitable data found." under a header row) becomes one empty state, drawn by CSS on InSIS's own
+  // table where it stands (only data attributes are added; InSIS's help is hidden in place, nothing is moved). A list with rows stays InSIS's own, under the one-line help. InSIS's
+  // help for the other sub-views (Copy folders, Ignored folders, My documents) is kept as InSIS wrote it.
+  let foldersState;
+  function yourFoldersState() {
+    if (foldersState !== undefined) return foldersState;
+    foldersState = null;
+    if (nav.route(document.baseURI.split('#')[0]).path !== '/auth/dok_server/moje_dok.pl') return null;
+    const page = document.getElementById('str1');
+    if (!page) return null;
+    // The sub-view at hand: the marked item of InSIS's own row (My folders is its first item).
+    const row = [...page.querySelectorAll('table.portal_menu, .portal_menu_wrapper')].find((t) => /moje_dok\.pl/.test(t.querySelector('a[href]')?.getAttribute('href') || ''));
+    const items = row ? [...row.querySelectorAll('a[href]')] : [];
+    const active = items.find((a) => a.closest('b, .active')) || null;
+    const first = !active || active === items[0];
+    const view = clean(active?.textContent) || T.myFolders;
+    const help = [...page.querySelectorAll('div.small')].filter((d) => !d.closest('table, form, .portal_menu_wrapper'));
+    const tables = [...page.querySelectorAll('table')].filter((t) => !t.closest('.portal_menu, .portal_menu_wrapper') && !t.classList.contains('portal_menu')
+      && t.querySelector('tr.zahlavi, thead'));
+    const body = tables.flatMap((t) => [...(t.tBodies[0]?.rows || [])].filter((tr) => !tr.classList.contains('zahlavi')));
+    const empty = tables.length > 0 && body.every((tr) => tr.cells.length === 1 && Number(tr.cells[0].colSpan) > 1)
+      && !tables.some((t) => t.querySelector('input:not([type="hidden"]), select, button, textarea'));
+    if (first) ipx.ui.hideInSlot(help);
+    if (empty) {
+      // Drawn in place by pages/course-pages.css (under InSIS's sub-view row, where the list was).
+      for (const t of tables) {
+        t.setAttribute('data-ipx-ds-empty', T.foldersEmpty(view));
+        if (first) t.setAttribute('data-ipx-ds-help', T.foldersHelp);
+      }
+      ipx.ui.styleSlotted('pages/course-pages.css');
+    }
+    foldersState = !empty && first && help.length ? h('p', { class: 'muted small' }, T.foldersHelp) : null;
+    return foldersState;
+  }
+
   // Materials settings: a page below the section (eyebrow Materials, title Settings) with its own view tabs, not the
   // Materials row. Until InSIS's other "All my folders" views are verified: E-mail and display · Your folders.
   ipx.kit.section({
@@ -527,7 +563,7 @@
       { id: 'display', href: plainLink('/auth/dok_server/nastaveni_stromu.pl'), text: T.displaySettings },
       { id: 'folders', href: plainLink('/auth/dok_server/moje_dok.pl'), text: T.yourFolders },
     ],
-    lead: () => h('p', { class: 'kit-note info' }, icon('info'), h('span', {}, T.settingsNote)),
+    lead: () => h('div', { class: 'kit-stack' }, h('p', { class: 'kit-note info' }, icon('info'), h('span', {}, T.settingsNote)), yourFoldersState()),
     // InSIS's own sub-views of Your folders (My documents, Copy folders, Ignored folders) stay reachable through
     // InSIS's row until InSIS+ may link them (zobraz_dok values unverified); only the document server's main row goes.
     keepRow: (table) => !table.querySelector('a[href*="nove_dok.pl"], a[href*="vyhledavani.pl"]'),

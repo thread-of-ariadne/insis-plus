@@ -128,3 +128,8 @@ a.sb-course-row:hover { background: var(--hover); }
   .sb-list { padding: 2px 14px; }
 }
 .sb-main .kpi-top { flex-wrap: wrap; }
+
+/* Page actions in the top bar: icon and label; on narrow screens shared.css hides every span of the button, which
+   takes the icon (span.icon) too — the icon stays here (shared fix requested). */
+.page-actions > .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.page-actions > .btn > span.icon svg { width: 16px; height: 16px; }

@@ -88,7 +88,7 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
   open"). Collapsed sidebar: destinations only.
 - **Top bar (desktop)**: page title and context · study switch (2+ studies) · search (button, "/", Ctrl+K or Alt+K
   where the browser takes Ctrl+K; ignored while typing in an InSIS field) · **Messages** · **Notifications** bell ·
-  **Help** (?) · **CS / EN** language switch (InSIS's own language links, copied verbatim from the page like Log out) · **avatar menu**: Account, Change
+  **Help** (?) · **light/dark toggle** (the InSIS+ theme; "as the system" in InSIS+ settings) · **language menu** (one globe button with the current language; the menu lists Čeština, Slovenčina, English in their own names, the current one ticked, the others InSIS's own language links copied verbatim like Log out; on phones both are in the avatar menu) · **avatar menu**: Account, Change
   password, InSIS+ settings, Log out (on phones also Language and the study switch).
 - **Phone**: top bar with search, Messages, Notifications and the avatar menu (which also holds the study switch);
   bottom bar Home · Courses · Exams · Grades · Menu (short labels in `mapping.json`). Menu: Help & who to ask ·

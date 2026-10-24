@@ -19,6 +19,8 @@
 //               files: number | null, section: 'open' | 'done' | 'closed',  // the InSIS table the box was listed in
 //               href: url }] }                  // the box's own InSIS page (insert/display files), else this page
 // "closes" is InSIS's own time; "…T00:00" means the end of the previous day.
+// The section's other pages have modules of their own: one box (pages/submission-box.js) and topic sign-ups
+// (pages/topics.js); both carry this section's name as their eyebrow and mark it in the sidebar.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
@@ -48,7 +50,7 @@
       how: 'Soubory se nahrávají na stránce InSIS u každé odevzdávárny: klikněte na Vložit soubory.',
       only: (c) => `Jen ${c}`, showAll: 'Zobrazit vše',
       byCourse: 'Podle předmětů', boxes: (n) => `${n} ${n === 1 ? 'odevzdávárna' : n > 1 && n < 5 ? 'odevzdávárny' : 'odevzdáváren'}`,
-      openShort: (n) => `${n} otevř.`, stale: 'Stránka je načtená dříve, stav se mohl změnit. Obnovte ji pro aktuální údaje.' },
+      topics: 'Přihlašování na témata', openShort: (n) => `${n} otevř.`, stale: 'Stránka je načtená dříve, stav se mohl změnit. Obnovte ji pro aktuální údaje.' },
     en: { open: 'Open boxes', due7: 'Due within 7 days', submitted: 'Submitted',
       next: 'Next deadline', none: 'None', of: (n) => `of ${n} boxes`,
       soon: 'Due soon', later: 'Later', upcoming: 'Not open yet', closed: 'Closed',
@@ -66,7 +68,7 @@
       how: 'Files are uploaded on InSIS’s page of each box: press Insert files.',
       only: (c) => `Only ${c}`, showAll: 'Show all',
       byCourse: 'By course', boxes: (n) => `${n} ${n === 1 ? 'box' : 'boxes'}`,
-      openShort: (n) => `${n} open`, stale: 'This page was loaded a while ago, so the status may have changed. Reload it for current data.' },
+      topics: 'Topic sign-ups', openShort: (n) => `${n} open`, stale: 'This page was loaded a while ago, so the status may have changed. Reload it for current data.' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -457,11 +459,15 @@
       const all = ipx.nav.target('courses.submissions');
       if (codes.length === 1) data.only = { code: codes[0], all: all && ipx.nav.route(all).path === ipx.nav.route(document.baseURI).path && !/[?;&]predmet=/.test(all) ? all : null };
     }
+    // Topic sign-ups (temata_prihlasovani.pl, pages/topics.js) belong to this section: one page action leads there,
+    // with the student's own portal link (it carries the study and the period).
+    const topics = ipx.kit?.portalLink('/auth/student/temata_prihlasovani.pl');
     takeover({
       key: 'submissions',
       css: 'pages/submissions.css',
       title: ipx.nav.sectionLabel('courses.submissions'),
       subtitle: ipx.nav.label('courses'),
+      extra: topics ? [anchor({ href: topics }, { class: 'btn ghost' }, icon('list'), h('span', {}, T.topics))] : null,
       build: () => {
         const wrap = h('div', { class: 'sb' });
         const state = { showClosed: null, render: () => wrap.replaceChildren(...buildPage(data, state)) };

@@ -1,0 +1,41 @@
+/* InSIS+ person page and Graduates (pages/person.js). Shadow root, after kit.css and pages/rebuild.css. */
+
+/* View tabs with a More menu (tabs past the fifth) */
+.psn-tabs { overflow: visible; }
+.psn-more-wrap { position: relative; flex: none; }
+.psn-more { display: inline-flex; align-items: center; gap: 4px; padding: 2px 0 11px; border: 0; background: none; color: var(--muted); font: 600 14px var(--font); cursor: pointer; }
+.psn-more:hover { color: var(--fg); }
+.psn-more .icon svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.psn-more-wrap.open .psn-more .icon svg { transform: rotate(180deg); }
+.psn-more-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 20; display: none; min-width: 200px; padding: 6px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-raised), 0 12px 32px -12px rgba(0, 0, 0, 0.35); }
+.psn-more-wrap.open .psn-more-menu { display: flex; flex-direction: column; }
+.psn-more-menu a { padding: 8px 10px; border-radius: 8px; color: var(--fg); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.psn-more-menu a:hover, .psn-more-menu a:focus-visible { background: var(--hover); color: var(--accent); }
+@media (max-width: 640px) {
+  .psn-tabs { overflow-x: auto; }
+  .psn-more-menu { position: fixed; top: auto; right: 16px; left: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .psn-more .icon svg { transition: none; } }
+
+/* Contacts */
+.psn-card { display: flex; flex-direction: column; gap: 14px; }
+.psn-head { display: flex; align-items: center; gap: 14px; }
+.psn-head > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.psn-head strong { font: 800 21px/1.15 var(--display); font-stretch: 85%; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.psn-head small { color: var(--muted); font-size: 13.5px; }
+.psn-avatar { width: 56px; height: 56px; flex: none; font-size: 18px; }
+.psn-positions h3 { margin: 0 0 6px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.psn-positions ul { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--fg-2); }
+.psn-positions a { color: var(--accent); font-weight: 600; }
+.psn-card .muted.small { margin: 0; }
+.psn-hours .card-title { display: flex; align-items: center; gap: 8px; }
+.psn-hours .card-title .icon svg { width: 16px; height: 16px; color: var(--accent); }
+.psn-hours p { margin: 0; color: var(--fg); font-size: 14.5px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.psn-mine .muted.small { margin-bottom: 12px; }
+.psn-mine .people-grid { grid-template-columns: minmax(0, 1fr); }
+
+/* Graduates */
+.psn-years { display: flex; flex-wrap: wrap; gap: 8px; }
+.psn-all { align-self: flex-start; }
+/* InSIS's own icon row (vCard, add to contacts: action links, kept in place) under the contact facts */
+.psn-insis { padding-top: 12px; border-top: 1px solid var(--line); }

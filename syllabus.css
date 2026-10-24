@@ -116,3 +116,15 @@ details.legend[open] summary { margin-bottom: 10px; }
   .jump { top: 120px; }
   .seg-control { height: 42px; }
 }
+
+/* InSIS's output form (slotted) at the end of the page, and the language switch in the header */
+.syl-output { margin-top: 18px; padding: 16px 18px; }
+.syl-output .card-head { padding: 0; margin-bottom: 6px; }
+.syl-output-lead { margin: 0 0 10px; font-size: 13.5px; }
+.syl-output-lead a { color: var(--accent); font-weight: 600; }
+.syl-lang { justify-content: flex-end; }
+
+/* Page actions in the top bar: icon and label; on narrow screens shared.css hides every span of the button, which
+   takes the icon (span.icon) too — the icon stays here (shared fix requested). */
+.page-actions > .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.page-actions > .btn > span.icon svg { width: 16px; height: 16px; }

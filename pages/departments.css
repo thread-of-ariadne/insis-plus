@@ -1,0 +1,134 @@
+/* InSIS+ Departments and Who to ask (pages/departments.js). One file, two places: the html.ipx-generic.ipx-topics rules
+   style InSIS's thesis-topic list in the page's DOM (it stays inside InSIS's filter form); the rest styles the InSIS+
+   parts in the shadow root. Shared parts come from pages/rebuild.css. */
+
+/* ---------- InSIS+ parts (shadow root) ---------- */
+
+.dep-faculties { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; align-items: start; }
+.dep-faculty, .dep-unit { display: flex; flex-direction: column; gap: 12px; }
+.dep-faculty.is-mine { box-shadow: 0 0 0 2px var(--accent), var(--shadow-card); }
+.dep-faculty-head { display: flex; align-items: flex-start; gap: 12px; }
+.dep-faculty-head > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dep-faculty-head strong { font-size: 16px; font-weight: 750; line-height: 1.25; }
+.dep-faculty-head small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.dep-faculty .rb-badge, .dep-unit .rb-badge { height: 42px; min-width: 46px; color: var(--fac, var(--accent)); background: color-mix(in srgb, var(--fac, var(--accent)) 14%, transparent); }
+.dep-faculty .facts { font-size: 13.5px; gap: 6px 18px; }
+.dep-mine { color: var(--accent) !important; font-weight: 700; }
+.rb-card.is-mine { box-shadow: 0 0 0 2px var(--accent), var(--shadow-card); }
+
+/* Full tree: one card per faculty with its departments as rows */
+.dep-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; align-items: start; }
+.dep-group { padding: 10px 6px 6px; }
+.dep-group-head { display: flex; flex-direction: column; gap: 1px; padding: 6px 12px 10px; border-bottom: 1px solid var(--line); }
+.dep-group-head a, .dep-group-head strong { color: var(--fg); font-size: 15.5px; font-weight: 750; }
+.dep-group-head a:hover { color: var(--accent); }
+.dep-group-head small { color: var(--muted); font-size: 12.5px; }
+.dep-rows { padding: 4px 0 0; }
+.dep-group:not(:has(.rb-row:not([hidden]))):has(.rb-row) { display: none; }
+
+/* Bodies */
+.dep-body { flex-wrap: wrap; }
+.dep-body > span { flex: 1 1 200px; }
+.rb-title::first-letter { text-transform: uppercase; }
+
+/* Staff cards */
+.dep-where { color: var(--fg-2) !important; }
+.dep-where a { color: var(--fg-2); font-weight: 650; }
+.dep-where a:hover { color: var(--accent); }
+.dep-hours-text { display: flex; gap: 6px; margin: 4px 0 0; padding: 8px 10px; border-radius: 10px; background: var(--chip); color: var(--fg-2); font-size: 12.5px; line-height: 1.4; }
+.dep-hours-text .icon { flex: none; color: var(--muted); }
+.dep-hours-text .icon svg { width: 14px; height: 14px; }
+.dep-hours-text span { overflow-wrap: anywhere; }
+
+/* Thesis topics: the summary line with the Filter toggle and the text search, as on Study matters › Thesis topics
+   (pages/matters.css .mx-bar / .mx-toggle / .mx-filter) */
+.dep-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.dep-lead { flex: 1 1 320px; max-width: 72ch; margin: 0; font-size: 14px; line-height: 1.5; }
+.dep-lead b { color: var(--fg); }
+.dep-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--chip); color: var(--fg); font: 700 13.5px var(--font); cursor: pointer; }
+.dep-toggle[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+.dep-toggle .icon svg { width: 15px; height: 15px; }
+.dep-search { position: relative; display: flex; align-items: center; }
+.dep-search .icon { position: absolute; left: 12px; color: var(--faint); pointer-events: none; }
+.dep-search .icon svg { width: 16px; height: 16px; }
+.dep-search input { width: 100%; height: 42px; padding: 0 12px 0 38px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-card); color: var(--fg); font: 500 14.5px var(--font); }
+.dep-search input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.dep-none { margin: 0; font-size: 14px; }
+.dep-none[hidden] { display: none; }
+
+/* Who to ask */
+.dep-office-head { display: flex; flex-direction: column; gap: 10px; }
+.dep-office-head .rb-title { margin: 0; }
+.dep-office-name { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.dep-office-name .rb-chip .icon svg { width: 14px; height: 14px; }
+.dep-office-head .kit-note { align-self: flex-start; font-weight: 650; }
+.dep-person { gap: 4px; }
+.dep-field { color: var(--accent) !important; font-size: 12.5px !important; font-weight: 700; line-height: 1.35; }
+.dep-name { color: var(--fg); font-size: 15px; font-weight: 700; }
+.dep-name:hover { color: var(--accent); }
+.dep-mail { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--accent); font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.dep-mail .icon svg { width: 14px; height: 14px; }
+.dep-hours ul { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.dep-hours li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.dep-hours li:first-child { border-top: 0; }
+.dep-hours li strong { display: flex; align-items: center; gap: 6px; color: var(--fg); font-weight: 650; }
+.dep-hours li > span { color: var(--fg-2); font-variant-numeric: tabular-nums; }
+.dep-hours li small { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.dep-hours li.is-today strong { color: var(--accent); }
+
+/* ---------- InSIS's thesis-topic list, in place (page DOM) ---------- */
+
+html.ipx-generic.ipx-topics #str1 form[data-ipx-topics-form] { display: block; margin: 0; padding: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-topics #str1 form[data-ipx-topics-form] > br, html.ipx-generic.ipx-topics #str1 form[data-ipx-topics-form] > p:empty,
+html.ipx-generic.ipx-topics #str1 form[data-ipx-topics-form] > a:empty { display: none; }
+/* InSIS's filter: a compact card of selects and its Restrict button */
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="filter"] { display: block; margin: 0 0 12px; padding: 12px 14px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="filter"] > tbody, html.ipx-generic.ipx-topics #str1 [data-ipx-part="filter"] > tbody > tr { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="filter"] td { padding: 2px 0 !important; color: var(--muted); font-size: 13px; font-weight: 600; }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="filter"] select { max-width: 260px; min-height: 36px; font-size: 13.5px; }
+html.ipx-generic.ipx-topics #str1 form[data-ipx-topics-form] input[type="submit"] { margin: 0 0 12px; }
+/* The letter pager: small round chips */
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; padding: 0; list-style: none; }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] li { margin: 0; padding: 0; border: 0; background: none; }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] a, html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] li > span, html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] li > b { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 8px; background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 700; text-decoration: none; }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] a:hover { background: var(--accent-soft); color: var(--accent); }
+html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] li.active > *, html.ipx-generic.ipx-topics #str1 [data-ipx-part="letters"] li > b { background: var(--accent); color: var(--accent-ink); }
+
+/* The list: topic rows as on Study matters › Thesis topics (pages/thesis.css) — title / supervisor · department ·
+   programme · field / type and places as chips, InSIS's Detail link stretched over the row */
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] { display: block; width: 100%; margin: 0; border: 0; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > thead { display: none; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody { display: block; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 12px 44px 12px 16px; border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr:first-child { border-top: 0; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent) !important; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr[data-ipx-off] { display: none; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr::before { content: ""; order: 3; flex-basis: 100%; height: 0; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td { display: block; min-width: 0; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; color: var(--muted); font-size: 13px; text-align: left !important; white-space: normal !important; }
+/* Unused columns (a cell with a form control or an InSIS action link has the role "act" instead), blanks ("--"),
+   and the row-number cell InSIS's script adds after load (no role) */
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td:is([data-ipx-col="num"], [data-ipx-col="other"]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-blank],
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] > tbody > tr:not([data-ipx-empty]) > td:not([data-ipx-col]):not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="topic"] { order: 1; flex-basis: 100%; color: var(--fg); font-size: 14.5px; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="supervisor"] { order: 2; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="supervisor"] a { position: relative; z-index: 2; color: var(--fg-2); font-weight: 600; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td:is([data-ipx-col="department"], [data-ipx-col="programme"], [data-ipx-col="major"]) { order: 2; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td:is([data-ipx-col="department"], [data-ipx-col="programme"], [data-ipx-col="major"])::before { content: "· "; color: var(--faint); }
+/* Chips: type of work, places (InSIS+ wording in data-ipx-label, InSIS's own code hidden) */
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td:is([data-ipx-col="type"], [data-ipx-col="capacity"]) { order: 4; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-label] { font-size: 0 !important; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-label]::before { content: attr(data-ipx-label); display: inline-block; padding: 2px 8px; border-radius: 6px; background: var(--chip); color: var(--fg-2); font-size: 12px; font-weight: 700; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] tr[data-ipx-full] td[data-ipx-col="capacity"]::before { background: #fde7e7; color: #b42318; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] tr[data-ipx-full] td[data-ipx-col="topic"] { color: var(--muted); }
+/* InSIS's controls or action links in a column InSIS+ does not otherwise show: on their own line, above the row link */
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="act"] { order: 5; display: flex; flex-wrap: wrap; gap: 6px; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="act"] :is(a, input, select, button, label) { position: relative; z-index: 2; }
+/* Detail: InSIS's link stretched over the row, a chevron where its icon was */
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="detail"] { position: static; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="detail"] a { color: var(--faint); text-decoration: none; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="detail"] a .uf-icon { display: none; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] td[data-ipx-col="detail"] a::before { content: "›"; position: absolute; top: 50%; right: 16px; transform: translateY(-50%); font-size: 22px; line-height: 1; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] a[data-ipx-stretch]::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] tr:hover td[data-ipx-col="detail"] a { color: var(--accent); }
+html.ipx-generic.ipx-topics #str1 table[data-ipx-topics] tr[data-ipx-empty] td { padding: 18px 16px !important; color: var(--muted); font-size: 14px; text-align: center !important; }

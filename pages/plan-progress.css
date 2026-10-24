@@ -93,3 +93,9 @@
 @media (prefers-reduced-motion: reduce) {
   .pp-group-head::before { transition: none; }
 }
+
+/* InSIS's Study Department menu hub (/auth/studijni/) */
+.pp-hub-lead { margin: 0; font-size: 14.5px; }
+.pp-hub-item { color: var(--fg); }
+.pp-hub-ico { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.pp-hub-ico svg { width: 18px; height: 18px; }

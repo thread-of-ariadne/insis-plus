@@ -1,0 +1,171 @@
+/* InSIS+ rare read-only pages (pages/rebuild.js and the modules that use it). One file, two places: the
+   html.ipx-generic.ipx-rb rules style what stays InSIS's own in the page's DOM (forms, trees, lists with action
+   links: styled in place, never moved); the other rules style the InSIS+ parts in the shadow root. */
+
+/* ---------- InSIS+ parts (shadow root) ---------- */
+
+.rb-page { gap: 16px; }
+.rb-title { margin: 8px 0 -4px; font: 800 20px/1.15 var(--display); font-stretch: 80%; letter-spacing: -0.01em; }
+.rb-title:first-child { margin-top: 0; }
+.rb-sub { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+.rb-text { margin: 0; color: var(--fg-2); font-size: 14.5px; line-height: 1.5; }
+.rb-facts .facts { gap: 10px 26px; }
+.rb-links { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; }
+.rb-cell { display: flex; flex-direction: column; gap: 4px; }
+.rb-cell > span:first-child { color: var(--fg); font-weight: 600; }
+.rb-cell .rb-links { font-size: 12.5px; font-weight: 500; }
+.rb-note-link { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+/* A list of links as rows */
+.rb-list { display: flex; flex-direction: column; padding: 6px; }
+.rb-row { display: flex; align-items: center; gap: 10px; min-height: 22px; padding: 9px 12px; border-radius: 10px; color: var(--fg); font-size: 14.5px; font-weight: 600; }
+.rb-row + .rb-row { box-shadow: 0 -1px 0 var(--line); }
+.rb-row > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rb-row small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 500; }
+.rb-row .icon { flex: none; color: var(--faint); }
+.rb-row .icon svg { width: 15px; height: 15px; }
+a.rb-row:hover { background: var(--hover); box-shadow: none; color: var(--accent); }
+a.rb-row:hover + .rb-row { box-shadow: none; }
+a.rb-row:hover .icon { color: var(--accent); }
+.rb-row[hidden] { display: none; }
+
+/* InSIS's icon rows, in words */
+.rb-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rb-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--chip); color: var(--fg); font-size: 13.5px; font-weight: 650; white-space: nowrap; }
+.rb-chip .icon svg { width: 13px; height: 13px; color: var(--faint); }
+.rb-chip:hover { background: var(--accent-soft); color: var(--accent); }
+.rb-chip:hover .icon svg { color: var(--accent); }
+
+/* Long lists: a filter field and "Show all" */
+.rb-long { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rb-filter { display: flex; align-items: center; gap: 8px; max-width: 380px; padding: 0 12px; border-radius: 10px; background: var(--chip); color: var(--faint); }
+.rb-filter:focus-within { background: var(--surface); box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-raised); }
+.rb-filter .icon svg { width: 15px; height: 15px; stroke-width: 2; }
+.rb-filter-input { flex: 1; min-width: 0; height: 38px; border: 0; outline: none; background: none; color: var(--fg); font: 14px var(--font); }
+.rb-more { align-self: flex-start; }
+.rb-more[hidden], .rb-nomatch[hidden] { display: none; }
+.rb-nomatch { margin: 0; font-size: 14px; }
+.dtable tr[hidden] { display: none; }
+@media (max-width: 640px) { .rb-filter { max-width: none; } }
+
+/* Cards of things (people, departments, rooms, servers): a grid of small cards */
+.rb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.rb-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 14px 16px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-card); color: var(--fg); }
+.rb-card[hidden] { display: none; }
+.rb-card strong { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.rb-card small, .rb-card .muted { color: var(--muted); font-size: 13px; line-height: 1.4; }
+a.rb-card:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-card); }
+a.rb-card:hover strong { color: var(--accent); }
+.rb-card .rb-chips { margin-top: 4px; }
+.rb-card .rb-chip { padding: 5px 10px; font-size: 12.5px; }
+.rb-card-top { display: flex; align-items: center; gap: 10px; }
+.rb-badge { display: grid; place-items: center; min-width: 38px; height: 38px; padding: 0 6px; flex: none; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.rb-card-top > span { display: flex; flex-direction: column; min-width: 0; }
+
+/* A form card holding InSIS's own form (slotted) */
+.rb-form { display: flex; flex-direction: column; gap: 8px; }
+.rb-form .form-lead { margin: 0 0 4px; }
+
+/* A disclosure over parts of InSIS's form (a filter) */
+.rb-disclosure { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.rb-disclosure .icon { color: var(--muted); transition: transform 0.2s; }
+.rb-disclosure .icon svg { width: 16px; height: 16px; }
+.rb-disclosure[aria-expanded="true"] .icon { transform: rotate(180deg); }
+.rb-disclosure > span { display: flex; flex-direction: column; min-width: 0; }
+.rb-disclosure strong { font-size: 14px; font-weight: 650; }
+.rb-disclosure small { color: var(--muted); font-size: 12.5px; }
+.rb-disclosure:hover strong { color: var(--accent); }
+.rb-disclosure:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { .rb-disclosure .icon { transition: none; } }
+
+/* A short status line under the header */
+.rb-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+
+/* ---------- InSIS's own parts, in place (page DOM) ---------- */
+
+/* InSIS's spacing between the blocks InSIS+ hid (line breaks, empty paragraphs) would leave gaps around what stays. */
+html.ipx-generic.ipx-rb #str1 div > br, html.ipx-generic.ipx-rb #str1 div > p:empty { display: none; }
+
+/* frame({ kept: true }): only the kept parts show; their ancestors' loose text shrinks away (keepOnlyKept). */
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="kept"] { font-size: 14px; line-height: 1.5; color: var(--fg-2); }
+html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="kept"] + [data-ipx-keep="kept"] { margin-top: 12px; }
+
+/* A kept form or list (rebuild.js marks it): a card. */
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"]:is(form, div.tree) { display: block; margin: 0 0 12px; padding: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"]:is(form, div.tree):last-child { margin-bottom: 0; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-collapsed="true"] { display: none !important; }
+/* A form a module marks as a card of its own (pages with several InSIS forms) */
+html.ipx-generic.ipx-rb #str1 form[data-ipx-card] { display: block; margin: 0 0 14px; padding: 14px 16px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-rb #str1 form[data-ipx-card] > br, html.ipx-generic.ipx-rb #str1 form[data-ipx-card] > p:empty { display: none; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"] table:not(:has(.zahlavi)) { width: auto; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"] td.odsazena { padding: 5px 8px 5px 0; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"] > br,
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb="keep"] > p:empty { display: none; }
+html.ipx-takeover.ipx-keep #str1 [data-ipx-rb-only][data-ipx-keep="node"] { padding: 0; border-radius: 0; background: none; box-shadow: none; color: var(--fg-2); font-size: 14px; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-rb-only] > br, html.ipx-generic.ipx-rb #str1 [data-ipx-rb-only] > p:empty { display: none; }
+/* Help lines InSIS writes inside a form read as captions, not paragraphs. */
+html.ipx-generic.ipx-rb #str1 form .small { display: block; margin: 2px 0 6px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+html.ipx-generic.ipx-rb #str1 form table.form-edit, html.ipx-generic.ipx-rb #str1 form table.form_edit { border-collapse: separate; border-spacing: 0 8px; }
+html.ipx-generic.ipx-rb #str1 form table.form-edit td:first-child, html.ipx-generic.ipx-rb #str1 form table.form_edit td:first-child { padding-right: 16px; color: var(--muted); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+html.ipx-generic.ipx-rb #str1 form select { max-width: 100%; }
+html.ipx-generic.ipx-rb #str1 form b { color: var(--fg); }
+/* Kept data tables scroll sideways inside their card on narrow screens instead of widening the page. */
+html.ipx-generic.ipx-rb #str1 table:has(.zahlavi) { display: block; max-width: 100%; overflow-x: auto; }
+html.ipx-generic.ipx-rb #str1 table:has(.zahlavi) > :is(thead, tbody) { display: table; width: 100%; border-collapse: collapse; }
+
+/* InSIS's icon-only links and status icons: their label as text (data-ipx-label), not the picture. */
+html.ipx-generic.ipx-rb #str1 a[data-ipx-label] { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; background: var(--chip); color: var(--accent); font-size: 12.5px; font-weight: 700; white-space: nowrap; text-decoration: none; }
+html.ipx-generic.ipx-rb #str1 a[data-ipx-label]:hover { background: var(--accent-soft); }
+html.ipx-generic.ipx-rb #str1 a[data-ipx-label] .uf-icon { display: none; }
+html.ipx-generic.ipx-rb #str1 a[data-ipx-label]::after { content: attr(data-ipx-label); }
+html.ipx-generic.ipx-rb #str1 .uf-icon[data-ipx-label] { display: inline; font-size: 13px; }
+html.ipx-generic.ipx-rb #str1 .uf-icon[data-ipx-label] svg { display: none; }
+html.ipx-generic.ipx-rb #str1 .uf-icon[data-ipx-label]::after { content: attr(data-ipx-label); color: var(--fg-2); }
+/* Decorative icons elsewhere in kept parts go. */
+html.ipx-generic.ipx-rb #str1 .uis_msg .uf-icon, html.ipx-generic.ipx-rb #str1 b > .uf-icon:first-child { display: none; }
+
+/* InSIS's row of icon links (rada-ikon): chips with their text. */
+html.ipx-generic.ipx-rb #str1 [data-ipx-row] { display: flex !important; flex-wrap: wrap; gap: 8px; width: auto !important; max-width: 100%; min-width: 0; margin: 8px 0; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-row] a.app-ikona { display: inline-flex; align-items: center; width: auto; height: auto; min-height: 0; padding: 7px 12px; border-radius: 999px; background: var(--chip); color: var(--fg); font-size: 13.5px; font-weight: 650; text-decoration: none; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-row] a.app-ikona:hover { background: var(--accent-soft); color: var(--accent); }
+html.ipx-generic.ipx-rb #str1 [data-ipx-row] .uf-icon { display: none; }
+html.ipx-generic.ipx-rb #str1 [data-ipx-row] .app-ikona-text { position: static; display: inline; width: auto; margin: 0; color: inherit; font: inherit; white-space: nowrap; }
+
+/* InSIS's message boxes left in kept parts: the InSIS+ note look. */
+html.ipx-generic.ipx-rb #str1 .uis_msg { display: flex; gap: 10px; margin: 8px 0; padding: 11px 14px; border: 0; border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; }
+html.ipx-generic.ipx-rb #str1 .uis_msg.ko, html.ipx-generic.ipx-rb #str1 .uis_msg.error { background: color-mix(in srgb, #c62828 12%, transparent); color: #c62828; }
+html.ipx-generic.ipx-rb #str1 .uis_msg.warning { background: color-mix(in srgb, #b26a00 14%, transparent); }
+
+/* A kept tree (access points, departments): grouped lists, every level shown, InSIS's drawing removed. */
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] ul { margin: 0; padding: 0; list-style: none; background: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] li { margin: 0; padding: 0; background: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] li[data-ipx-off] { display: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-container,
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-icon-container { display: block; position: static; width: auto; height: auto; min-height: 0; margin: 0; padding: 0; border: 0; background: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .border-top,
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .border-bottom,
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-icon,
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .clear,
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .uf-icon { display: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .subtree { display: block !important; margin: 0; padding: 0 0 0 16px; border: 0; background: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-label { display: block; float: none; width: auto; margin: 0; padding: 6px 8px; border-radius: 8px; color: var(--fg-2); font-size: 14px; line-height: 1.35; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-label:has(> a):hover { background: var(--chip); }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-label > a { color: var(--fg); font-weight: 600; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-label:not(:has(> a)) { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+/* InSIS's first level holds the root (the university, hidden) and the campuses or units beside it: those are the
+   group headings; their subtrees start flush. */
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] .node-container.root .node-label { display: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] > ul > li { margin-bottom: 10px; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] > ul > li > .node-container:not(.root) .node-label { padding-top: 10px; border-bottom: 1px solid var(--line); border-radius: 0; color: var(--fg); font-size: 15px; font-weight: 750; letter-spacing: 0; text-transform: none; }
+html.ipx-generic.ipx-rb #str1 div.tree[data-ipx-rb] > ul > li > .subtree { padding-left: 0; }
+
+/* InSIS's form tables on phones: one column, controls as wide as the card. */
+html.ipx-generic.ipx-rb #str1 form :is(input[type="text"], input:not([type]), select, textarea) { max-width: 100%; box-sizing: border-box; }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit),
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit) > tbody,
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit) > tbody > tr,
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit) > tbody > tr > td { display: block; width: 100%; box-sizing: border-box; }
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit) td:first-child { padding: 8px 0 2px !important; white-space: normal; }
+  html.ipx-generic.ipx-rb #str1 form :is(table.form-edit, table.form_edit) :is(input[type="text"], input:not([type]), select, textarea) { width: 100%; }
+}

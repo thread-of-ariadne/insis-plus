@@ -13,14 +13,14 @@
       pinned: 'Připnuté', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
       inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', creditsOf: (a, b) => `${a} z ${b} kreditů`, creditsN: (a) => `${a} kreditů`, nothingDue: 'Nic nečeká na odevzdání', tomorrowAt: 'zítra',
       inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), navigation: 'Navigace', account: 'Účet',
-      pageHelp: 'Nápověda k této stránce', allHelp: 'Veškerá nápověda' },
+      pageHelp: 'Nápověda k této stránce', allHelp: 'Veškerá nápověda', language: 'Jazyk', darkTheme: 'Tmavý vzhled' },
     en: { loading: 'Loading…', ask: 'Ask or make a request', classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
       menu: 'Menu', collapse: 'Collapse sidebar',
       note: 'Unofficial extension. Your data stays in your browser.', unpin: 'Unpin',
       pinned: 'Pinned', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
       inMin: (n) => `in ${n} min`, inHours: (n) => `in ${n} h`, todayAt: 'today', creditsOf: (a, b) => `${a} of ${b} credits`, creditsN: (a) => `${a} credits`, nothingDue: 'Nothing due', tomorrowAt: 'tomorrow',
       inDays: (n) => `in ${n} days`, navigation: 'Navigation', account: 'Account',
-      pageHelp: 'Help for this page', allHelp: 'All help' },
+      pageHelp: 'Help for this page', allHelp: 'All help', language: 'Language', darkTheme: 'Dark theme' },
   }[lang];
 
   // The places students use most: always visible in the sidebar ("Main"); home.js also uses them to spot the main page.
@@ -68,6 +68,8 @@
     panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M16 10l-2 2 2 2"/>',
     burger: '<path d="M4 6h16M4 12h16M4 18h16"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
     award: '<circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8"/>',
     layers: '<path d="m12 2 10 5-10 5L2 7Z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
@@ -108,19 +110,64 @@
   const anchor = (link, props, ...kids) =>
     h('a', { href: link.href, target: link.target || null, rel: link.target ? 'noopener' : null, ...props }, ...kids);
 
-  // "doc. Ing. Ota Novotný, Ph.D." → "ON": skip titles (words with a dot) and the degree after the comma.
+  // "doc. Ing. Jana Nováková, Ph.D." → "JN": skip titles (words with a dot) and the degree after the comma.
   function initials(name) {
     const words = name.split(',')[0].split(/\s+/).filter((w) => w && !w.includes('.'));
     return words.slice(-2).map((w) => w[0]).join('').toUpperCase();
   }
 
-  const LANG_CODES = { cesky: 'CS', english: 'EN', slovensky: 'SK' };
+  // InSIS's three languages, each named in its own language (a language menu is read by someone who may not know
+  // the current one), with its code for the button and the lang/hreflang attributes.
+  const LANGS = [
+    { key: 'cesky', code: 'cs', text: 'Čeština' },
+    { key: 'slovensky', code: 'sk', text: 'Slovenčina' },
+    { key: 'english', code: 'en', text: 'English' },
+  ];
 
-  // Language switch links of the original page (ČESKY / SLOVENSKY / ENGLISH).
+  // The language menu: InSIS's #vlajky links only the other languages (ČESKY / SLOVENSKY / ENGLISH), so the current
+  // one is the language it leaves out. Each other language is InSIS's own link, copied verbatim (?lang=…).
+  // Each link passes the URL rule (InSIS builds them from the current address, which may carry an action); a refused
+  // one falls back to the same page without its query, then to Home, in that language.
+  const langHref = (href) => {
+    const lang = new URL(href).searchParams.get('lang') || /[;?&]lang=(\w+)/.exec(href)?.[1];
+    const safe = (u) => ipx.nav?.safe(u, 'link', { copied: true });
+    return safe(href) || (lang && (safe(`${location.origin}${location.pathname}?lang=${lang}`) || safe(`${location.origin}/auth/?lang=${lang}`))) || null;
+  };
   function langLinks() {
-    return [...document.querySelectorAll('#vlajky a[href]')]
-      .filter((a) => /^(cesky|english|slovensky)$/.test(norm(a.textContent)))
-      .map((a) => ({ href: a.href, text: clean(a.textContent) }));
+    const links = new Map([...document.querySelectorAll('#vlajky a[href]')]
+      .map((a) => [norm(a.textContent), langHref(a.href)]).filter(([k, href]) => href && LANGS.some((l) => l.key === k)));
+    if (!links.size) return [];
+    const missing = LANGS.filter((l) => !links.has(l.key));
+    const current = missing.length === 1 ? missing[0] : LANGS.find((l) => l.code === lang);
+    return LANGS.map((l) => ({ ...l, href: links.get(l.key) || null, current: l === current }))
+      .filter((l) => l.href || l.current);
+  }
+
+  // ---------- theme toggle (InSIS+ setting plus.theme: system / light / dark, content.js) ----------
+  // One button flips what is on screen now, light <-> dark; the choice is saved as an explicit theme and "As the
+  // system" stays in InSIS+ settings. A toggle (aria-pressed) rather than a three-way menu: in the top bar the
+  // question is only "darker or lighter", and the icon shows what a click does (moon: go dark, sun: go light).
+  const systemDark = matchMedia('(prefers-color-scheme: dark)');
+  const isDark = () => ipx.state.plus?.theme === 'dark' || (ipx.state.plus?.theme !== 'light' && systemDark.matches);
+  const themeButtons = new Set();
+  function syncTheme() {
+    const dark = isDark();
+    for (const b of themeButtons) {
+      // A button of a top bar that was drawn again is dropped (it was on the page once and is no longer).
+      if (b.isConnected) b._ipxShown = true;
+      else if (b._ipxShown) { themeButtons.delete(b); continue; }
+      b.setAttribute('aria-pressed', String(dark));
+      // The labelled switch in the account menu keeps one icon; the bare top-bar button shows what a click does.
+      b.replaceChildren(b.dataset.text ? icon('moon') : icon(dark ? 'sun' : 'moon'), b.dataset.text ? h('span', {}, T.darkTheme) : '');
+    }
+  }
+  systemDark.addEventListener?.('change', syncTheme);
+  function themeButton(cls, withText) {
+    const b = h('button', { class: cls, type: 'button', title: withText ? null : T.darkTheme, 'aria-label': withText ? null : T.darkTheme,
+      'data-text': withText ? '1' : null, onclick: () => ipx.setTheme?.(isDark() ? 'light' : 'dark')?.then?.(syncTheme) });
+    themeButtons.add(b);
+    syncTheme();
+    return b;
   }
 
   // ---------- navigation (docs/ia/02-redesign.md §2–3; data in nav-data.js) ----------
@@ -146,11 +193,12 @@
     // A page the mapping does not know (e.g. the page after a form was sent) keeps the place of the page before it.
     if (!r.node) {
       try {
-        const last = JSON.parse(sessionStorage.getItem('ipx-last-node') || 'null');
+        const last = ipx.state.lastNode || null;
         if (last && document.referrer && new URL(document.referrer).origin === location.origin) return { ...r, ...last, inherited: true };
       } catch {}
     } else {
-      try { sessionStorage.setItem('ipx-last-node', JSON.stringify({ node: r.node, dest: r.dest })); } catch {}
+      // InSIS+ session state (wiped with the rest; never in the page's own sessionStorage, which InSIS can read).
+      if (ipx.state.lastNode?.node !== r.node) { ipx.state.lastNode = { node: r.node, dest: r.dest }; ipx.save?.(); }
     }
     return r;
   }
@@ -236,9 +284,17 @@
 
   // A small menu that opens under its button (Help, avatar). Closes on Escape or a click outside.
   function popMenu(button, label, items) {
-    const panel = h('div', { class: 'pop', role: 'menu', hidden: true }, items.filter(Boolean).map((it) =>
-      it.href ? anchor(it, { class: 'pop-item' + (it.phone ? ' phone-only' : ''), role: 'menuitem', onclick: it.onclick }, it.icon && icon(it.icon), h('span', {}, it.text))
-        : h('p', { class: 'pop-note' }, it.text)));
+    // Items: a link ({href}); one of a group of choices ({tick}: the current one marked and not a link); an own
+    // control ({node}, e.g. the theme switch); or a plain note.
+    const panel = h('div', { class: 'pop', role: 'menu', hidden: true }, items.filter(Boolean).map((it) => {
+      const cls = 'pop-item' + (it.phone ? ' phone-only' : '') + (it.sep ? ' sep' : '');
+      if (it.node) { it.node.className = `${it.node.className} ${cls}`; it.node.setAttribute('role', 'menuitemcheckbox'); return it.node; }
+      const kids = [it.icon && icon(it.icon), h('span', { lang: it.lang || null }, it.text), it.tick != null && h('span', { class: 'pop-tick' }, it.tick ? icon('tick') : null)];
+      if (it.current) return h('span', { class: `${cls} current`, role: 'menuitemradio', 'aria-checked': 'true' }, ...kids);
+      if (it.href) return anchor(it, { class: cls, role: it.tick != null ? 'menuitemradio' : 'menuitem', 'aria-checked': it.tick != null ? 'false' : null,
+        hreflang: it.lang || null, onclick: it.onclick }, ...kids);
+      return h('p', { class: 'pop-note' + (it.phone ? ' phone-only' : '') }, it.text);
+    }));
     const wrap = h('div', { class: 'pop-wrap' }, button, panel);
     button.setAttribute('aria-haspopup', 'menu');
     button.setAttribute('aria-expanded', 'false');
@@ -264,12 +320,20 @@
     const at = (path) => new URL(path, document.baseURI).href;
     const mail = nav().target('messages.mail');
     const logout = pageLink(/logout\.pl/)?.href || at('/auth/system/logout.pl');
-    const help = pageLink(/help\.pl/);
+    // The page's context help passes the URL rule like any copied link; Log out is InSIS's own (docs/pages.md: never
+    // touched, only followed), copied verbatim.
+    const helpLink = pageLink(/help\.pl/);
+    const help = helpLink && nav().safe(helpLink.href, 'link', { copied: true }) ? helpLink : null;
     const unread = ipx.state.messages?.unread;
     const fresh = ipx.notifications?.unseen() || 0;
 
     const helpBtn = h('button', { class: 'chip-btn', type: 'button' }, h('b', { class: 'q' }, '?'));
     const avatarBtn = h('button', { class: 'avatar', type: 'button', title: p.name || T.account }, p.name ? initials(p.name) : icon('people'));
+    const langs = langLinks();
+    const currentLang = langs.find((l) => l.current);
+    const langItems = langs.length > 1 ? langs.map((l) => ({ href: l.href, text: l.text, lang: l.code, current: l.current, tick: l.current })) : [];
+    const langBtn = currentLang && langItems.length && h('button', { class: 'chip-btn lang-btn', type: 'button', title: T.language },
+      icon('globe'), h('span', {}, currentLang.code.toUpperCase()));
 
     return h('header', { class: 'topbar' },
       h('button', { class: 'icon-btn burger', type: 'button', 'aria-label': T.menu, onclick: () => shellEl.classList.toggle('drawer') }, icon('burger')),
@@ -277,7 +341,9 @@
         subtitle && h('p', { class: 'eyebrow' }, subtitle),
         h('h1', {}, title)),
       h('div', { class: 'top-actions' },
-        extra,
+        // The page's own actions: in the bar on wide screens, a labelled row under the title on phones (as icons
+        // they would repeat the bar's own mail / globe / people icons).
+        extra && h('div', { class: 'page-actions' }, extra),
         h('button', { class: 'searchbox', type: 'button', onclick: () => ipx.open() },
           icon('search'), h('span', {}, T.search), h('kbd', {}, 'Ctrl K')),
         mail && h('a', { class: 'chip-btn', href: mail, title: nav().label('messages'), 'aria-label': unread ? `${nav().label('messages')}: ${unread}` : nav().label('messages') },
@@ -291,15 +357,19 @@
           help && { href: help.href, target: '_blank', text: T.pageHelp, icon: 'info' },
           { href: nav().composedUrl('dest.help'), text: T.allHelp, icon: 'book' },
         ].filter((x) => !x || x.href)),
-        h('span', { class: 'langs' }, langLinks().map((l) => anchor(l, { class: 'lang', title: l.text }, LANG_CODES[norm(l.text)] || l.text.slice(0, 2)))),
+        themeButton('chip-btn theme-btn', false),
+        langBtn && popMenu(langBtn, `${T.language}: ${currentLang.text}`, [{ text: T.language }, ...langItems]),
         popMenu(avatarBtn, nav().label('account'), [
           p.name && { text: p.name },
           { href: nav().composedUrl('dest.account'), text: nav().label('account'), icon: 'gear' },
           nav().safe(at('/auth/system/zmena_hesla.pl')) && { href: at('/auth/system/zmena_hesla.pl'), text: nav().label('password'), icon: 'shield' },
           { href: nav().composedUrl('plus.settings'), text: nav().label('plus'), icon: 'layout' },
-          ...langLinks().map((l) => ({ ...l, icon: 'globe', phone: true })),
+          // Phones: the top bar keeps search, messages, notifications and help; the theme and the language are here.
+          { node: themeButton('pop-btn', true), phone: true },
+          langItems.length > 0 && { text: T.language, phone: true },
+          ...langItems.map((l) => ({ ...l, phone: true })),
           // Personal data goes before InSIS logs out (principle 8).
-          { href: logout, text: nav().label('logout'), icon: 'back', onclick: () => ipx.wipe() },
+          { href: logout, text: nav().label('logout'), icon: 'back', sep: true, onclick: () => ipx.wipe() },
         ])));
   }
 
@@ -739,7 +809,7 @@
   const onPinsChange = (fn) => pinListeners.push(fn);
 
   ipx.ui = {
-    PORTAL_ACTIONS, quickActions, here, nodeLinks, viewTabs, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
+    PORTAL_ACTIONS, quickActions, here, nodeLinks, viewTabs, h, icon, anchor, initials, langLinks, syncTheme, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
     facultyFromCode, facultyFor, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
     kpi, sectionHead, tabs, emptyState, skeleton, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,

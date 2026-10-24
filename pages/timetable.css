@@ -215,3 +215,84 @@ html.ipx-takeover.ipx-tt #str1 [data-ipx-keep="node"] { color-scheme: light dark
 .tt-sheet slot { display: block; }
 @media (max-width: 600px) { .tt-sheet-body { padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { .tt-sheet[open] { animation: none; } }
+
+/* ---------- Timetable search (pages/timetable.js, search()): shadow-root parts, classes prefixed tts- ---------- */
+.tts-lead { margin: 0; font-size: 14px; line-height: 1.5; }
+.tts-card { color: inherit; text-decoration: none; }
+.tts-block { display: flex; flex-direction: column; gap: 10px; }
+.tts-list { display: flex; flex-direction: column; padding: 4px 0; overflow: hidden; }
+.tts-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); color: var(--fg); text-decoration: none; }
+.tts-row:first-child { border-top: 0; }
+.tts-row[hidden] { display: none; }
+.tts-row:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.tts-row.now { box-shadow: inset 3px 0 0 var(--ok); }
+.tts-row-main { flex: 1; min-width: 0; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tts-row-n { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tts-go { display: grid; color: var(--faint); }
+.tts-go svg { width: 16px; height: 16px; transform: rotate(-90deg); }
+.tts-row:hover .tts-go { color: var(--accent); }
+.tts-filter { width: 100%; max-width: 360px; height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--fg); font: inherit; font-size: 14px; box-sizing: border-box; }
+.tts-nomatch { margin: 0; }
+
+/* ---------- InSIS's forms of the search, styled in place (in the page itself, under html.ipx-tts) ---------- */
+/* The form already sits in an InSIS+ form card: no second card around it. */
+html.ipx-generic.ipx-tts #str1 [data-ipx-keep="node"] { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+
+/* Criteria: InSIS's rows laid out as labelled groups (Who · What and when · Where · Programme and group) */
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] table,
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tbody { display: block; width: 100%; border: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr { display: grid; grid-template-columns: 170px minmax(0, 1fr); align-items: center; gap: 4px 12px; padding: 4px 0; background: none !important; border: 0; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp-label]::before { content: attr(data-ipx-grp-label); grid-column: 1 / -1; margin: 14px 0 2px; padding-top: 12px;
+  border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="where"][data-ipx-grp-label]::before { margin-top: 0; padding-top: 0; border-top: 0; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] td { display: block; min-width: 0; padding: 0 !important; border: 0 !important; background: none !important; color: var(--fg-2); }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] td:first-child { color: var(--fg); font-size: 13.5px; font-weight: 600; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] td:nth-child(2) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] select { width: 100%; max-width: 520px; min-width: 0; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] td:nth-child(2):has(input[type="submit"]) select { width: auto; flex: 1 1 240px; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="note"] { display: block; margin-top: 6px; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="note"] td { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="format"] { grid-template-columns: 170px minmax(0, 240px) auto; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="format"] td:nth-child(3) { justify-self: start; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] > p:empty { display: none; }
+
+/* The checkbox step: InSIS's table as a list of rows, then its tick buttons as quiet chips, then its submit button (InSIS's order) */
+/* InSIS separates its buttons with &nbsp; text: block layout with font-size 0 keeps those out of the way. */
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] { display: block; font-size: 0; text-align: left; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > input { margin: 0 8px 8px 0 !important; font-size: 13.5px; vertical-align: middle; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > br, html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > p:empty,
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > .jstm-toolbox { display: none !important; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > input[data-ipx-part="tick"] { display: inline-block; width: auto; height: 32px; padding: 0 12px; border: 0; border-radius: 9px;
+  background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 600; box-shadow: none; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > input[data-ipx-part="tick"]:hover { color: var(--accent); }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > table[data-ipx-list] { margin: 0 0 12px; font-size: 14px; }
+html.ipx-generic.ipx-tts #str1 form[data-ipx-pick] > input[type="submit"] { display: block; width: auto; margin-top: 8px !important; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] { display: block; width: 100%; border: 1px solid var(--line); border-radius: 12px; background: none; box-shadow: none; overflow: hidden; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > thead { display: none; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > tbody { display: block; max-height: 60vh; overflow-y: auto; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > tbody > tr { display: grid; align-items: center; column-gap: 12px;
+  grid-template-columns: 24px minmax(0, 1fr) auto; grid-template-areas: "sel name dates" "sel meta meta"; padding: 9px 14px; border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > tbody > tr:first-child { border-top: 0; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > tbody > tr:has(input:checked) { background: color-mix(in srgb, var(--accent) 8%, transparent) !important; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td { display: block; min-width: 0; padding: 0 !important; border: 0 !important; background: none !important; color: var(--muted); font-size: 12.5px; text-align: left !important; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="num"],
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td.UISTMNumberCell,
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="dept"],
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="form"],
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="to"] { display: none !important; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="select"] { grid-area: sel; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="select"] input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="name"] { grid-area: name; color: var(--fg); font-size: 14px; font-weight: 650; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="period"] { grid-area: meta; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="period"]::after { content: attr(data-ipx-extra); }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="from"] { grid-area: dates; justify-self: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="from"]::after { content: attr(data-ipx-to); }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr,
+  html.ipx-generic.ipx-tts #str1 form[data-ipx-criteria] tr[data-ipx-grp="format"] { grid-template-columns: minmax(0, 1fr); }
+  html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] > tbody > tr { grid-template-columns: 24px minmax(0, 1fr); grid-template-areas: "sel name" "sel meta" "sel dates"; }
+  html.ipx-generic.ipx-tts #str1 table[data-ipx-list="pick"] td[data-ipx-col="from"] { justify-self: start; }
+}
+/* The search steps are kit pages: the ordinary content column, not My week's grid with a rail. */
+:host .content:has(> .kit-page) { display: block; padding: 24px 32px 48px; }
+@media (max-width: 900px) { :host .content:has(> .kit-page) { padding: 16px 16px 96px; } }

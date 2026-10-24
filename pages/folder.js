@@ -105,7 +105,7 @@
       dirs.setAttribute('data-ipx-title', T.folders);
       // Inside a course (reached from the course page), a subfolder of the same course opens inside the course too:
       // only the fragment of InSIS's link is extended (#ipx-in=course), which changes nothing that is requested.
-      const inCourse = /[#&]ipx-in=course/.test(location.hash);
+      const inCourse = /[#&]ipx-in=course\b/.test(location.hash);
       const courseFolders = ipx.state.docserver?.folders || {};
       for (const tr of dirs.querySelectorAll('tbody > tr')) {
         const sel = tr.querySelector('[data-ipx-col="select"]');
