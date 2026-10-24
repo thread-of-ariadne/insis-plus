@@ -1,0 +1,95 @@
+/* InSIS+ Study matters — InSIS's own forms slotted into InSIS+ form cards (excuses.js, thesis.js, abroad.js,
+   internships.js). Injected into the page: styles InSIS's elements in place through data attributes; nothing is moved.
+   The InSIS+ card around the slot is the card, so the form drops keepOnly()'s own card look. */
+
+html.ipx-takeover.ipx-keep #str1 form[data-ipx-card][data-ipx-keep="node"] { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+html.ipx-generic #str1 form[data-ipx-card] td.odsazena { margin: 0 !important; }
+html.ipx-generic #str1 form[data-ipx-card] p:empty, html.ipx-generic #str1 form[data-ipx-card] > br { display: none; }
+
+/* A one-line filter (a checkbox or a select and InSIS's button) */
+html.ipx-generic #str1 form[data-ipx-card] [data-ipx-filter] { display: block; }
+html.ipx-generic #str1 form[data-ipx-card] [data-ipx-filter] > tbody, html.ipx-generic #str1 form[data-ipx-card] [data-ipx-filter] tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+html.ipx-generic #str1 form[data-ipx-card] [data-ipx-filter] td { padding: 0 !important; color: var(--fg-2); font-size: 14px; }
+
+/* Label / control tables (form-edit): labels above controls on narrow cards, controls full width */
+html.ipx-generic #str1 form[data-ipx-card] table.form-edit { width: 100%; }
+html.ipx-generic #str1 form[data-ipx-card] table.form-edit select,
+html.ipx-generic #str1 form[data-ipx-card] table.form-edit input[type="text"] { width: 100%; max-width: 100%; box-sizing: border-box; }
+html.ipx-generic #str1 form[data-ipx-card][data-ipx-stack] table.form-edit tr { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+html.ipx-generic #str1 form[data-ipx-card][data-ipx-stack] table.form-edit td { padding: 0 !important; }
+html.ipx-generic #str1 form[data-ipx-card][data-ipx-stack] table.form-edit td:first-child { color: var(--muted); font-size: 13px; font-weight: 600; }
+
+/* Groups of checkboxes InSIS lays out in a layout table (theses archive): wrapping columns */
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups], html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] > tbody { display: block; width: 100%; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] > tbody > tr { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px 18px; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] > tbody > tr > td { display: block; padding: 0 !important; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] > tbody > tr > td:is(:empty, [data-ipx-blank]) { display: none !important; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] table.form-edit td[colspan] { padding: 0 0 4px !important; color: var(--fg); font-size: 13.5px; font-weight: 700; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-groups] table.form-edit td { padding: 2px 0 !important; font-size: 13.5px; }
+
+/* InSIS's buttons in the InSIS+ accent (InSIS's own stylesheet paints some of them light grey) */
+html.ipx-generic #str1 form[data-ipx-card] input[type="submit"] { background: var(--accent) !important; color: var(--accent-ink) !important; border: 0 !important; }
+
+/* The form's own submit button, on its own line */
+html.ipx-generic #str1 form[data-ipx-card] > input[type="submit"] { margin: 10px 0 4px; }
+
+/* InSIS's form drawn as a card in place, InSIS's results below it (theses archive, study abroad reports) */
+html.ipx-generic #str1 form[data-ipx-card="inplace"] { margin: 0 0 16px; padding: 16px 18px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic #str1 form[data-ipx-card="inplace"] > table.form-edit { max-width: 640px; }
+html.ipx-generic #str1 form[data-ipx-card="inplace"] table.form-edit td { vertical-align: middle; }
+html.ipx-generic #str1 form[data-ipx-card="inplace"] input[type="checkbox"] { margin: 0 6px 0 0; }
+html.ipx-generic #str1 form[data-ipx-card="inplace"] > table[data-ipx-groups] { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* Many label / select rows (study abroad reports): wrapping columns, label above its control. Rows InSIS hides
+   (empty dependent selects) keep InSIS's own display. */
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-columns] { display: block; max-width: none !important; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-columns] > tbody { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px 18px; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-columns] td { display: block; padding: 0 !important; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-columns] td:first-child { margin-bottom: 4px !important; color: var(--muted); font-size: 13px; font-weight: 600; }
+html.ipx-generic #str1 form[data-ipx-card] table[data-ipx-columns] select { width: 100%; max-width: 100%; }
+
+/* ---------- InSIS's list tables as rows, in place (internships.js, elections.js) ----------
+   The first column is the row's title; every other column a "Label: value" item on the line below; InSIS's links and
+   checkboxes stay where they are. InSIS's "No suitable data found." row becomes an empty state. */
+html.ipx-generic #str1 table[data-ipx-rows] { display: block; width: 100%; margin: 0 0 16px; border: 0; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic #str1 table[data-ipx-rows]::before { content: attr(data-ipx-rows); display: block; padding: 14px 16px 6px; color: var(--fg); font: 700 15px "Figtree", sans-serif; }
+html.ipx-generic #str1 table[data-ipx-rows] > thead { display: none; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody { display: block; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 12px 16px; border-top: 1px solid var(--line);
+  background: none !important; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr > td { display: block; min-width: 0; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important;
+  color: var(--fg-2); font-size: 13px; text-align: left !important; white-space: normal !important; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr > td[data-ipx-main] { flex-basis: 100%; color: var(--fg); font-size: 14.5px; font-weight: 650; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr > td[data-ipx-prefix]::before { content: attr(data-ipx-prefix) ": "; color: var(--muted); }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr > td:is([data-ipx-blank], [data-ipx-num]):not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr > td a { font-weight: 650; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr[data-ipx-empty] { display: block; padding: 18px 16px 22px; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr[data-ipx-empty] > td { color: var(--muted); font-size: 14px; text-align: center !important; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr[data-ipx-empty] > td[data-ipx-label] { font-size: 0 !important; }
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr[data-ipx-empty] > td[data-ipx-label]::before { content: attr(data-ipx-label); font-size: 14px; }
+
+/* An InSIS filter (a select or two and its button) as a compact bar above the list */
+html.ipx-generic #str1 form[data-ipx-bar] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 12px; }
+html.ipx-generic #str1 form[data-ipx-bar] > p, html.ipx-generic #str1 form[data-ipx-bar] > br { display: none; }
+html.ipx-generic #str1 form[data-ipx-bar] table.form-edit, html.ipx-generic #str1 form[data-ipx-bar] table.form-edit > tbody,
+html.ipx-generic #str1 form[data-ipx-bar] table.form-edit tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+html.ipx-generic #str1 form[data-ipx-bar] td { margin: 0 !important; padding: 0 !important; color: var(--muted); font-size: 13.5px; }
+html.ipx-generic #str1 form[data-ipx-bar] select { min-height: 36px; max-width: min(380px, 80vw); font-size: 13.5px; }
+html.ipx-generic #str1 form[data-ipx-bar] input[type="submit"] { min-height: 36px; font-size: 13.5px; background: var(--accent) !important; color: var(--accent-ink) !important; }
+/* InSIS's spacing between blocks (line breaks, empty paragraphs) on the pages framed in place */
+html.ipx-generic:is(.ipx-praxe, .ipx-abroad, .ipx-elections) #str1 :is(div, form):has(> table[data-ipx-rows], > form, > table.form-edit) > :is(br, p:empty) { display: none !important; }
+
+/* A status icon InSIS explains in a key: a labelled chip (data-ipx-chip), the icon hidden */
+html.ipx-generic #str1 table[data-ipx-rows] td[data-ipx-chip] { order: -1; font-size: 0 !important; }
+html.ipx-generic #str1 table[data-ipx-rows] td[data-ipx-chip] .uf-icon { display: none; }
+html.ipx-generic #str1 table[data-ipx-rows] td[data-ipx-chip]::before { content: attr(data-ipx-chip); display: inline-block; padding: 2px 8px; border-radius: 6px;
+  background: var(--chip); color: var(--fg-2); font-size: 12px; font-weight: 700; }
+/* An InSIS action link in a row (Vote) drawn as a button, its icon hidden */
+html.ipx-generic #str1 table[data-ipx-rows] a[data-ipx-button] { display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 9px;
+  background: var(--accent); color: var(--accent-ink) !important; font-size: 13px; font-weight: 700; text-decoration: none !important; }
+html.ipx-generic #str1 table[data-ipx-rows] a[data-ipx-button] .uf-icon { display: none; }
+html.ipx-generic #str1 table[data-ipx-rows] a[data-ipx-button]::after { content: attr(data-ipx-button); }
+html.ipx-generic #str1 table[data-ipx-rows] td:has(> a[data-ipx-button]) { order: 99; margin-left: auto !important; }
+/* InSIS's script may add a row-number cell after the module marked the cells: any cell it did not see is hidden. */
+html.ipx-generic #str1 table[data-ipx-rows] > tbody > tr:not([data-ipx-empty]) > td:not([data-ipx-cell]):not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }

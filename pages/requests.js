@@ -95,8 +95,41 @@
         anchor({ href: office }, { class: 'rq-link' }, icon('people'), h('span', {}, nav.label('campus.office')))));
   }
 
+  // Help › FAQ (dok/faq.pl, treatment R): InSIS's help line and a table of FAQ categories inside an empty form (no
+  // field, no button), or "No category found." Here: the categories as rows (InSIS's own links through the URL
+  // rule), otherwise an empty state that points to where questions are answered (Requests and its knowledge base).
+  const F = {
+    cs: { title: 'Časté dotazy', lead: 'Odpovědi InSIS na časté otázky, po kategoriích.', none: 'InSIS teď nemá žádné kategorie častých dotazů.',
+      instead: 'Odpověď můžete hledat v databázi znalostí nebo položit dotaz formulářem v Žádostech.', categories: 'Kategorie' },
+    en: { title: 'FAQ', lead: 'InSIS’s answers to common questions, by category.', none: 'InSIS has no FAQ categories right now.',
+      instead: 'You can search the knowledge base or ask a question with a form under Requests.', categories: 'Categories' },
+  }[lang];
+  function faqPage(page) {
+    const rows = [...page.querySelectorAll('form table tr')].filter((tr) => tr.closest('table').closest('form'));
+    const links = rows.flatMap((tr) => [...tr.querySelectorAll('a[href]')].map(kit.linkOf).filter((l) => l?.text));
+    const requests = nav.target('studies.requests');
+    kit.page({
+      key: 'faq',
+      css: ['pages/requests.css', 'pages/matters.css'],
+      title: F.title,
+      subtitle: nav.label('help'),
+      build: () => [
+        h('p', { class: 'muted mx-lead' }, F.lead),
+        links.length ? h('section', { class: 'card mx-rows' }, h('h2', { class: 'card-title' }, F.categories), links.map((l) => row(l)))
+          : h('div', { class: 'empty' }, h('p', {}, F.none), h('p', { class: 'muted small' }, F.instead),
+            requests && anchor({ href: requests, text: nav.sectionLabel('studies.requests') }, { class: 'more' }, nav.sectionLabel('studies.requests'))),
+        ...kit.messages(page).filter((m) => m.tone !== 'info').map(kit.note),
+      ],
+    });
+  }
+
   ipx.ready.then(() => {
     const path = nav.route(document.baseURI.split('#')[0]).path;
+    if (path === '/auth/dok/faq.pl') {
+      const page = document.getElementById('str1');
+      if (page?.querySelector('form[action*="faq"]')) faqPage(page);
+      return;
+    }
     if (path !== '/auth/kc/kc.pl' && path !== '/auth/kc/') return;
     const data = parse();
     if (!data) return;

@@ -142,7 +142,14 @@ html.ipx-generic #str1 input:not([type]), html.ipx-generic #str1 select, html.ip
 }
 html.ipx-generic #str1 textarea { padding: 10px 12px; }
 html.ipx-generic #str1 input:focus, html.ipx-generic #str1 select:focus, html.ipx-generic #str1 textarea:focus { background: var(--surface); box-shadow: 0 0 0 2px var(--accent); }
-html.ipx-generic #str1 input[type="checkbox"], html.ipx-generic #str1 input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; vertical-align: -3px; }
+/* InSIS draws its own checkboxes (appearance: none, a dark hairline) that vanish on the dark theme: the browser's
+   own control in the accent colour instead, visible on both themes. */
+html.ipx-generic #str1 input[type="checkbox"], html.ipx-generic #str1 input[type="radio"] {
+  appearance: auto; -webkit-appearance: auto; width: 16px; height: 16px; margin: 0 4px 0 0; padding: 0;
+  border: 0; background: none; box-shadow: none; accent-color: var(--accent); color-scheme: light dark; vertical-align: -3px;
+}
+html.ipx-generic[data-ipx-theme="light"] #str1 input[type="checkbox"], html.ipx-generic[data-ipx-theme="light"] #str1 input[type="radio"] { color-scheme: light; }
+html.ipx-generic[data-ipx-theme="dark"] #str1 input[type="checkbox"], html.ipx-generic[data-ipx-theme="dark"] #str1 input[type="radio"] { color-scheme: dark; }
 html.ipx-generic #str1 input[type="submit"], html.ipx-generic #str1 input[type="button"],
 html.ipx-generic #str1 input[type="reset"], html.ipx-generic #str1 button {
   min-height: 40px;
@@ -197,3 +204,27 @@ html.ipx-generic #str1 :has(> table.portal_menu) ~ :has(> table.portal_menu) tab
   background: var(--surface); box-shadow: var(--shadow-raised);
 }
 html.ipx-generic #str1 td.portal_menu_hole { display: none; }
+
+/* InSIS's edit forms (table.form-edit, e.g. Materials › Search): a form card — labels in a quiet column (above the
+   field on phones), no table chrome. InSIS's old datepicker icon goes; the field takes the date as typed
+   (DD/MM/YYYY), as InSIS accepts. Page modules style their own forms more specifically. */
+html.ipx-generic #str1 form:has(> table.form-edit) { padding: 18px 20px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-raised); }
+html.ipx-generic #str1 table.form-edit { width: 100%; margin: 0; border: 0; background: none; box-shadow: none; }
+html.ipx-generic #str1 table.form-edit td { padding: 8px 12px 8px 0 !important; border: 0 !important; background: none !important; vertical-align: middle; }
+html.ipx-generic #str1 table.form-edit td:first-child:not(:only-child) { width: 30%; color: var(--muted); font-size: 14px; }
+html.ipx-generic #str1 table.form-edit .small { color: var(--muted); font-size: 12.5px; }
+html.ipx-generic #str1 img.ui-datepicker-trigger { display: none; }
+html.ipx-generic #str1 form:has(> table.form-edit) + .small, html.ipx-generic #str1 div.small:has(+ br + form > table.form-edit) { max-width: 72ch; color: var(--muted); font-size: 13px; }
+@media (max-width: 700px) {
+  html.ipx-generic #str1 table.form-edit, html.ipx-generic #str1 table.form-edit tbody,
+  html.ipx-generic #str1 table.form-edit tr, html.ipx-generic #str1 table.form-edit td { display: block; width: auto !important; }
+  html.ipx-generic #str1 table.form-edit td:first-child:not(:only-child) { padding-bottom: 2px !important; }
+  html.ipx-generic #str1 table.form-edit input[type="text"] { width: 100%; max-width: 100%; box-sizing: border-box; }
+}
+/* InSIS gives its .small help boxes a fixed 800 px width and justified text: they follow the page width instead. */
+html.ipx-generic #str1 div.small { width: auto !important; max-width: 100%; text-align: left !important; }
+html.ipx-generic #str1 table.form-edit select { max-width: 100%; }
+@media (max-width: 700px) {
+  html.ipx-generic #str1 table.form-edit td > span[style*="nowrap"] { white-space: normal !important; }
+  html.ipx-generic #str1 table.form-edit input[type="text"] + .small { display: block; margin-top: 4px; }
+}

@@ -6,23 +6,55 @@
 // may mark notices as read: `insis-only`), so the tree stays InSIS's own, in place: it is styled here as one card per
 // unit with its folders as rows (CSS and data- attributes only; no node is moved, copied or rebuilt). Above it: how
 // many new contributions there are and in which folders, read from the page. InSIS's tab row gives the view tabs
-// (only links that pass the URL rule); Settings is a page action, not a view. The heading, help paragraph, the two
+// (all four, Settings included, when every link passes the URL rule; otherwise InSIS's own row stays, styled in place),
+// the same set on the Settings page; no page actions. The heading, help paragraph, the two
 // buttons and the key are hidden while InSIS+ is on. Nothing is fetched: the noticeboard is `read: never`.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui || !ipx.nav) return;
   const { lang, clean } = ipx;
-  const { h, icon, anchor, takeover, styleSlotted, hideInSlot, viewTabs } = ipx.ui;
+  const { h, icon, takeover, styleSlotted, hideInSlot, viewTabs } = ipx.ui;
   const nav = ipx.nav;
 
   const T = {
     cs: { fresh: (n) => (n === 1 ? '1 nový příspěvek' : n < 5 ? `${n} nové příspěvky` : `${n} nových příspěvků`), nothing: 'Na vývěsce není nic nového.',
       inFolders: (list) => `Ve složkách: ${list}.`, folders: (n, c) => `${n} ${ipx.kit.plural(n, 'složka', 'složky', 'složek')}, celkem ${c} ${ipx.kit.plural(c, 'příspěvek', 'příspěvky', 'příspěvků')}.`, newBadge: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`,
-      settings: 'Nastavení vývěsky', views: 'Vývěska', lead: 'Složku otevřete v InSIS; čísla v závorkách jsou počty příspěvků.' },
+      views: 'Vývěska', lead: 'Složku otevřete v InSIS; čísla v závorkách jsou počty příspěvků.' },
     en: { fresh: (n) => (n === 1 ? '1 new contribution' : `${n} new contributions`), nothing: 'Nothing new on the noticeboard.',
       inFolders: (list) => `In: ${list}.`, folders: (n, c) => `${n} folders, ${c} contributions in total.`, newBadge: (n) => `${n} new`,
-      settings: 'Noticeboard settings', views: 'Noticeboard', lead: 'A folder opens in InSIS; the numbers are the contributions in it.' },
+      views: 'Noticeboard', lead: 'A folder opens in InSIS; the numbers are the contributions in it.' },
   }[lang];
+
+  // InSIS's main tab row of the noticeboard (Contribution tree · New contributions (n) · My contributions · Settings),
+  // read the same way on every noticeboard page: one fixed set of views for the section, the same on the tree and on
+  // Settings, and no page actions (Settings is a view, not an action).
+  //   - Every view's link passes the URL rule: they are InSIS+ view tabs (InSIS's own addresses), Settings included.
+  //   - Some do not (New and My contributions are insis-only until verified): InSIS's own row stays, styled in place,
+  //     as the one tab row on every page, and InSIS+ draws no tabs of its own (the row cannot be rebuilt without
+  //     copying links InSIS+ may not copy).
+  const mainRow = (root = document.getElementById('str1')) => root?.querySelector('table.portal_menu:has(a[href*="zalozka=1"])') || root?.querySelector('table.portal_menu[data-pm-selected]');
+  function rowTabs(menu = mainRow()) {
+    return [...(menu?.querySelectorAll('td[data-pm-sysid]') || [])].map((td) => {
+      const a = td.querySelector('a[href]');
+      const m = /^(.*?)\s*\((\d+)\)$/.exec(clean(a?.textContent));
+      return a && { id: td.getAttribute('data-pm-sysid'), sysid: td.getAttribute('data-pm-sysid'), href: nav.safe(a.href, 'link', { copied: true }),
+        text: m ? m[1] : clean(a.textContent), count: m ? Number(m[2]) : null, on: !!td.querySelector('b a') };
+    }).filter(Boolean);
+  }
+  const ownRowOf = (tabs) => tabs.length > 0 && tabs.some((t) => !t.href);
+
+  // Noticeboard settings (zalozka=4) is a form page framed by generic.js under this header. With InSIS's own row
+  // (see above) both of InSIS's rows stay: the main row as the tab row, the settings' sub-row (Noticeboard setting ·
+  // Folder setting) as the small choice under it (03-pages §1, rule 1). Otherwise only the sub-row stays.
+  ipx.kit?.section({
+    id: 'noticeboard',
+    title: () => nav.sectionLabel('messages.noticeboard'),
+    subtitle: () => nav.label('messages'),
+    pages: { '/auth/vyveska/': (r) => (r.params?.get('zalozka') === '4' ? (ownRowOf(rowTabs()) ? null : 'nastaveni') : undefined) },
+    views: () => { const tabs = rowTabs(); return ownRowOf(tabs) ? [] : tabs; },
+    keepRow: (t) => ownRowOf(rowTabs()) || t !== mainRow(),
+    node: () => 'messages.noticeboard',
+  });
 
   function parse() {
     const page = document.getElementById('str1');
@@ -32,14 +64,8 @@
     if (!tree || menu?.getAttribute('data-pm-selected') !== 'strom_prispevku') return null;
     if (!tree.querySelector('a[href*="slozka.pl"]')) return null;
 
-    // InSIS's tab row: views whose links pass the URL rule, Settings apart (a page action), counts kept.
-    const tabs = [...menu.querySelectorAll('td[data-pm-sysid]')].map((td) => {
-      const a = td.querySelector('a[href]');
-      const m = /^(.*?)\s*\((\d+)\)$/.exec(clean(a?.textContent));
-      return a && { sysid: td.getAttribute('data-pm-sysid'), href: nav.safe(a.href, 'link', { copied: true }),
-        text: m ? m[1] : clean(a.textContent), count: m ? Number(m[2]) : null, on: !!td.querySelector('b a') };
-    }).filter(Boolean);
-    const settings = tabs.find((t) => t.sysid === 'nastaveni');
+    // InSIS's tab row: the section's fixed views (the same on Settings), counts kept.
+    const tabs = rowTabs(menu);
     const freshTab = tabs.find((t) => t.sysid === 'nove_prispevky');
 
     // Every folder label: "<a>Name</a> (n) <rights icon>"; new contributions are a bold number in the label.
@@ -54,11 +80,10 @@
 
     // Views InSIS+ may not link (New and My contributions are insis-only until verified) are reachable only through
     // InSIS's own tab row: then that row stays, styled in place, and InSIS+ draws no tabs or Settings action of its own.
-    const ownRow = tabs.some((t) => !t.href && t.sysid !== 'nastaveni');
+    const ownRow = ownRowOf(tabs);
     return {
       page, tree, menu, folders, ownRow,
-      views: ownRow ? [] : tabs.filter((t) => t.href && t.sysid !== 'nastaveni'),
-      settings: !ownRow && settings?.href ? settings : null,
+      views: ownRow ? [] : tabs,
       fresh: freshTab?.count ?? folders.reduce((s, f) => s + f.fresh, 0),
       chrome: [page.querySelector('#titulek'), !ownRow && menu, ...page.querySelectorAll('nav[aria-label="breadcrumb"], div.small, .uisLegend'),
         ...page.querySelectorAll('input[type="button"][id$="_open_all"], input[type="button"][id$="_close_all"]'),
@@ -77,6 +102,13 @@
       if (f.fresh) f.label.setAttribute('data-ipx-new', T.newBadge(f.fresh));
       if (f.count === 0 && !f.fresh) f.label.setAttribute('data-ipx-empty', '');
     }
+  }
+
+  // The summary as plain text (for InSIS's tree when InSIS's tab row stays above it).
+  function summaryText(d) {
+    const node = summary(d);
+    const [note, lead] = node.children;
+    return { summary: ipx.clean(note.textContent), lead: ipx.clean(lead.textContent) };
   }
 
   function summary(d) {
@@ -99,6 +131,12 @@
     const data = parse();
     if (!data) return;
     mark(data);
+    if (data.ownRow) {
+      const lines = summaryText(data);
+      data.tree.setAttribute('data-ipx-summary', lines.summary);
+      data.tree.setAttribute('data-ipx-lead', lines.lead);
+      data.tree.setAttribute('data-ipx-tone', data.fresh ? 'warn' : 'info');
+    }
     hideInSlot(data.chrome);
     styleSlotted('pages/noticeboard.css');
     takeover({
@@ -106,11 +144,13 @@
       css: ['kit.css', 'pages/noticeboard.css'],
       title: nav.sectionLabel('messages.noticeboard'),
       subtitle: nav.label('messages'),
-      extra: data.settings && anchor({ href: data.settings.href }, { class: 'btn ghost' }, icon('gear'), h('span', {}, T.settings)),
       slotted: [data.page],
       build: () => h('div', { class: 'kit-page' },
         viewTabs(data.views, T.views),
-        summary(data),
+        // When InSIS's own tab row stays (its views are pages InSIS+ does not link), it sits at the top of the slotted
+        // content: the summary is then written onto InSIS's tree as data- attributes (noticeboard.css shows them
+        // between the row and the folders), so the page still reads header · tabs · summary · content.
+        data.ownRow ? null : summary(data),
         h('slot')),
     });
   });

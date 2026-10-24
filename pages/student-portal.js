@@ -23,7 +23,8 @@
   let doc = document;
   let here = location;
   const { clean, lang } = ipx;
-  const { h, icon, anchor, takeover, viewTabs, PORTAL_ACTIONS, facultyColors } = ipx.ui;
+  const ui = ipx.ui;
+  const { h, icon, anchor, takeover, PORTAL_ACTIONS, facultyColors } = ui;
 
   // One header for the section's pages (kit.section): Status (this page), History (studium.pl) and the student
   // card pages below it, which generic.js draws around InSIS's content.
@@ -38,7 +39,13 @@
       card: 'Průkaz studenta', cardText: 'Průkaz ISIC nebo zaměstnanecký průkaz používá fotografii uloženou v InSIS.',
       photo: 'Změnit fotografii', cardTypes: 'Typy průkazů', validity: 'Ověřit platnost průkazu',
       ask: 'Na koho se obrátit', askText: 'Se studiem, omezením i průkazem poradí studijní oddělení vaší fakulty.',
-      requests: 'Formuláře kontaktního centra', noStudy: 'InSIS na této stránce neukazuje žádné studium.' },
+      requests: 'Formuláře kontaktního centra', noStudy: 'InSIS na této stránce neukazuje žádné studium.',
+      details: 'Údaje o studiu', obtained: 'Získané kredity', ofCredits: (n) => `z ${n} potřebných`, enrolledCr: 'Zapsané kredity', wholeStudy: 'za celé studium',
+      coupons: 'Registrační kupóny', couponsNow: 'Kupóny teď', ofCoupons: (n) => `z ${n} na začátku`, couponsLead: 'Kupóny se spotřebovávají při registraci předmětů.',
+      extraCoupons: 'Přidělené navíc', interruptions: 'Přerušení studia', trips: 'Zahraniční pobyty', noData: 'Nic není zaznamenáno.',
+      cardTitle: 'Průkaz studenta', typesTitle: 'Typy průkazů', cardLead: 'Stránky InSIS k průkazům, které smíte používat.',
+      typesGloss: 'Jaké druhy průkazů jsou na VŠE v provozu', validityGloss: 'Zda je průkaz s daným číslem platný',
+      photoGloss: 'Fotografie, kterou používá ISIC i zaměstnanecký průkaz', typesLead: 'Druhy identifikačních průkazů, které jsou na VŠE v provozu.' },
     en: { studyOffice: 'Study department', title: 'Study status', status: 'Status', history: 'History', views: 'Views of your study',
       noRestriction: 'No restriction', restriction: 'Restriction', period: 'Period',
       restrictionText: (f) => `A restriction can block course registration and exam sign-up. The study department${f ? ` of ${f}` : ''} sets and lifts it.`,
@@ -47,7 +54,13 @@
       card: 'Student card', cardText: 'Your ISIC or employee card uses the photo stored in InSIS.',
       photo: 'Change photo', cardTypes: 'Card types', validity: 'Check a card’s validity',
       ask: 'Who to ask', askText: 'The study department of your faculty helps with your study, a restriction or your card.',
-      requests: 'Contact centre forms', noStudy: 'InSIS shows no study on this page.' },
+      requests: 'Contact centre forms', noStudy: 'InSIS shows no study on this page.',
+      details: 'Study details', obtained: 'Credits obtained', ofCredits: (n) => `of ${n} required`, enrolledCr: 'Credits enrolled', wholeStudy: 'for the whole study',
+      coupons: 'Registration coupons', couponsNow: 'Coupons now', ofCoupons: (n) => `of ${n} at the start`, couponsLead: 'Coupons are used up when you register for courses.',
+      extraCoupons: 'Granted extra', interruptions: 'Interruption of study', trips: 'Trips abroad', noData: 'Nothing recorded.',
+      cardTitle: 'Student card', typesTitle: 'Card types', cardLead: 'The InSIS pages about ID cards that you may use.',
+      typesGloss: 'Which kinds of ID card are in use at VŠE', validityGloss: 'Whether the card with a given number is valid',
+      photoGloss: 'The photo used on your ISIC and employee card', typesLead: 'The kinds of identification card in use at VŠE.' },
   }[lang];
 
   // Addresses are compared without their query: many carry a link back to the portal (zpet=…/student/…).
@@ -264,13 +277,125 @@
       rail(d));
   }
 
+  // ---------- History (student/studium.pl), the card pages (karty/, karty/typy_karet.pl) ----------
+  // All three are information pages (treatment R): read, drawn again with InSIS+ components, the original hidden.
+  // History holds the study's facts (a label/value table), the registration coupons and three history tables
+  // (interruptions, trips abroad, extra coupons), each with InSIS's help paragraph; most are empty for most students.
+
+  const card = (title, ...body) => h('section', { class: 'card pad' }, h('h2', { class: 'card-title' }, title), ...body);
+  const isEmptyRow = (d) => !d || !d.rows.length || (d.rows.length === 1 && d.rows[0].cells.length === 1);
+  // A history table as a readable table without InSIS's audit columns (Changed / Changed by); its own "nothing
+  // here" sentence when empty.
+  function historyTable(d, label) {
+    // InSIS's own sentence when it says something specific ("You have no interruption of study registered."), not
+    // its generic "No suitable data found."
+    const said = d?.rows[0]?.cells[0]?.text;
+    if (isEmptyRow(d)) return h('p', { class: 'muted mx-none' }, said && !/suitable data|vyhovuj/i.test(ipx.norm(said)) ? said : T.noData);
+    const keep = d.head.map((t, i) => ({ t, i })).filter(({ t }) => t && !/^(changed|zmen)/.test(ipx.norm(t)));
+    return ipx.kit.dataTable({ label, columns: keep.map(({ t, i }, n) => ({ key: `c${i}`, label: t, main: n === 0 })),
+      rows: d.rows.map((r) => Object.fromEntries(keep.map(({ i }) => [`c${i}`, r.cells[i]?.links.length === 1 ? r.cells[i].links[0] : r.cells[i]?.text]))) });
+  }
+
+  function historyPage(page) {
+    const kit = ipx.kit;
+    const norm = ipx.norm;
+    // Label/value tables: no header row, no nested table, not a tab row or the key. Read here rather than with
+    // kit.keyValues, which skips labels over 60 characters ("Number of credits obtained during your whole …").
+    const pairs = (t) => [...t.rows].filter((tr) => tr.cells.length === 2).map((tr) => ({
+      label: kit.cellText(tr.cells[0]).replace(/:$/, ''), value: kit.cellText(tr.cells[1]) })).filter((f) => f.label);
+    const plain = [...page.querySelectorAll('table')].filter((t) => !t.closest('table.portal_menu, .uisLegend') &&
+      !t.querySelector('table, .zahlavi') && pairs(t).length);
+    const facts = plain[0] ? pairs(plain[0]).filter((f) => f.value) : [];
+    const couponFacts = plain[1] ? pairs(plain[1]) : [];
+    const tables = kit.findTables(page).map((t) => kit.readTable(t));
+    const pick = (re) => tables.find((d) => d.head.some((x) => re.test(norm(x))));
+    const fact = (list, re) => list.find((f) => re.test(norm(f.label)))?.value;
+    const required = fact(facts, /required|potreb|nutn/);
+    const obtained = fact(facts, /obtained|ziskan/);
+    const enrolled = fact(facts, /enrolled for|zapsan/);
+    const initial = fact(couponFacts, /initial|pocatecni/);
+    const current = fact(couponFacts, /current|aktualni|soucasn/);
+    const extra = pick(/quantity|pocet|mnozstvi/);
+    return h('div', { class: 'kit-stack' },
+      h('div', { class: 'kpis' },
+        ui.kpi({ label: T.obtained, value: obtained, foot: required && T.ofCredits(required) }),
+        ui.kpi({ label: T.enrolledCr, value: enrolled, foot: T.wholeStudy }),
+        ui.kpi({ label: T.couponsNow, value: current, foot: initial && T.ofCoupons(initial) })),
+      h('div', { class: 'kit-cols' },
+        facts.length ? card(T.details, kit.facts(facts)) : h('div', { class: 'empty' }, h('p', {}, T.noData)),
+        h('div', { class: 'kit-stack' },
+          (couponFacts.length > 0 || !isEmptyRow(extra)) && card(T.coupons,
+            h('p', { class: 'muted small mx-gap' }, T.couponsLead),
+            kit.facts(couponFacts.filter((f) => f.value)),
+            !isEmptyRow(extra) && [h('h3', { class: 'mx-sub' }, T.extraCoupons), historyTable(extra, T.extraCoupons)]),
+          card(T.interruptions, historyTable(pick(/reason|duvod/), T.interruptions)),
+          card(T.trips, historyTable(pick(/institution|instituce|podnik/), T.trips)))));
+  }
+
+  // A row linking one InSIS page, with a one-line gloss.
+  const pageRow = (l, iconName, gloss) => anchor(l, { class: 'mx-row' },
+    h('span', { class: 'mx-row-icon' }, icon(iconName)),
+    h('span', { class: 'mx-row-text' }, h('strong', {}, l.text), gloss && h('small', {}, gloss)),
+    h('span', { class: 'mx-row-go' }, icon('arrow')));
+
+  // karty/: InSIS's menu of card pages (with Open all / Close all) → the leaves as rows, plus the photo page.
+  function cardsPage(page) {
+    // InSIS's menu links carry its menu counter (_m), which the URL rule does not take: the plain address instead,
+    // offered only when InSIS's menu lists the page.
+    const find = (re, path) => [...page.querySelectorAll('a[href]')].some((x) => re.test(x.getAttribute('href'))) &&
+      { href: ipx.nav.safe(new URL(path, document.baseURI).href, 'link') };
+    const photo = ipx.state.portal?.paths?.['/auth/personalizace/vkladani_fotky.pl'];
+    const rows = [
+      [find(/typy_karet\.pl/, '/auth/karty/typy_karet.pl'), 'list', T.typesTitle, T.typesGloss],
+      [find(/platnost\.pl/, '/auth/karty/platnost.pl'), 'check', T.validity, T.validityGloss],
+      [safe(photo), 'people', T.photo, T.photoGloss],
+    ].filter(([l]) => l?.href);
+    return h('div', { class: 'kit-stack' },
+      h('p', { class: 'muted mx-lead' }, T.cardLead),
+      rows.length ? h('section', { class: 'card mx-rows' }, rows.map(([l, ic, text, gloss]) => pageRow({ ...l, text }, ic, gloss)))
+        : h('div', { class: 'empty' }, h('p', {}, ipx.kit.looseText(page) || T.noData)));
+  }
+
+  // karty/typy_karet.pl: a short text, a table of card types, or InSIS's message that there are none.
+  function typesPage(page) {
+    const kit = ipx.kit;
+    const tables = kit.findTables(page).map((t) => kit.readTable(t)).filter((d) => !isEmptyRow(d));
+    const msgs = kit.messages(page);
+    return h('div', { class: 'kit-stack' },
+      h('p', { class: 'muted mx-lead' }, T.typesLead),
+      tables.map((d) => historyTable(d, T.typesTitle)),
+      !tables.length && h('div', { class: 'empty' }, h('p', {}, msgs.find((m) => m.tone === 'info')?.text || kit.looseText(page) || T.noData)),
+      msgs.filter((m) => tables.length || m.tone !== 'info').map(kit.note));
+  }
+
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
   (ipx.readers ||= {}).portal = (fetched, url) => {
     doc = fetched; here = new URL(url);
     try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
   };
 
+  // The other pages of the section, each drawn only on its own address and only when InSIS's content is there.
+  const OTHER = {
+    '/auth/student/studium.pl': { key: 'study-history', view: 'history', build: historyPage, ok: (p) => p.querySelector('table') },
+    '/auth/karty/': { key: 'id-cards', title: () => T.cardTitle, build: cardsPage, ok: (p) => p.querySelector('#menitko, a[href*="karty/"]') },
+    '/auth/karty/typy_karet.pl': { key: 'card-types', title: () => T.typesTitle, build: typesPage, ok: () => true },
+  };
+
   ipx.ready.then(() => {
+    const other = OTHER[ipx.nav.route(document.baseURI.split('#')[0]).path];
+    const original = document.getElementById('str1');
+    if (other && original && other.ok(original)) {
+      // History is a view of the section (its header and tabs); the card pages are below it (03-pages.md §1 rule 7:
+      // titled by the thing, the section as eyebrow, no tabs).
+      ipx.kit.page({
+        key: other.key, css: 'pages/matters.css',
+        title: other.view ? ipx.nav.sectionLabel('studies.status') : other.title(),
+        subtitle: other.view ? ipx.nav.label('matters') : ipx.nav.sectionLabel('studies.status'),
+        tabs: other.view ? ipx.kit.sectionTabs(statusSection, other.view) : null,
+        build: () => other.build(original),
+      });
+      return;
+    }
     const data = parse();
     if (!data) return;
     remember(data);

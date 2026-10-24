@@ -134,6 +134,12 @@ building, account device pages) start as **B**.
 9. InSIS mail, Requests / Contact centre, Who to ask.
 10. Everything else, by frequency.
 
+**Status (2026-10-24):** steps 1–10 are built and checked against 207 logged-in snapshots (113 addresses), in
+English and, where a snapshot exists, Czech, at 1300 px and 375 px: every page has its own module except the §6
+exceptions. Not yet seen with real data, so written from InSIS's markup and checked with made-up rows: open exam
+sign-up, an open submission box, a topic group open for sign-up, a registration round, Mail settings other than
+Forwarding, a person's tabs other than Contacts. Exam dates' summary gets a fresh snapshot when dates open.
+
 ## 6. Exceptions (G)
 
 Pages that stay InSIS's content in the shared styles, and why:

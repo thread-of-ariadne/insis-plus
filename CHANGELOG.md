@@ -7,6 +7,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Added
+- Top bar: one language menu instead of a button per language — a globe button with the current language (CS / SK /
+  EN) opens Čeština · Slovenčina · English, each named in its own language, the current one ticked (InSIS shows
+  only the other languages, so the current one used to be invisible); a light/dark toggle next to it (saved as the
+  InSIS+ theme; "As the system" stays in InSIS+ settings). On phones both are in the account menu.
+- Every InSIS page a student uses now has its own page, checked against 207 logged-in snapshots
+  (`docs/ia/03-pages.md` §5). New: Confirmations & decisions (print, delivered, printed), Excuse notes, Thesis
+  topics and detail, Theses archive, Study abroad reports and agreements, Internships, Elections, Map of my study,
+  Enrolment statistics, Classmates, Topic sign-ups, the Submission box, Registration & enrolment (with
+  extra-semestral courses, minor tracks, favourites), Course e-plans, Courses on offer, Departments (faculties,
+  units, staff, courses, topics, publications), Who to ask (study offices), a person's page, Graduates, Rooms,
+  E-mail & accounts, Apps & devices, Approvals, Access system, Help topics and articles, News, Discussions,
+  To-do, Search, Mail settings. Reworked against real pages: Exam dates (rows, summary, How it works, filter),
+  one exam date, Pass rates, Academic calendar, Timetable search, Study plans, History of study, cards, Payments,
+  FAQ, Catalogue, Syllabus, e-Library, Noticeboard, InSIS mail.
+- Page actions are a labelled row under the title on phones (never icons repeating the bar's own); on laptop
+  widths the search box folds to its icon before a title wraps.
+
+### Fixed
+- Catalogue: InSIS's result links are no longer moved out of its form, and the filters fold with CSS only.
+- Syllabus: the copied text keeps only text structure (an allow-list); images, frames and objects from
+  teacher-entered HTML are dropped; the back link that failed the URL rule is gone; InSIS's output form is shown.
+- Language links and the page-help link pass the URL rule; the remembered place of an unknown page is InSIS+
+  session data instead of the page's own sessionStorage.
+- Forwarding settings (`posta/forwardy.pl`) are no longer read in the background (settings pages are never read).
+- Czech Payments page showed "—" for every date; course subfolders opened from a course lost the course context.
+- InSIS's checkboxes are visible on the dark theme; header buttons keep their icons on phones.
 - First-frame skeleton (`boot.js`): an InSIS+ skeleton instead of the original page while InSIS's server responds.
 - In-place navigation between Home and the InSIS+ pages on its address (no server round trip); a session cache for
   course syllabi (shown at once, refreshed in the background); skeleton placeholders instead of "Loading…".

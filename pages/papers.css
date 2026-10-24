@@ -1,0 +1,174 @@
+/* InSIS+ — Confirmations & decisions (pages/papers.js). Injected into the page itself: InSIS's own links, tables and
+   forms are styled in place through the data attributes papers.js sets (nothing is moved out of InSIS's forms).
+   Scoped to html.ipx-generic.ipx-papers. */
+
+/* InSIS's column chooser ("Display: Note Size …") hides cells with inline styles; the rows below decide what shows,
+   so the chooser goes and the cells InSIS+ shows are forced visible. Empty paragraphs InSIS uses as spacing go. */
+html.ipx-generic.ipx-papers #str1 .clm_main, html.ipx-generic.ipx-papers #str1 p:empty, html.ipx-generic.ipx-papers #str1 div:has(> form) > br { display: none !important; }
+
+/* ---------- Get a confirmation: two cards (sealed PDF, to print), the documents as a CZ | EN matrix of tiles ---------- */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] { display: block; width: 100%; max-width: 860px; margin: 0 0 18px; padding: 6px 0 10px;
+  border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block]::before { content: attr(data-ipx-title); display: block; padding: 10px 18px 8px; color: var(--fg);
+  font: 700 15.5px "Figtree", sans-serif; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] > tbody, html.ipx-generic.ipx-papers #str1 table[data-ipx-block] > tbody > tr,
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] > tbody > tr > td { display: block; padding: 0 !important; border: 0 !important; background: none !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] td > div { display: block; width: auto !important; margin: 0 !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] .rada-ikon { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+  width: auto !important; margin: 0 !important; padding: 0 12px !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "name lang" "gloss lang";
+  align-items: center;
+  justify-items: start;
+  column-gap: 12px;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 62px;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 12px;
+  background: var(--chip) !important;
+  color: var(--fg) !important;
+  text-align: left !important;
+  text-decoration: none !important;
+}
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona:hover { background: var(--accent-soft) !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona:hover .app-ikona-text { color: var(--accent) !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona .uf-icon { display: none !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona .app-ikona-text { grid-area: name; display: block !important; width: auto !important; margin: 0 !important;
+  color: var(--fg) !important; font: 650 14px/1.3 "Figtree", sans-serif !important; white-space: normal !important; text-align: left !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona::before { content: attr(data-ipx-gloss); grid-area: gloss; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] a.app-ikona::after { content: attr(data-ipx-lang); grid-area: lang; justify-self: end; padding: 3px 8px; border-radius: 7px;
+  background: var(--surface); color: var(--fg-2); font-size: 11.5px; font-weight: 800; letter-spacing: .04em; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block="sealed"] a.app-ikona::after { background: var(--accent); color: var(--accent-ink); }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-papers #str1 table[data-ipx-block] .rada-ikon { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- Delivered to me: InSIS's folders as a segmented choice, the filter as a compact bar, documents as rows ---------- */
+/* The folders: a captioned form control in the page body ("Folder [Admission procedure | Study]"), smaller than and
+   unlike the view tabs above (those are underlined words; this is a pill switch with a label) */
+html.ipx-generic.ipx-papers #str1 table.portal_menu { display: flex; align-items: center; gap: 10px; width: auto; margin: 0 0 12px; padding: 0; border: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu[data-ipx-seg]::before { content: attr(data-ipx-seg); color: var(--muted); font-size: 13.5px; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu > tbody { display: block; padding: 3px; border-radius: 10px; background: var(--chip); }
+html.ipx-generic.ipx-papers #str1 table.portal_menu tbody, html.ipx-generic.ipx-papers #str1 table.portal_menu tr { gap: 2px; align-items: center; height: auto !important; min-height: 0 !important; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu tr { display: flex; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu td:not(.portal_menu_hole), html.ipx-generic.ipx-papers #str1 table.portal_menu td > b { display: flex; align-items: center; height: auto !important; min-height: 0 !important; margin: 0 !important; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu .badge { margin-left: 6px; }
+html.ipx-generic.ipx-papers #str1 form:has(table[data-ipx-list]) > br { display: none; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu a { display: block; margin: 0 !important; padding: 4px 12px; border: 0 !important; border-radius: 8px; color: var(--fg-2); font-size: 13px; font-weight: 600; line-height: 20px; text-decoration: none !important; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu a::after, html.ipx-generic.ipx-papers #str1 table.portal_menu td::after { display: none !important; }
+html.ipx-generic.ipx-papers #str1 table.portal_menu b a { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-raised); }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] { display: block; margin: 0 0 12px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] tbody, html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] td { margin: 0 !important; padding: 0 !important; color: var(--muted); font-size: 13.5px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] input[type="submit"] { background: var(--accent) !important; color: var(--accent-ink) !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] select, html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] input[type="submit"] { min-height: 36px; font-size: 13.5px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-filter=""] select { max-width: min(360px, 70vw); }
+
+/* A list (both registers): a card of rows, no header row */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] { display: block; width: 100%; margin: 0 0 16px; border: 0; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list]::before { content: attr(data-ipx-title); display: block; padding: 14px 16px 6px; color: var(--fg);
+  font: 700 15px "Figtree", sans-serif; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] > thead { display: none; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] > tbody { display: block; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] > tbody > tr { position: relative; display: grid; align-items: center; column-gap: 12px; row-gap: 4px; padding: 12px 16px;
+  border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td { display: block; min-width: 0; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important;
+  color: var(--fg-2); font-size: 13px; text-align: left !important; white-space: normal !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td b { color: inherit; font-weight: inherit; }
+/* Unused columns. papers.js gives a cell with a form control or an InSIS action link the role "act" instead; the
+   :has() guard also keeps controls InSIS's scripts add after load. */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="num"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="other"]:not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }
+/* InSIS's actions in a column InSIS+ does not otherwise show: small labelled chips (InSIS's own links, in place) */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="act"] { display: flex !important; flex-wrap: wrap; gap: 6px; order: 9; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="act"] a[data-ipx-act] { position: relative; z-index: 2; display: inline-flex; align-items: center; min-height: 26px;
+  padding: 0 9px; border-radius: 7px; background: var(--chip); color: var(--fg-2); font-size: 12px; font-weight: 650; text-decoration: none; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="act"] a[data-ipx-act] .uf-icon { display: none; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="act"] a[data-ipx-act]:not([data-ipx-act=""])::after { content: attr(data-ipx-act); }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] td[data-ipx-col="act"] a[data-ipx-act]:hover { color: var(--accent); }
+/* InSIS's "No suitable data found." row: an empty state, in InSIS+'s words where papers.js gave them */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] tr[data-ipx-empty] { display: block; padding: 18px 16px 22px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] tr[data-ipx-empty] td { color: var(--muted); font-size: 14px; text-align: center !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] tr[data-ipx-empty] td[data-ipx-label] { font-size: 0 !important; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] tr[data-ipx-empty] td[data-ipx-label]::before { content: attr(data-ipx-label); font-size: 14px; }
+
+/* Documents: title / note / chips (delivery, seal, confirmation) / created · opened · size, with [Open] on the right.
+   A wrapping flex row: several cells share a line, which a grid cannot do without overlapping them. */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list="storage"] > tbody > tr:not([data-ipx-empty]) { display: flex; flex-wrap: wrap; align-items: center;
+  gap: 4px 8px; padding-right: 120px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list="storage"] > tbody > tr:not([data-ipx-empty])::before { content: ""; order: 5; flex-basis: 100%; height: 0; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="file"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="sign"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="posted"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="by"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="app"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="delivery"]:not([data-ipx-label]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="seal"]:not([data-ipx-label]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="confirm"]:not([data-ipx-label]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="opened"]:not([data-ipx-prefix]) { display: none !important; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="document"] { display: block !important; order: 1; flex-basis: 100%; color: var(--fg); font-size: 14.5px; font-weight: 650; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="note"] { display: block !important; order: 2; flex-basis: 100%; color: var(--muted); }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="note"]:empty,
+html.ipx-generic.ipx-papers #str1 [data-ipx-list] td[data-ipx-blank] { display: none !important; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-label] { display: block !important; order: 4; font-size: 0 !important; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="delivery"][data-ipx-label] { order: 3; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-label]::before { content: attr(data-ipx-label); display: inline-block; padding: 2px 8px; border-radius: 6px;
+  background: var(--chip); color: var(--fg-2); font-size: 12px; font-weight: 750; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] tr[data-ipx-state="waiting"] td[data-ipx-col="delivery"]::before { background: #fff4d6; color: #8a5a00; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] tr[data-ipx-state="read"] td[data-ipx-col="delivery"]::before { background: #dff5e7; color: #17733f; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="created"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="opened"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="size"] { display: block !important; order: 6; margin-right: 10px; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="opened"] { order: 7; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="size"] { order: 8; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list] td[data-ipx-prefix]::before { content: attr(data-ipx-prefix) " "; }
+/* Open: InSIS's own link (it records that the document was displayed), drawn as a button; never stretched over the row */
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"] { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"] a[data-ipx-open] { display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px;
+  border-radius: 9px; background: var(--accent); color: var(--accent-ink) !important; font-size: 13px; font-weight: 700; text-decoration: none !important; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"] a[data-ipx-open] .uf-icon { display: none; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"] a[data-ipx-open]::after { content: attr(data-ipx-open); }
+/* A document InSIS does not let this student open: its "not authorised" icon, kept small */
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"]:not(:has(a[data-ipx-open])) .uf-icon svg { width: 18px; height: 18px; color: var(--faint); }
+
+/* ---------- Printed: the search form collapsed under Filter, printouts as rows ---------- */
+html.ipx-generic.ipx-papers:not([data-ipx-filter-open]) #str1 form[data-ipx-filter="collapsible"] { display: none !important; }
+html.ipx-generic.ipx-papers #str1 form[data-ipx-filter="collapsible"] { margin: 0 0 16px; padding: 14px 16px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-papers #str1 form[data-ipx-filter="collapsible"] td.odsazena { padding: 5px 6px; }
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list="register"] > tbody > tr:not([data-ipx-empty]) {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "select type printed details" "select study seal details";
+}
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="select"] { grid-area: select; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="select"]:not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="type"] { grid-area: type; color: var(--fg); font-size: 14.5px; font-weight: 650; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="study"] { grid-area: study; color: var(--muted); }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="printed"] { grid-area: printed; color: var(--muted); font-variant-numeric: tabular-nums; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="seal"] { grid-area: seal; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="details"] { grid-area: details; }
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="agenda"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="person"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="marked"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="markedOn"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="unreleased"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="delivered"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="changed"],
+html.ipx-generic.ipx-papers #str1 [data-ipx-list="register"] td[data-ipx-col="by"] { display: none !important; }
+
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-papers #str1 table[data-ipx-list="register"] > tbody > tr:not([data-ipx-empty]) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "select type details" "select study details" "select printed details" "select seal details";
+  }
+  html.ipx-generic.ipx-papers #str1 table[data-ipx-list="storage"] > tbody > tr:not([data-ipx-empty]) { padding-right: 16px; }
+  html.ipx-generic.ipx-papers #str1 [data-ipx-list="storage"] td[data-ipx-col="open"] { position: static; order: 9; flex-basis: 100%; margin-top: 6px; transform: none; }
+}
+
+/* InSIS's script may add a row-number cell after papers.js marked the cells: any cell without a role is hidden. */
+html.ipx-generic.ipx-papers #str1 table[data-ipx-list] > tbody > tr:not([data-ipx-empty]) > td:not([data-ipx-col]):not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }

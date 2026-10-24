@@ -342,6 +342,7 @@
       else delete el.dataset.theme;
     }
     globalThis.__ipxBootTheme?.(theme); // the first-frame skeleton (boot.js) in the same colours
+    globalThis.insisPlus?.ui?.syncTheme?.(); // the top bar's light/dark button
   }
   function setTheme(theme) {
     state.plus = { ...state.plus, theme };

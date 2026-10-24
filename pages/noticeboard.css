@@ -10,6 +10,21 @@
 /* ---------- InSIS's tree, in place ---------- */
 
 html.ipx-generic #str1 div.tree[data-ipx-board] { margin: 0; }
+/* The summary, when InSIS's own tab row stays above the tree (noticeboard.js writes it as data- attributes). */
+html.ipx-generic #str1 div.tree[data-ipx-board][data-ipx-summary]::before {
+  content: attr(data-ipx-summary) "\A" attr(data-ipx-lead);
+  display: block;
+  white-space: pre-line;
+  margin: 0 0 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--chip);
+  color: var(--fg-2);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+html.ipx-generic #str1 div.tree[data-ipx-board][data-ipx-tone="warn"]::before { background: color-mix(in srgb, #b26a00 14%, transparent); color: #b26a00; }
 html.ipx-generic #str1 div.tree[data-ipx-board] ul { margin: 0; padding: 0; list-style: none; background: none; }
 html.ipx-generic #str1 div.tree[data-ipx-board] li { margin: 0; padding: 0; background: none; }
 /* One card per unit (the tree's first level), in balanced columns. */

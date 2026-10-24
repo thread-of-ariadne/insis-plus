@@ -60,7 +60,12 @@
       compareNote: 'Srovnání vašich výsledků s ostatními studenty, jak ho ukazuje InSIS.',
       leftText: 'Kolik kreditů a které předměty vám ve studijním plánu ještě chybí',
       leftOf: (a, b, m) => `${a} z ${b} kreditů · chybí ${m}`,
-      attainmentHint: 'Vyberte fakultu nebo součást, která předmět vyučuje; pak zvolíte předmět.' },
+      attainmentHint: 'Vyberte fakultu nebo součást, která předmět vyučuje; pak zvolíte předmět.',
+      pickPeriod: 'Vyberte období, za které chcete úspěšnost předmětů vidět.', pickCourse: 'Vyberte předmět; otevře se jeho úspěšnost v tomto období.',
+      nowPeriod: 'probíhá', coursesOf: (n) => `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')}`,
+      filterCourses: 'Hledat podle kódu, názvu nebo garanta', noMatch: 'Hledání neodpovídá žádný předmět.',
+      students: (n) => `${n} ${ipx.kit.plural(Number(n), 'student', 'studenti', 'studentů')}`,
+      letters: 'Počáteční písmeno', all: 'Vše', noCourses: 'V tomto výběru nejsou žádné předměty.' },
     en: { passRates: 'Pass rates', title: 'E-study record', earned: 'Credits earned', toEarn: (n) => `${n} not earned yet`,
       average: 'Average grade', avgPage: 'as stated by InSIS', avgRows: (n) => `from ${n} ${n === 1 ? 'grade' : 'grades'} in the table`,
       passed: 'Courses passed', ofCourses: (n) => `of ${n} ${n === 1 ? 'course' : 'courses'}`,
@@ -79,7 +84,12 @@
       compareNote: 'How your results compare with other students, as InSIS shows it.',
       leftText: 'How many credits and which courses your study plan still needs',
       leftOf: (a, b, m) => `${a} of ${b} credits · ${m} missing`,
-      attainmentHint: 'Choose the faculty or unit that teaches the course, then pick the course.' },
+      attainmentHint: 'Choose the faculty or unit that teaches the course, then pick the course.',
+      pickPeriod: 'Choose the period whose pass rates you want to see.', pickCourse: 'Choose a course to see its pass rates in this period.',
+      nowPeriod: 'now', coursesOf: (n) => `${n} ${n === 1 ? 'course' : 'courses'}`,
+      filterCourses: 'Search by code, title or supervisor', noMatch: 'No course matches your search.',
+      students: (n) => `${n} ${Number(n) === 1 ? 'student' : 'students'}`,
+      letters: 'First letter', all: 'All', noCourses: 'There are no courses in this selection.' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -321,7 +331,9 @@
     for (const table of page.querySelectorAll('table')) {
       if ([...known].some((n) => n.contains(table))) continue;
       const cols = columnMap(table);
-      if ('code' in cols && 'name' in cols && ('result' in cols || 'credits' in cols)) {
+      // The basic overviews (vyber=vybrane_obdobi, vsechna_obdobi) leave out the Code column: a course table is one
+      // with a course name and a result or credits column.
+      if ('name' in cols && ('result' in cols || 'credits' in cols)) {
         const sem = readCourses(table, cols, period);
         mark(table);
         mark(sem.label?.node);
@@ -550,6 +562,92 @@
         h('li', {}, anchor(u, { class: 'sr-link' }, h('span', {}, u.text), icon('arrow')))))]);
   }
 
+  // ---------- course attainment evaluation: the period and course steps ----------
+  // hodnoceni.pl?fakulta=… lists the unit's periods (Name of period · Beginning · End · Choose); …;obdobi=… lists the
+  // courses taught in that period (Code · Course title · Course supervisor · Number of students · Choose), with
+  // InSIS's letter pager above. Both are plain GET links (no form): rebuilt as InSIS+ lists (R). The links are
+  // InSIS's own, through the URL rule; the path above the list comes from InSIS's breadcrumbs.
+  const PERIOD_COLS = [['name', /^(name of period|nazev obdobi|obdobi)$/], ['from', /^(beginning|zacatek)/], ['to', /^(end|konec)/], ['go', /^(choose|zvolit|vyber)/]];
+  const COURSE_COLS = [['code', /^(code|kod)$/], ['name', /^(course title|nazev predmetu|predmet)$/], ['sup', /supervisor|garant/],
+    ['count', /number of students|pocet studentu/], ['go', /^(choose|zvolit|vyber)/]];
+
+  function readStepTable(table, cols) {
+    const t = ipx.kit.readTable(table);
+    const idx = Object.fromEntries(cols.map(([k, re]) => [k, t.head.findIndex((x) => re.test(norm(x)))]));
+    if (idx.name < 0 || idx.go < 0) return null;
+    return t.rows.map((r) => {
+      const c = (k) => (idx[k] >= 0 ? r.cells[idx[k]] : null);
+      return { name: c('name')?.links[0]?.text || c('name')?.text || '', code: c('code')?.text || '',
+        from: c('from')?.text || '', to: c('to')?.text || '', sup: c('sup')?.links[0] || (c('sup')?.text ? { text: c('sup').text } : null),
+        count: c('count')?.text || '', go: c('go')?.links[0] || null };
+    }).filter((r) => r.name && r.go);
+  }
+
+  function parseAttainmentStep() {
+    if (!/\/hodnoceni\.pl$/.test(here.pathname) && !/\/hodnoceni\.pl/.test(doc.baseURI || '')) return null;
+    const page = doc.getElementById('str1');
+    const table = page?.querySelector('table#tmtab_1') || (page && ipx.kit.findTables(page)[0]);
+    if (!table) return null;
+    // InSIS's breadcrumbs after its home link: the picker ("Course Attainment Evaluation", named Faculties here),
+    // the unit, then the period.
+    const crumbs = [...page.querySelectorAll('.breadcrumb-item')].slice(1).map((li, i) => {
+      const a = li.querySelector('a[href]');
+      const link = (a && ipx.kit.linkOf(a)) || { text: clean(li.textContent) };
+      return i === 0 ? { ...link, text: T.faculties } : link;
+    }).filter((c) => c.text);
+    const periods = readStepTable(table, PERIOD_COLS);
+    if (periods?.length) return { kind: 'periods', rows: periods, crumbs };
+    const courses = readStepTable(table, COURSE_COLS);
+    if (!courses) return null;
+    const letters = [...page.querySelectorAll('ul.paginator a[href]')].map((a) => {
+      const l = ipx.kit.linkOf(a);
+      return l && { ...l, text: clean(a.textContent) === '*' ? T.all : clean(a.textContent), on: a.getAttribute('data-selected') === 'true' };
+    }).filter(Boolean);
+    return { kind: 'courses', rows: courses, crumbs, letters };
+  }
+
+  function buildAttainmentStep(d) {
+    const path = d.crumbs.length > 0 && h('p', { class: 'sr-path' }, d.crumbs.map((c, i) => [i ? h('span', { class: 'sr-path-sep', 'aria-hidden': 'true' }, '›') : null,
+      c.href && i < d.crumbs.length - 1 ? anchor(c, {}, c.text) : h('strong', {}, c.text)]));
+    if (d.kind === 'periods') {
+      const now = new Date();
+      const isNow = (r) => { const a = ipx.kit.dateOf(r.from); const b = ipx.kit.dateOf(r.to); return !!(a && b && a <= now && now < b); };
+      return h('div', { class: 'sr-attain' }, path,
+        h('p', { class: 'muted sr-attain-hint' }, T.pickPeriod),
+        h('ul', { class: 'card sr-step-list' }, d.rows.map((r) => h('li', {},
+          anchor(r.go, { class: 'sr-step' },
+            h('span', { class: 'sr-step-main' }, h('strong', {}, r.name), isNow(r) && h('span', { class: 'delta ok' }, T.nowPeriod)),
+            h('span', { class: 'sr-step-meta' }, [r.from, r.to].filter(Boolean).join(' – ')),
+            icon('arrow'))))));
+    }
+    const list = h('ul', { class: 'card sr-step-list' });
+    const none = h('div', { class: 'empty', hidden: true }, h('p', {}, T.noMatch));
+    const rows = d.rows.map((r) => {
+      const li = h('li', { class: 'sr-step sr-course-step' },
+        h('span', { class: 'sr-step-code' }, r.code),
+        h('span', { class: 'sr-step-main' }, anchor(r.go, { class: 'sr-step-link' }, h('strong', {}, r.name)),
+          r.sup && (r.sup.href ? anchor(r.sup, { class: 'sr-step-sup' }, r.sup.text) : h('span', { class: 'sr-step-sup' }, r.sup.text))),
+        r.count && h('span', { class: 'sr-step-meta' }, T.students(r.count)),
+        icon('arrow'));
+      li._q = norm([r.code, r.name, r.sup?.text].join(' '));
+      return li;
+    });
+    list.append(...rows);
+    const search = h('input', { type: 'search', class: 'sr-filter', placeholder: T.filterCourses, 'aria-label': T.filterCourses,
+      oninput: (e) => {
+        const q = norm(e.target.value);
+        let shown = 0;
+        for (const li of rows) { const on = !q || li._q.includes(q); li.hidden = !on; shown += on; }
+        none.hidden = shown > 0;
+        list.hidden = shown === 0;
+      } });
+    return h('div', { class: 'sr-attain' }, path,
+      h('p', { class: 'muted sr-attain-hint' }, T.pickCourse),
+      d.letters.length > 1 && h('nav', { class: 'sr-letters', 'aria-label': T.letters },
+        d.letters.map((l) => anchor(l, { class: l.on ? 'on' : null, 'aria-current': l.on ? 'page' : null }, l.text))),
+      d.rows.length ? [h('div', { class: 'sr-step-tools' }, search, h('span', { class: 'muted' }, T.coursesOf(d.rows.length))), list, none] : emptyState(T.noCourses));
+  }
+
   // ---------- start ----------
 
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
@@ -580,6 +678,19 @@
       return;
     }
     const attain = parseAttainment();
+    const step = !attain && parseAttainmentStep();
+    if (step) {
+      takeover({
+        key: 'attainment',
+        css: 'pages/study-record.css',
+        // The steps keep the picker's header (a page below the Catalogue section, 03-pages.md rule 7); where the
+        // student is (unit › period) is the path above the list.
+        title: T.passRates,
+        subtitle: ipx.nav.sectionLabel('courses.catalogue'),
+        build: () => buildAttainmentStep(step),
+      });
+      return;
+    }
     if (attain) {
       takeover({
         key: 'attainment',

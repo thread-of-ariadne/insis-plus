@@ -27,3 +27,4 @@ a.el-row:hover strong { color: var(--accent); }
 .el-filter-wrap .icon svg { width: 15px; height: 15px; stroke-width: 2; }
 .el-filter { flex: 1; min-width: 0; height: 38px; border: 0; outline: none; background: none; color: var(--fg); font: 14px var(--font); }
 @media (max-width: 640px) { .el-filter-wrap { max-width: none; } }
+.el-tools { display: flex; flex-direction: column; gap: 8px; }

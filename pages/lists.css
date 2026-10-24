@@ -1,0 +1,217 @@
+/* InSIS+ — InSIS's own lists styled in place (pages/lists.js). Injected into the page itself and scoped to
+   html.ipx-generic.ipx-il: only data attributes were added to InSIS's elements; nothing is moved out of its forms.
+   A row:  [lead]  title ............ meta  [actions]
+                   sub · sub · note
+   The lead (a code, InSIS's checkbox) sits in the row's left gutter; the line break before the subs is the row's own
+   ::after, so no element is ever added inside InSIS's markup. */
+
+html.ipx-generic.ipx-il #str1 {
+  --il-bad: #c62828;
+  --il-warn: #a15c00;
+  --il-ok: #1b7f45;
+}
+@media (prefers-color-scheme: dark) {
+  html.ipx-generic.ipx-il:not([data-ipx-theme="light"]) #str1 { --il-bad: #ff8a80; --il-warn: #f0b660; --il-ok: #6fd69c; }
+}
+html.ipx-generic.ipx-il[data-ipx-theme="dark"] #str1 { --il-bad: #ff8a80; --il-warn: #f0b660; --il-ok: #6fd69c; }
+
+/* InSIS's empty paragraphs and line breaks between the blocks */
+html.ipx-generic.ipx-il #str1 p:empty { display: none; }
+html.ipx-generic.ipx-il #str1 :is(div:not(.text):not(.small):not([class*="uis"]), form) > br { display: none; }
+html.ipx-generic.ipx-il #str1 .small { width: auto !important; max-width: 100%; }
+
+/* ---------- a list: a card of rows ---------- */
+html.ipx-generic.ipx-il #str1 table[data-il] { display: block; width: 100%; max-width: 1100px; margin: 0 0 18px; border: 0; border-radius: 16px;
+  background: var(--surface); box-shadow: var(--shadow-card); overflow: hidden; box-sizing: border-box; }
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-title]::before { content: attr(data-il-title); display: block; padding: 14px 16px 4px; color: var(--fg);
+  font: 700 15px "Figtree", system-ui, sans-serif; }
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-empty]:not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] > thead, html.ipx-generic.ipx-il #str1 table[data-il] > tbody { display: block; }
+/* (a header row with one of InSIS's controls in it, a "select all" box, stays) */
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head]:not([data-il-head="sort"]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row="none"] { display: none; }
+
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] {
+  position: relative; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; row-gap: 3px;
+  padding: 12px 16px 12px calc(16px + var(--il-lead, 0px)); border: 0; border-top: 1px solid var(--line); background: none !important;
+}
+html.ipx-generic.ipx-il #str1 table[data-il]:not([data-il-title]) tr[data-il-row]:first-child,
+html.ipx-generic.ipx-il #str1 table[data-il]:not([data-il-title]) tr[data-il-head] + tr[data-il-row] { border-top: 0; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]:hover { background: color-mix(in srgb, var(--accent) 5%, transparent) !important; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]::after { content: ""; order: 4; flex-basis: 100%; height: 0; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] > td { display: block; min-width: 0; padding: 0 !important; border: 0 !important;
+  background: none !important; color: var(--fg-2); font-size: 13.5px; line-height: 1.45; text-align: left !important; white-space: normal !important; }
+/* Unused columns. lists.js gives a cell with a form control or an InSIS action link the role "act" instead; the :has()
+   guard also keeps controls InSIS's scripts add after load. */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="num"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="hide"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] > td:not([data-il-col]):not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-blank] { display: none !important; }
+
+/* The lead: a code, a date or InSIS's own checkbox, in the left gutter */
+html.ipx-generic.ipx-il #str1 table[data-il]:has(td[data-il-col="lead"], td[data-il-col="pick"]) { --il-lead: var(--il-lead-w, 78px); }
+/* Only InSIS's checkbox in the gutter: a narrow one */
+html.ipx-generic.ipx-il #str1 table[data-il]:has(td[data-il-col="pick"]):not(:has(td[data-il-col="lead"])) { --il-lead: 34px; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="lead"],
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="pick"] { position: absolute; left: 16px; top: 13px; width: calc(var(--il-lead) - 12px); }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="lead"] { color: var(--accent); font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="pick"] { z-index: 2; }
+
+/* Title (the row's main link may be stretched over the whole row), meta on the right, actions */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="title"] { order: 1; flex: 1 1 240px; color: var(--fg); font-size: 14.5px; font-weight: 650; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="title"] a { color: var(--fg); }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]:hover td[data-il-col="title"] a { color: var(--accent); }
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-stretch] td[data-il-col="title"] a:first-of-type::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-stretch] tr[data-il-row] > td:not([data-il-col="title"]) :is(a, input, select, button, label) { position: relative; z-index: 2; }
+/* The right-hand facts (credits, deadlines) stay visible even when InSIS's column switch hides their column */
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] > td[data-il-col="meta"]:not([data-il-blank]) { display: block !important; }
+/* InSIS draws its checkboxes with appearance: none and its own images; here they are the browser's own */
+html.ipx-generic.ipx-il #str1 table[data-il] input[type="checkbox"], html.ipx-generic.ipx-il #str1 table[data-il] input[type="radio"] { appearance: auto !important; margin: 0; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="meta"] { order: 2; flex: none; color: var(--fg-2); font-size: 13px; text-align: right !important; font-variant-numeric: tabular-nums; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="meta"][data-il-label]::before { content: attr(data-il-label); display: block; color: var(--faint);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="act"] { order: 3; flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; align-self: center; }
+/* Neighbouring action cells read as one group (6 px apart, as inside one cell) */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="act"] + td[data-il-col="act"] { margin-left: -8px; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="sub"],
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="note"] { order: 5; flex: 0 1 auto; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="sub"][data-il-label]::before { content: attr(data-il-label) ": "; color: var(--faint); }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="sub"] a, html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="note"] a { color: var(--muted); }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="sub"] a:hover { color: var(--accent); }
+/* Short rows with one action (a person and "Message"): the action sits on the right, centred over both lines */
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-side] tr[data-il-row] { padding-right: calc(16px + var(--il-side, 120px)); }
+html.ipx-generic.ipx-il #str1 table[data-il][data-il-side] td[data-il-col="act"] { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
+/* The last line of a row takes what is left (a long note or timetable entry wraps under itself) */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="note"] { flex-basis: 100%; }
+
+/* InSIS's icon links as small buttons; a word from lists.label() next to the icon */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="act"] a,
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text] {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border-radius: 9px; background: var(--chip);
+  color: var(--fg-2); font-size: 12.5px; font-weight: 650; text-decoration: none; white-space: nowrap; box-sizing: border-box; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="act"] a:hover,
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text]:hover { color: var(--accent); text-decoration: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text]::after { content: attr(data-il-text); }
+/* The word replaces the icon (InSIS's icon boxes are sized for 48 px glyphs) */
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text] .uf-icon { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text][data-il-primary] { background: var(--accent); color: var(--accent-ink); }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-text][data-il-primary]:hover { color: var(--accent-ink); filter: brightness(1.08); }
+
+/* A file row: InSIS's own download link as the type badge, stretched over the whole row (as in a folder) */
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file] { display: grid; place-items: center; width: 44px; height: 40px; margin-top: -9px; border-radius: 10px;
+  background: var(--chip); color: var(--fg-2); text-decoration: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file] .uf-icon { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file]::before { content: attr(data-il-file); font-size: 11px; font-weight: 800; letter-spacing: 0.02em; }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file]::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr:hover a[data-il-file] { background: var(--accent); color: var(--accent-ink); }
+html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file="PDF"] { background: #fde7e7; color: #b42318; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]:has(a[data-il-file]) > td:not([data-il-col="lead"]) :is(a, input, select, button) { position: relative; z-index: 2; }
+html.ipx-generic.ipx-il #str1 table[data-il]:has(a[data-il-file]) { --il-lead-w: 70px; }
+/* InSIS's explanation under its message */
+html.ipx-generic.ipx-il #str1 [data-il-msgnote] { display: block; max-width: 1100px; margin: -8px 0 14px; padding: 0 14px; color: var(--muted); font-size: 13px; }
+
+/* A chip after a cell's text (a countdown to InSIS's date): data-il-chip, toned by data-il-tone */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-chip]::after { content: attr(data-il-chip); display: inline-block; margin-left: 8px; padding: 1px 7px;
+  border-radius: 6px; background: var(--chip); color: var(--muted); font-size: 11px; font-weight: 800; white-space: nowrap; vertical-align: 1px; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="meta"][data-il-chip]::after { display: block; width: max-content; margin: 3px 0 0 auto; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-tone="bad"]::after { background: var(--il-bad); color: #fff; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-tone="warn"]::after { background: color-mix(in srgb, var(--il-warn) 16%, transparent); color: var(--il-warn); }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-tone="ok"]::after { background: color-mix(in srgb, var(--il-ok) 14%, transparent); color: var(--il-ok); }
+/* A cell's value in InSIS+'s format (a date): InSIS's text stays in the cell, invisible, and data-il-show is drawn */
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-show]:not([data-il-chip]) { font-size: 0 !important; }
+html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-show]:not([data-il-chip])::after { content: attr(data-il-show); font-size: 13px; }
+/* InSIS's state icons in words (lists.label on the icon) */
+html.ipx-generic.ipx-il #str1 .uf-icon[data-il-text] svg { display: none; }
+html.ipx-generic.ipx-il #str1 .uf-icon[data-il-text]::after { content: attr(data-il-text); display: inline-block; padding: 1px 7px; border-radius: 6px; background: var(--chip);
+  color: var(--fg-2); font-size: 11px; font-weight: 800; white-space: nowrap; }
+/* Lists folded behind a switch in the header's lead (rejected, closed …) */
+html.ipx-generic.ipx-il:not(.ipx-il-unfold) #str1 table[data-il][data-il-fold] { display: none; }
+
+/* InSIS's header row of sort links as a "Sort by" row */
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 16px;
+  border-bottom: 1px solid var(--line); }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"]::before { content: attr(data-il-sort); margin-right: 4px; color: var(--muted); font-size: 12.5px; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] > * { display: block; padding: 0 !important; border: 0 !important; background: none !important;
+  font-size: 12.5px !important; letter-spacing: 0 !important; text-transform: none !important; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] > *:not(:has(a, input:not([type="hidden"]), select, button, textarea)) { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] a { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 8px;
+  background: var(--chip); color: var(--fg-2); font-weight: 650; text-decoration: none; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] a:hover { color: var(--accent); }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-head="sort"] .uf-icon { display: none; }
+
+/* InSIS's column switch above a list ("Display: Course supervisor · Timetable"): hidden, as on the exams, papers and
+   thesis pages. InSIS hides some columns by default with an inline display: none, and the switch was the only way to
+   their data, so every column a row uses (title, sub, meta, note, act …) is shown whatever the switch says; the
+   columns the page module does not use stay hidden as before. */
+html.ipx-generic.ipx-il #str1 .clm_main { display: none !important; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] > td[style*="none"]:is([data-il-col="title"], [data-il-col="sub"], [data-il-col="meta"],
+  [data-il-col="note"], [data-il-col="lead"], [data-il-col="pick"]):not([data-il-blank]) { display: block !important; }
+html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row] > td[style*="none"][data-il-col="act"]:not([data-il-blank]) { display: flex !important; }
+
+/* ---------- InSIS's page-range table as page buttons ---------- */
+html.ipx-generic.ipx-il #str1 table[data-il-pager] { display: block; margin: 4px 0 14px; border: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] tbody, html.ipx-generic.ipx-il #str1 table[data-il-pager] tr { display: flex; flex-wrap: wrap; gap: 4px; background: none !important; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] td { display: block; padding: 0 !important; border: 0 !important; background: none !important; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] td[data-il-blank] { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] a, html.ipx-generic.ipx-il #str1 table[data-il-pager] td[data-il-current] {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 9px; box-sizing: border-box;
+  background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 650; text-decoration: none; white-space: nowrap; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] td[data-il-current] { background: var(--accent) !important; color: var(--accent-ink); }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] a:hover { color: var(--accent); text-decoration: none; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon svg { display: none; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon::before { font-size: 16px; line-height: 1; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon[data-sysid="tree-vlevo-zarazka"]::before { content: "«"; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon[data-sysid="tree-vlevo"]::before { content: "‹"; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon[data-sysid="tree-vpravo"]::before { content: "›"; }
+html.ipx-generic.ipx-il #str1 table[data-il-pager] .uf-icon[data-sysid="tree-vpravo-zarazka"]::before { content: "»"; }
+
+/* ---------- InSIS's bold headings as section titles (InSIS+ words when given) ---------- */
+html.ipx-generic.ipx-il #str1 [data-il-heading] { display: block; margin: 20px 0 10px; color: var(--fg); font: 700 16px "Figtree", system-ui, sans-serif; }
+html.ipx-generic.ipx-il #str1 [data-il-heading]:not([data-il-heading=""]) { font-size: 0; }
+html.ipx-generic.ipx-il #str1 [data-il-heading]:not([data-il-heading=""])::before { content: attr(data-il-heading); font-size: 16px; }
+
+/* ---------- InSIS's messages ---------- */
+html.ipx-generic.ipx-il #str1 .uis_msg:not([data-ipx-keep="hide"]) { display: flex !important; align-items: flex-start; gap: 10px; width: auto !important; max-width: 1100px; margin: 0 0 14px; padding: 12px 14px; border: 0;
+  border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; line-height: 1.45; box-sizing: border-box; }
+html.ipx-generic.ipx-il #str1 .uis_msg .text { color: inherit; font-weight: 600; }
+/* InSIS's message icon goes (the box's colour carries the tone); its empty box left a gutter before the text */
+html.ipx-generic.ipx-il #str1 .uis_msg > .uf-icon { display: none; }
+html.ipx-generic.ipx-il #str1 .uis_msg.ko, html.ipx-generic.ipx-il #str1 .uis_msg.error { background: color-mix(in srgb, var(--il-bad) 13%, transparent); color: var(--il-bad); }
+html.ipx-generic.ipx-il #str1 .uis_msg.warning { background: color-mix(in srgb, var(--il-warn) 14%, transparent); color: var(--il-warn); }
+html.ipx-generic.ipx-il #str1 .uis_msg.success, html.ipx-generic.ipx-il #str1 .uis_msg.ok { background: color-mix(in srgb, var(--il-ok) 13%, transparent); color: var(--il-ok); }
+
+/* ---------- InSIS's forms as cards, with one line saying what InSIS does (data-il-form) ---------- */
+html.ipx-generic.ipx-il #str1 [data-il-form] { display: block; max-width: 1100px; margin: 0 0 18px; padding: 16px 18px; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); box-sizing: border-box; }
+html.ipx-generic.ipx-il #str1 [data-il-form]:not([data-il-form=""])::before { content: attr(data-il-form); display: block; margin: 0 0 12px; color: var(--muted);
+  font-size: 13.5px; line-height: 1.45; }
+html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit { margin: 0; border: 0; background: none; box-shadow: none; }
+html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit td { padding: 4px 12px 4px 0 !important; border: 0 !important; background: none !important; vertical-align: middle; }
+html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit td:first-child { color: var(--muted); font-size: 13.5px; }
+html.ipx-generic.ipx-il #str1 [data-il-form] select { max-width: 100%; }
+/* A form card around one of InSIS's lists (a selection form): the list joins the card */
+html.ipx-generic.ipx-il #str1 [data-il-form] table[data-il] { width: calc(100% + 36px); max-width: none; margin: 0 -18px 14px; border-radius: 0; background: none;
+  box-shadow: none; border-top: 1px solid var(--line); }
+/* A filter form folded under the lead's Filter button (open when InSIS shows a filtered list) */
+html.ipx-generic.ipx-il:not(.ipx-il-filter) #str1 form[data-il-fold] { display: none; }
+/* A filter table inside the list's own form (a form-edit table): a card of its own, folded under Filter */
+html.ipx-generic.ipx-il:not(.ipx-il-filter) #str1 table.form-edit[data-il-fold] { display: none; }
+html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter] { display: block; max-width: 1100px; margin: 0 0 14px; padding: 14px 16px; border-radius: 16px;
+  background: var(--surface); box-shadow: var(--shadow-card); box-sizing: border-box; }
+html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter]::before { content: attr(data-il-filter); display: block; margin: 0 0 10px; color: var(--muted); font-size: 13.5px; }
+html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter] td { padding: 4px 12px 4px 0 !important; border: 0 !important; background: none !important; vertical-align: middle; }
+/* A form that holds a list: the list is the card, the form itself stays plain */
+html.ipx-generic.ipx-il #str1 form[data-il-holder] { display: block; margin: 0; padding: 0; background: none; box-shadow: none; }
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="title"] { flex-basis: 100%; }
+  html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="meta"] { order: 6; text-align: left !important; }
+  html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]::before { content: ""; order: 7; flex-basis: 100%; height: 0; }
+  html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="act"] { order: 8; }
+  html.ipx-generic.ipx-il #str1 table[data-il]:has(td[data-il-col="lead"]) { --il-lead: 0px; }
+  html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-col="lead"] { position: static; order: 0; flex-basis: 100%; width: auto; }
+  html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit, html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit tbody,
+  html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit tr, html.ipx-generic.ipx-il #str1 [data-il-form] table.form-edit td { display: block; width: 100%; }
+  html.ipx-generic.ipx-il #str1 [data-il-form] select { width: 100%; }
+}

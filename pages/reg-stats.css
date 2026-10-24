@@ -1,0 +1,54 @@
+/* InSIS+ — Enrolment statistics (pages/reg-stats.js). Loaded inside the shadow root after kit.css; classes rs-. */
+
+.rs-path { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: 14px; }
+.rs-path a { color: var(--accent); font-weight: 600; }
+.rs-path strong { color: var(--fg); }
+.rs-sep { color: var(--faint); }
+.rs-lead { margin: 0; font-size: 14px; line-height: 1.45; }
+
+/* Units and periods */
+.rs-units { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.rs-unit { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+.rs-unit .cover, .rs-unit .cover svg { width: 100%; }
+.rs-unit .cover svg { height: 56px; }
+.rs-unit-body { display: flex; flex-direction: column; gap: 4px; padding: 0 6px 6px; }
+.rs-unit-code { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .02em; }
+.rs-unit strong { font: 700 16px/1.2 var(--display); letter-spacing: -0.01em; }
+.rs-unit:hover strong { color: var(--accent); }
+.rs-unit.mine { box-shadow: var(--shadow-card), 0 0 0 2px var(--accent-soft); }
+.rs-list { display: flex; flex-direction: column; margin: 0; padding: 4px 0; list-style: none; }
+.rs-list > li { border-top: 1px solid var(--line); }
+.rs-list > li:first-child { border-top: 0; }
+.rs-row { display: flex; align-items: center; gap: 14px; padding: 12px 18px; font-size: 14px; }
+.rs-row:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.rs-row:hover strong, .rs-row:hover > .icon { color: var(--accent); }
+.rs-row-main { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.rs-row-main strong { color: var(--fg); font-weight: 650; }
+.rs-row-meta { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rs-row > .icon { flex: none; color: var(--faint); }
+.rs-row > .icon svg { width: 15px; height: 15px; }
+
+/* Results: InSIS's filter form collapsed under Filter */
+.rs-filter > summary { display: inline-flex; align-items: center; gap: 7px; width: max-content; min-height: 34px; padding: 0 12px; font-size: 13px; list-style: none; }
+.rs-filter > summary::-webkit-details-marker { display: none; }
+.rs-filter[open] > summary { margin-bottom: 10px; background: var(--accent-soft); color: var(--accent); }
+.rs-letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.rs-letters a { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 8px; border-radius: 9px; background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 700; }
+.rs-letters a:hover { color: var(--accent); }
+.rs-letters a.on { background: var(--accent); color: var(--accent-ink, #fff); }
+
+@media (max-width: 640px) {
+  .rs-row { flex-wrap: wrap; gap: 4px 10px; padding: 12px 14px; }
+  .rs-row-main { flex-basis: 100%; }
+  .rs-row > .icon { display: none; }
+}
+
+/* Injected into the page too (html.ipx-rs): InSIS's filter form, slotted in the Filter card, stacks on phones */
+html.ipx-generic.ipx-rs #str1 form table.form-edit { margin: 0; box-shadow: none; background: none; }
+html.ipx-generic.ipx-rs #str1 form select { max-width: 100%; }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-rs #str1 form table.form-edit, html.ipx-generic.ipx-rs #str1 form table.form-edit tbody,
+  html.ipx-generic.ipx-rs #str1 form table.form-edit tr, html.ipx-generic.ipx-rs #str1 form table.form-edit td { display: block; width: 100%; }
+  html.ipx-generic.ipx-rs #str1 form table.form-edit td { padding: 4px 0 !important; }
+  html.ipx-generic.ipx-rs #str1 form select { width: 100%; }
+}

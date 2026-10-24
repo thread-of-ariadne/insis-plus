@@ -1,0 +1,69 @@
+/* InSIS+ — thesis topics and the theses archive (pages/thesis.js). Injected into the page itself: InSIS's own list,
+   filter and forms styled in place through data attributes (nothing moved out of InSIS's forms). Scoped to
+   html.ipx-generic.ipx-thesis. */
+
+html.ipx-generic.ipx-thesis #str1 p:empty, html.ipx-generic.ipx-thesis #str1 form > br, html.ipx-generic.ipx-thesis #str1 div:has(> form) > br { display: none !important; }
+html.ipx-generic.ipx-thesis #str1 .clm_main { display: none !important; }
+
+/* ---------- the filter, collapsed until Filter is opened ---------- */
+html.ipx-generic.ipx-thesis:not([data-ipx-filter-open]) #str1 [data-ipx-filter="collapsible"] { display: none !important; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-filter="collapsible"] { display: block; margin: 0 0 10px; padding: 12px 14px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-filter="collapsible"] > tbody > tr { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-filter="collapsible"] td { margin: 0 !important; padding: 0 !important; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-filter="collapsible"] select { max-width: min(420px, 80vw); }
+html.ipx-generic.ipx-thesis #str1 input[data-ipx-filter="collapsible"] { margin: 0 0 14px; background: var(--accent) !important; color: var(--accent-ink) !important; }
+
+/* ---------- topics: title / supervisor · department · programme / type · capacity, Detail over the whole row ---------- */
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] { display: block; width: 100%; margin: 0 0 16px; border: 0; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > thead { display: none; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody { display: block; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
+  padding: 12px 44px 12px 16px; border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr:first-child { border-top: 0; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent) !important; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr[data-ipx-out] { display: none; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr::before { content: ""; order: 3; flex-basis: 100%; height: 0; }
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] td { display: block; min-width: 0; margin: 0 !important; padding: 0 !important; border: 0 !important;
+  background: none !important; color: var(--muted); font-size: 13px; text-align: left !important; white-space: normal !important; }
+/* Unused columns (thesis.js gives a cell with a form control or an InSIS action link the role "act" instead) */
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="num"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="other"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="proposed"]:not(:has(input:not([type="hidden"]), select, button, textarea)),
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-blank] { display: none !important; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="topic"] { order: 1; flex-basis: 100%; color: var(--fg); font-size: 14.5px; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="supervisor"] { order: 2; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="supervisor"] a { position: relative; z-index: 2; color: var(--fg-2); font-weight: 600; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="department"],
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="programme"],
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="major"] { order: 2; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="department"]::before,
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="programme"]::before,
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="major"]::before { content: "· "; color: var(--faint); }
+/* Chips: type of work, capacity (InSIS+ wording in data-ipx-label, InSIS's own text hidden) */
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="type"],
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="capacity"] { order: 4; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-label] { font-size: 0 !important; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-label]::before { content: attr(data-ipx-label); display: inline-block; padding: 2px 8px; border-radius: 6px;
+  background: var(--chip); color: var(--fg-2); font-size: 12px; font-weight: 700; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr[data-ipx-full] td[data-ipx-col="capacity"]::before { background: #fde7e7; color: #b42318; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr[data-ipx-full] td[data-ipx-col="topic"] { color: var(--muted); }
+/* Detail: InSIS's link, stretched over the row; a chevron where its icon was */
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="detail"] { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="detail"] a { color: var(--faint); text-decoration: none; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="detail"] a .uf-icon { display: none; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="detail"] a::before { content: "›"; font-size: 22px; line-height: 1; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="detail"] a::after { content: ""; position: absolute; inset: 0; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr:hover td[data-ipx-col="detail"] a { color: var(--accent); }
+/* The stretched link needs the row as its box: the cell itself must not be the positioned ancestor */
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr:has(td[data-ipx-col="detail"] a) td[data-ipx-col="detail"] { position: static; transform: none; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr:has(td[data-ipx-col="detail"] a) td[data-ipx-col="detail"] a::before { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] tr[data-ipx-empty] td { padding: 18px 16px !important; color: var(--muted); font-size: 14px; text-align: center !important; }
+
+
+/* InSIS's script adds a row-number cell in front of each row once the page has loaded (after thesis.js marked the
+   cells): any cell without a role is hidden. */
+html.ipx-generic.ipx-thesis #str1 table[data-ipx-list="topics"] > tbody > tr:not([data-ipx-empty]) > td:not([data-ipx-col]):not(:has(input:not([type="hidden"]), select, button, textarea)) { display: none !important; }
+/* InSIS's controls or action links in a column InSIS+ does not otherwise show: on their own line, above the row link */
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="act"] { order: 5; display: flex; flex-wrap: wrap; gap: 6px; }
+html.ipx-generic.ipx-thesis #str1 [data-ipx-list="topics"] td[data-ipx-col="act"] :is(a, input, select, button, label) { position: relative; z-index: 2; }

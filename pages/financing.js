@@ -27,6 +27,10 @@
       noDecisions: 'Žádná rozhodnutí o poplatcích. Kdyby fakulta poplatek vyměřila (třeba po překročení standardní doby studia), objeví se tady.',
       type: 'Druh', sum: 'Částka', manual: 'Požadováno teď', issuedOn: 'Vydáno', due: 'Splatnost', status: 'Stav', settled: 'Úhrada', detail: 'Detail',
       payment: (t) => `Platební údaje${t ? ` · ${t}` : ''}`, copy: 'Kopírovat', copied: 'Zkopírováno',
+      overview: 'Přehled poplatků po obdobích: kolik bylo v kterém období požadováno a kolik zaplaceno.',
+      noOverview: 'Žádné poplatky za studium nejsou evidovány.', scholLead: 'Stipendia, která vám VŠE za toto studium vyplatila.',
+      noSchol: 'Za toto studium vám zatím nebylo vyplaceno žádné stipendium.', scholWhere: 'Stipendia chodí na účet označený pro stipendia v Bankovních účtech.',
+      payments: 'Výplaty', lastPaid: 'Poslední výplata',
       ask: 'Otázky k poplatkům', askText: 'Poplatky vyměřuje a vysvětluje studijní oddělení vaší fakulty; odvolání se podává formulářem v Žádostech.',
       statusOf: { 'stav-zruseno2': 'Zrušeno', 'stav-zaplaceno': 'Zaplaceno', 'stav-vytvoreno': 'Vytvořeno' },
       settledOf: { 'uhrazeno-pred-splatnosti': 'Uhrazeno včas', 'uhrazeno-po-splatnosti': 'Uhrazeno po splatnosti',
@@ -42,6 +46,10 @@
       noDecisions: 'No fee decisions. If the faculty assesses a fee (for example after the standard length of study is exceeded), it appears here.',
       type: 'Type', sum: 'Sum', manual: 'Requested now', issuedOn: 'Issued', due: 'Due date', status: 'Status', settled: 'Payment', detail: 'Detail',
       payment: (t) => `Payment details${t ? ` · ${t}` : ''}`, copy: 'Copy', copied: 'Copied',
+      overview: 'Fees per period of your study: what was requested in each period and what was paid.',
+      noOverview: 'No study fees are recorded.', scholLead: 'Scholarships VŠE has paid to you for this study.',
+      noSchol: 'No scholarships have been paid to you for this study yet.', scholWhere: 'Scholarships go to the account marked for scholarships under Bank accounts.',
+      payments: 'Payments', lastPaid: 'Last payment',
       ask: 'Questions about fees', askText: 'The study department of your faculty assesses and explains fees; an appeal is a form under Requests.',
       statusOf: { 'stav-zruseno2': 'Cancelled', 'stav-zaplaceno': 'Paid', 'stav-vytvoreno': 'Created' },
       settledOf: { 'uhrazeno-pred-splatnosti': 'Settled before due date', 'uhrazeno-po-splatnosti': 'Settled past due date',
@@ -69,7 +77,7 @@
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const fi = fin ? { text: Math.max(0, col(fin.head, /^financ/)), since: col(fin.head, /^(since|od)\b/), until: col(fin.head, /^(until|do)\b/) } : null;
+    const fi = fin ? { text: Math.max(0, col(fin.head, /^financ/)), since: col(fin.head, /^(since|odkdy|od\b)/), until: col(fin.head, /^(until|dokdy|do\b)/) } : null;
     const financing = (fin?.rows || []).filter((r) => r.cells.length > 1).map((r) => {
       const raw = r.cells[fi.text]?.text || '';
       // "1 - study fully financed from MŠMT": InSIS's code, then its meaning.
@@ -84,7 +92,7 @@
     const k = (re) => (dec ? col(dec.head, re) : -1);
     const ix = {
       status: k(/^(status|stav)$/), account: k(/^(account number|cislo uctu)/), recipient: k(/^(recipient|prijemce|nazev prijemce)/),
-      iban: k(/^iban/), swift: k(/^(swift|bic)/), vs: k(/variab/), issued: k(/^(issue date|datum vydani|vydani)/), due: k(/^(due|splatnost|datum splatnosti)/),
+      iban: k(/^iban/), swift: k(/^(swift|bic)/), vs: k(/variab|^var\.? ?symbol/), issued: k(/^(issue date|datum vydani|vydani|rozh)/), due: k(/^(due|splatnost|datum splatnosti)/),
       type: k(/^(type|typ|druh)$/), sum: k(/^(sum|castka|suma)$/), manual: k(/^(manually|rucne)/), settled: k(/^(settled|uhrazeno|uhrada)$/),
       detail: k(/^detail/),
     };
@@ -205,12 +213,55 @@
       { id: 'accounts', href: link('/auth/student/bank_spojeni_clovek.pl'), text: T.accounts },
     ],
     actions: () => [benefitAction()].filter(Boolean),
+    // The header parts (the page action's narrow form) on the pages generic.js frames too (Bank accounts).
+    css: ['pages/financing.css'],
   });
 
+  // The section's two other information pages: the main menu's "Overview of financing" (financovani.pl?prehled:
+  // no form, a summary per period, or InSIS's message that there is nothing) and Scholarships (vypl_stip_student.pl:
+  // a table of payments, or InSIS's message). Both are read and drawn again; their tables in readable form, InSIS's
+  // message as the empty state. Bank accounts and the accommodation benefit form stay generic.js's (forms, F later).
+  function infoView(page, { view, lead, empty, foot }) {
+    const tables = kit.findTables(page).map((t) => kit.readTable(t)).filter((d) => d.rows.some((r) => r.cells.length > 1));
+    const msgs = kit.messages(page);
+    const rows = tables.flatMap((d) => d.rows.filter((r) => r.cells.length > 1));
+    const dates = rows.flatMap((r) => r.cells.map((c) => dateOf(c.text))).filter(Boolean).sort((a, b) => b - a);
+    kit.page({
+      key: `money-${view}`,
+      css: ['pages/financing.css', 'pages/matters.css'],
+      title: nav.sectionLabel('studies.money'),
+      subtitle: nav.label('matters'),
+      tabs: kit.sectionTabs(money, view),
+      actions: money.actions(),
+      build: () => [
+        h('p', { class: 'muted mx-lead' }, lead),
+        view === 'scholarships' && rows.length > 0 && h('div', { class: 'kpis' },
+          kpi({ label: T.payments, value: rows.length }),
+          dates[0] && kpi({ label: T.lastPaid, value: day(dates[0]), isText: true })),
+        tables.length ? tables.map((d) => kit.dataTable({ label: lead, rows: d.rows.filter((r) => r.cells.length > 1).map((r) =>
+          Object.fromEntries(r.cells.map((c, i) => [`c${i}`, c.links.length === 1 ? c.links[0] : c.text]))),
+        columns: d.head.map((t, i) => ({ key: `c${i}`, label: t, main: i === 0, align: /sum|amount|castka|suma|kc\b|czk/.test(norm(t)) ? 'end' : null })) }))
+          : h('div', { class: 'empty' }, h('p', {}, empty), foot && h('p', { class: 'muted small' }, foot)),
+        // InSIS's message is the empty state when there is no table; otherwise (and any warning) a note.
+        ...msgs.filter((m) => tables.length || (m.tone !== 'info' && m.tone !== 'bad')).map(kit.note),
+      ],
+    });
+  }
+
   ipx.ready.then(() => {
-    if (nav.route(document.baseURI.split('#')[0]).path !== '/auth/student/financovani.pl') return;
+    const route = nav.route(document.baseURI.split('#')[0]);
     const page = document.getElementById('str1');
-    if (!page?.querySelector('form[action*="financovani"]')) return;
+    if (!page) return;
+    if (route.path === '/auth/student/vypl_stip_student.pl') {
+      const said = kit.messages(page)[0]?.text;
+      infoView(page, { view: 'scholarships', lead: T.scholLead, empty: said || T.noSchol, foot: T.scholWhere });
+      return;
+    }
+    if (route.path !== '/auth/student/financovani.pl') return;
+    if (!page.querySelector('form[action*="financovani"]')) {
+      if (route.params?.has('prehled')) infoView(page, { view: 'fees', lead: T.overview, empty: kit.messages(page)[0]?.text || T.noOverview });
+      return;
+    }
     const data = parse(page);
     if (!data) return;
     kit.page({

@@ -374,3 +374,57 @@
     if (data) remember(data, x);
   });
 })();
+
+// InSIS+ — InSIS's "Study Department" menu hub (/auth/studijni/, also index.pl). Treatment R. Despite its name it
+// is not the study office: an InSIS menu page with a sentence for officials and two menu sections ("Course catalogue
+// and study plans" → Course catalogue; "Registration and enrollment" → Enrollment statistics). A page below the
+// Catalogue section (mapping.json), so by rule 7 it keeps InSIS's name (from its breadcrumb) with the section as the
+// eyebrow. Here: each menu section as a group of link cards; InSIS's menu controls (open all / close all, the
+// personalisation and close icons) are left out. Every link is InSIS's own, through the URL rule.
+(() => {
+  const ipx = globalThis.insisPlus;
+  if (!ipx?.kit) return;
+  const { clean, lang } = ipx;
+  const { h, icon, anchor, sectionHead, emptyState } = ipx.ui;
+  const nav = ipx.nav;
+  const T = {
+    cs: { lead: 'Rozcestník InSIS k aplikacím studijní agendy. Vaše vlastní studium najdete v postranním panelu.', empty: 'InSIS tu teď žádnou aplikaci nenabízí.' },
+    en: { lead: 'InSIS’s index of study-agenda applications. Your own study is in the sidebar.', empty: 'InSIS offers no application here right now.' },
+  }[lang];
+
+  // InSIS's menu links carry its menu-click marker (?_m=<item id>), which the URL rule does not know: only that
+  // marker is dropped (it changes nothing InSIS shows), and the plain address must then pass the URL rule.
+  function menuLink(a) {
+    const url = new URL(a.href);
+    url.searchParams.delete('_m');
+    const href = nav.safe(url.href, 'link', { copied: true });
+    return href ? { href, text: clean(a.textContent) } : null;
+  }
+
+  ipx.ready.then(() => {
+    const path = nav.route(document.baseURI.split('#')[0]).path;
+    if (path !== '/auth/studijni/' && path !== '/auth/studijni/index.pl') return;
+    const page = document.getElementById('str1');
+    const menu = page?.querySelector('#vsechny-polozky');
+    if (!menu) return;
+    const groups = [...menu.querySelectorAll('.polozky-obal')].map((sec) => ({
+      title: clean(sec.querySelector('.sekce-nadpis > b, .sekce-nadpis b')?.textContent),
+      links: [...sec.querySelectorAll('ul li a[href]')].map(menuLink).filter((l) => l && l.text),
+    })).filter((g) => g.links.length);
+    const crumbs = [...page.querySelectorAll('.breadcrumb-item')].map((li) => clean(li.textContent)).filter(Boolean);
+    ipx.kit.page({
+      key: 'studijni-hub',
+      css: 'pages/plan-progress.css',
+      title: crumbs.at(-1) || clean(document.title),
+      subtitle: nav.sectionLabel('courses.catalogue'),
+      build: () => [
+        h('p', { class: 'muted pp-hub-lead' }, T.lead),
+        groups.length ? groups.map((g) => [g.title && sectionHead(g.title),
+          h('div', { class: 'glist-items' }, g.links.map((l) => anchor(l, { class: 'card glist-item pp-hub-item' },
+            h('span', { class: 'pp-hub-ico' }, icon('layers')),
+            h('span', { class: 'glist-text' }, h('strong', {}, l.text)),
+            h('span', { class: 'glist-go' }, icon('arrow')))))]) : emptyState(T.empty),
+      ],
+    });
+  });
+})();

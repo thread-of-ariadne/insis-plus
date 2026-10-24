@@ -1,0 +1,28 @@
+/* InSIS+ — Map of my study (pages/study-map.js). Loaded inside the shadow root after kit.css; classes sm-. */
+
+.sm-lead { margin: 0; font-size: 14px; line-height: 1.45; }
+.sm-study { display: flex; align-items: center; gap: 10px; }
+.sm-study .icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.sm-study .icon svg { width: 17px; height: 17px; }
+
+/* The time line: years on top, bars on a track, a Today mark */
+.sm-axis { position: relative; padding-top: 4px; }
+.sm-years { display: flex; color: var(--muted); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sm-years span { padding: 0 0 6px 6px; border-left: 1px solid var(--line); }
+.sm-bars { position: relative; min-height: 44px; padding: 8px 0; border-radius: 12px; background: var(--chip); }
+.sm-bar { position: relative; height: 28px; margin: 4px 0; overflow: hidden; border-radius: 9px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.sm-bar + .sm-bar { margin-top: 8px; }
+.sm-done { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
+.sm-break { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, var(--warn) 0 4px, transparent 4px 8px); }
+.sm-label { position: relative; display: block; padding: 0 10px; color: var(--fg); font-size: 12.5px; font-weight: 700; line-height: 28px; white-space: nowrap;
+  text-shadow: 0 0 6px var(--surface); }
+.sm-today { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--bad); }
+.sm-today small { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding: 1px 6px; border-radius: 6px; background: var(--bad); color: #fff;
+  font-size: 10.5px; font-weight: 800; white-space: nowrap; }
+.sm-ticks { display: flex; height: 6px; }
+.sm-ticks span { border-left: 1px solid var(--line); }
+.sm-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; color: var(--muted); font-size: 12.5px; }
+.sm-key span { display: inline-flex; align-items: center; gap: 6px; }
+.sm-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.sm-swatch.done { background: var(--accent); }
