@@ -9,8 +9,9 @@
   --c5: #3a9b4a;
 }
 @media (prefers-color-scheme: dark) {
-  :host { --c0: #8d9cff; --c1: #35c2c2; }
+  :host(:not([data-theme="light"])) { --c0: #8d9cff; --c1: #35c2c2; }
 }
+:host([data-theme="dark"]) { --c0: #8d9cff; --c1: #35c2c2; }
 
 .page-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
 .versions { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 500; }

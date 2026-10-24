@@ -108,8 +108,9 @@
 .sb-next-row.first .sb-next-sep { background: color-mix(in srgb, currentColor 25%, transparent); }
 .sb-next-row.first small { color: color-mix(in srgb, currentColor 70%, transparent); }
 @media (prefers-color-scheme: dark) {
-  .sb-next-row.first, .sb-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
+  :host(:not([data-theme="light"])) .sb-next-row.first, :host(:not([data-theme="light"])) .sb-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 }
+:host([data-theme="dark"]) .sb-next-row.first, :host([data-theme="dark"]) .sb-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 
 .sb-courses { display: flex; flex-direction: column; gap: 2px; }
 .sb-course-row { display: flex; flex-direction: column; gap: 1px; padding: 9px 12px; border-radius: 12px; }

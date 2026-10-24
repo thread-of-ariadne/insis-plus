@@ -318,7 +318,8 @@
       style.textContent = `
         html.ipx-takeover body > :not(#insis-plus-page):not(#insis-plus-root) { display: none !important; }
         html.ipx-takeover body { margin: 0; background: #f2f4f8; }
-        @media (prefers-color-scheme: dark) { html.ipx-takeover body { background: #0c0e13; } }`;
+        @media (prefers-color-scheme: dark) { html.ipx-takeover:not([data-ipx-theme="light"]) body { background: #0c0e13; } }
+        html.ipx-takeover[data-ipx-theme="dark"] body { background: #0c0e13; }`;
       document.head.append(style);
       // Fonts must be declared in the document; shadow roots then use them. Bricolage needs its width axis.
       document.head.append(h('link', { rel: 'stylesheet',
@@ -329,7 +330,7 @@
       document.head.append(h('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }));
     }
 
-    const host = h('div', { id: 'insis-plus-page' });
+    const host = h('div', { id: 'insis-plus-page', 'data-ipx-host': '' });
     const root = host.attachShadow({ mode: 'closed' });
     const isClassic = () => !!(typeof ipx.state.classic === 'object' && ipx.state.classic?.[key]);
     // Classic view means the original look too, so the slotted-content styles switch off with it.
@@ -374,6 +375,7 @@
       n.before(n._ipxHome);
     });
     document.body.prepend(host);
+    ipx.applyTheme?.();
 
     function apply() {
       const classic = isClassic();

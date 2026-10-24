@@ -36,7 +36,8 @@
 5. Log out with the avatar menu, log in again: Přehled loads the data again (nothing was kept from before).
 6. Switch InSIS to Czech or English (CS/EN): everything follows.
 7. On any page, **Classic view** brings the original InSIS page back; the **InSIS+ view** button switches back.
-8. Phone: narrow the window below 900px: a bottom bar with Přehled · Předměty · Zkoušky · Známky · Menu.
+8. Avatar → InSIS+ settings → Appearance: Light / Dark switch at once on every page; System follows your OS.
+9. Phone: narrow the window below 900px: a bottom bar with Přehled · Předměty · Zkoušky · Známky · Menu.
 
 If a page looks wrong: open Classic view (everything still works there), and report the page in an issue
 (blur personal data).

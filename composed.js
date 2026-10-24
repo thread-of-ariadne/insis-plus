@@ -14,6 +14,7 @@
       classic: 'Klasický vzhled InSIS', classicText: 'Vzhled InSIS+ můžete na každé stránce vypnout tlačítkem Klasické zobrazení dole v postranním panelu.',
       privacy: 'Soukromí', privacyText: 'InSIS+ běží jen ve vašem prohlížeči a nic nikam neposílá.',
       requests: 'Žádosti na studijní oddělení (přerušení studia, uznání předmětů, prodloužení termínů) se podávají podle pokynů vaší fakulty. Zeptejte se na studijním oddělení nebo v kontaktním centru.',
+      theme: 'Vzhled', themeText: 'Světlý, tmavý, nebo podle nastavení systému.', themeSystem: 'Podle systému', themeLight: 'Světlý', themeDark: 'Tmavý',
       background: 'Číst data na pozadí', backgroundText: 'Rozvrh, výsledky, odevzdávárny a materiály se načítají samy, nejvýš jednou za 3 hodiny.',
       shared: 'Sdílený počítač', sharedText: 'Mezi návštěvami se neukládá nic (připnuté stránky, nastavení, co už jste viděli).',
       clear: 'Smazat uložená data', clearText: 'Smaže vše, co InSIS+ uložil, kromě volby sdíleného počítače.', clearButton: 'Smazat', cleared: 'Smazáno.',
@@ -24,6 +25,7 @@
       classic: 'Classic InSIS look', classicText: 'Switch the InSIS+ look off on any page with Classic view at the bottom of the sidebar.',
       privacy: 'Privacy', privacyText: 'InSIS+ runs only in your browser and sends nothing anywhere.',
       requests: 'Requests to the study department (interrupting studies, recognition of courses, deadline extensions) follow your faculty’s instructions. Ask the study department or the contact centre.',
+      theme: 'Appearance', themeText: 'Light, dark, or as your system is set.', themeSystem: 'System', themeLight: 'Light', themeDark: 'Dark',
       background: 'Read data in the background', backgroundText: 'Timetable, results, submission boxes and materials load by themselves, at most every 3 hours.',
       shared: 'Shared computer', sharedText: 'Nothing is kept between visits (pins, settings, what you have seen).',
       clear: 'Clear stored data', clearText: 'Deletes everything InSIS+ stored, except the shared-computer choice.', clearButton: 'Clear', cleared: 'Cleared.',
@@ -76,6 +78,20 @@
       h('span', { class: 'glist-text' }, h('strong', {}, label), h('small', {}, text)), input);
   }
 
+  // Appearance: follow the system, or always light / dark (applied at once, kept per user like other settings).
+  function themePicker() {
+    const current = () => ipx.state.plus?.theme || 'system';
+    const options = [['system', T.themeSystem], ['light', T.themeLight], ['dark', T.themeDark]];
+    const group = h('div', { class: 'segmented', role: 'radiogroup', 'aria-label': T.theme });
+    const render = () => group.replaceChildren(...options.map(([id, text]) => h('button', {
+      type: 'button', role: 'radio', 'aria-checked': String(current() === id), class: current() === id ? 'on' : null,
+      onclick: () => ipx.setTheme(id).then(render),
+    }, text)));
+    render();
+    return h('section', { class: 'card setting' },
+      h('span', { class: 'glist-text' }, h('strong', {}, T.theme), h('small', {}, T.themeText)), group);
+  }
+
   register('plus.settings', () => ({
     title: nav.label('plus'),
     build: () => {
@@ -83,6 +99,7 @@
       const status = h('p', { class: 'muted', role: 'status' });
       return h('div', { class: 'glist' },
         h('p', { class: 'muted' }, T.settingsLead),
+        themePicker(),
         toggle('ipx-pause', T.background, T.backgroundText, !plus().pause, (on) => { plus().pause = !on; ipx.save(); }),
         toggle('ipx-shared', T.shared, T.sharedText, !!ipx.state.shared, (on) => ipx.setShared(on)),
         h('section', { class: 'card setting' },

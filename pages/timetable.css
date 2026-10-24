@@ -142,8 +142,9 @@ a.tt-next-row.first:hover { background: var(--fg); filter: brightness(1.15); }
 .tt-next-row.first small, .tt-next-row.first .tt-next-time { color: color-mix(in srgb, currentColor 70%, transparent); }
 .tt-next-row.first .tt-next-time { color: inherit; }
 @media (prefers-color-scheme: dark) {
-  .tt-next-row.first, a.tt-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
+  :host(:not([data-theme="light"])) .tt-next-row.first, :host(:not([data-theme="light"])) a.tt-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 }
+:host([data-theme="dark"]) .tt-next-row.first, :host([data-theme="dark"]) a.tt-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 
 .tt-chart .card-head { margin-bottom: 4px; }
 .tt-chart-total { color: var(--fg); font-size: 13px; font-weight: 700; }
