@@ -25,6 +25,7 @@
         "ui.js",
         "todo.js",
         "composed.js",
+        "course.js",
         "home.js",
         "syllabus.js",
         "catalog.js",
@@ -48,6 +49,7 @@
         "home.css",
         "syllabus.css",
         "catalog.css",
+        "course.css",
         "generic.css",
         "pages/*"
       ],
