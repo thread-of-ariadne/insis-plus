@@ -6,6 +6,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-24
+
+### Added
+- A new information architecture, designed from a read-only crawl of InSIS (135 page types) and reviewed in 16 rounds
+  (`docs/ia/`): seven destinations (Home, Courses, Schedule, Exams, Grades & credits, Study matters, Campus & people),
+  All services, Messages, Notifications, Help and an account menu. `docs/ia/mapping.json` maps every InSIS page type
+  to its place, with the addresses InSIS+ may read or link to; `nav-data.js` is generated from it
+  (`scripts/build_nav.py`), and `scripts/ia_check.py` checks it against the crawl (both run in CI).
+- Navigation shell: sidebar with the destinations and pins, destination tabs, top bar, phone bottom bar.
+- Home: To do (with when each source was last checked), My courses, InSIS notices; the rail keeps the week, timetable,
+  new materials by course and teaching hours.
+- Course page (Overview, Materials, Submissions, Points, People, Syllabus) and Courses › My courses / Materials.
+- Messages ("Where do messages arrive?"), Notifications, InSIS+ settings (background reads, shared computer, clear
+  data), grouped lists for Study matters, Campus & people, All services, Help and Account.
+- `bg.js` and the `alarms` permission: session data is wiped after 10 minutes without InSIS activity.
+
+### Changed
+- Personal data read from InSIS is kept only for the session (session storage), wiped on logout, change of identity
+  and when another user logs in; settings are kept per user; a shared-computer mode keeps nothing (PRIVACY.md).
+- Every address InSIS+ reads in the background or shows as a link passes one rule from the mapping (allowed
+  parameter sets, no action parameters); Ctrl+K search offers only such links.
+- The Student's portal page is Study status; its actions live in the navigation. The old dashboard KPIs, quick actions
+  and "recently opened" are gone.
+- The card entrance animation no longer starts from invisible.
+
+### Fixed
+- The document server module took the mail box's folder tree for its own and wiped the materials data.
+- The Czech e-index "Zadáno" column (date a result was entered) was not read.
+
 ## [0.6.0] - 2026-10-23
 
 ### Added

@@ -1,19 +1,44 @@
 # Privacy
 
-InSIS+ is built so that your InSIS data stays in your browser.
+InSIS+ is built so that your InSIS data stays in your browser, and only for as long as you need it.
 
 ## What the extension stores
 
-Locally, in your browser's extension storage (`chrome.storage.local`), and nowhere else:
+**Data read from InSIS** (your study, classes, results, submission deadlines, new-file counts, the InSIS menu, your
+name): only for the session. It is kept in the browser's session storage, which is never written to disk; where a
+browser does not allow that, in a temporary entry that the extension deletes when the browser starts. It is also
+deleted:
 
-- Titles and addresses of InSIS pages you opened, to power Ctrl+K search and "Recently opened".
-- Your pinned pages and interface choices (sidebar grouping, collapsed state, classic view per page).
-- The InSIS menu, your name and the document/task counters from the InSIS main page, to show them on other pages.
-- Summaries of course syllabi you opened (code, name, semester, credits), for "My courses".
-- Parsed data from pages that a module reads (your portal links, timetable, study record, submission deadlines,
-  courses with new documents), for the dashboard.
+- when you log out (with InSIS+'s Log out or InSIS's own logout link) or change identity in InSIS;
+- when a different InSIS user logs in in the same browser;
+- after 10 minutes without activity in InSIS, even if no InSIS tab is open.
 
-You can delete all of it by removing the extension or clearing its storage.
+**Your settings**, per InSIS user (identified by a one-way hash of InSIS's internal user number, never the number
+itself), in the extension's local storage:
+
+- pinned pages and the addresses and titles of InSIS pages you opened (for Ctrl+K search);
+- interface choices (collapsed sidebar, Classic view per page type, background reads on or off);
+- a small record for Notifications: the time of your last visit to Notifications and the last count of new
+  documents (plain values; nothing about your grades or courses).
+
+**Shared computer mode** (asked once on the main page, changeable in InSIS+ settings): nothing at all is kept
+between sessions, no settings, no pins, no record.
+
+"Clear stored data" in InSIS+ settings deletes everything; removing the extension does too.
+
+## What it reads, and when
+
+- **In the background**, at most every 3 hours, only while an InSIS tab is open and you were active in the last
+  10 minutes, InSIS+ opens these InSIS pages in a hidden frame with your existing session: the Student's portal,
+  your personal timetable, your study record, coursework submissions, the document server's folder tree and your
+  InSIS mail box (only the unread count it shows). These are ordinary page loads from `insis.vse.cz`, the same as
+  clicking the links; nothing is clicked, submitted or changed. They may appear in InSIS's own log of your
+  operations ("My operations").
+- **When you open a page that needs it**: the list of classmates on a course's People tab, and InSIS's mail
+  forwarding page when the mail box does not say where mail is forwarded. Not stored.
+- **Never**: pages or links that do something (sign up, sign off, mark as read, generate a document, delete,
+  change settings), opening a stored document, questionnaires, messages. Every address InSIS+ reads or links to
+  is checked against a reviewed list (`docs/ia/mapping.json`).
 
 ## What it sends
 
@@ -21,13 +46,11 @@ You can delete all of it by removing the extension or clearing its storage.
 - **No requests outside InSIS**, with one exception: the fonts (Bricolage Grotesque and Figtree) are loaded from
   Google Fonts, which means Google sees your IP address and that a font was requested. Bundling the fonts with the
   extension to remove this is planned.
-- In the background, InSIS+ opens five InSIS pages in a hidden frame, using your existing session: the Student's
-  portal, your personal timetable, your study record, coursework submissions and the document server. That happens
-  at most every 3 hours, only while you are logged in, and is the same as you clicking those links: ordinary page
-  loads from `insis.vse.cz`; nothing is clicked, submitted or changed there, and what is read stays in your
-  browser.
+- Links outside InSIS that InSIS+ shows: your university e-mail in Outlook (InSIS's own link), and e-mail
+  addresses, app-store and support links copied from InSIS pages.
 
 ## Permissions
 
 - `storage`: to keep the data above.
+- `alarms`: to delete the session data after 10 minutes without activity, even when no InSIS tab is open.
 - Access to `https://insis.vse.cz/*` only: the extension runs on no other site.
