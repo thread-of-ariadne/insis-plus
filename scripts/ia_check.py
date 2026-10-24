@@ -100,6 +100,8 @@ for path, m in pages.items():
                 errors.append(f"{path}: {key} set contains action parameters {bad}")
     if feeds and m.get("verify"):
         errors.append(f"{path}: feeds {', '.join(sorted(feeds))} but its parameter sets are not verified")
+    if m.get("verify_effect") and (m.get("fetch") or m.get("read") != "never"):
+        errors.append(f"{path}: verify_effect pages (reading might change something in InSIS) must be read: never without fetch sets")
     if feeds and m.get("verify_data"):
         print(f"note: {path} feeds {', '.join(sorted(feeds))}; off until confirmed: {m['verify_data']}")
 TRANSIENT = {k for k in mapping.get("transient_params", {}) if k != "_comment"}

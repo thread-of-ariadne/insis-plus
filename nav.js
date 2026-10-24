@@ -98,12 +98,19 @@
     const p = parse(url);
     if (!p) return null;
     if (p.u.origin !== ORIGIN) return kind === 'link' && externalAllowed(p.u, copied) ? p.u.href : null;
-    if (/^#ipx:/.test(p.u.hash)) return kind === 'link' ? p.u.href : null;
+    // An InSIS+ page lives on the main page's address with no query (target()). Any other address carrying "#ipx:"
+    // is checked like every InSIS address, so a copied link cannot slip an action past the rule with that hash.
+    if (/^#ipx:/.test(p.u.hash)) {
+      if (kind === 'link' && p.u.href.split('#')[0] === home().split('#')[0]) return p.u.href;
+      p.u.hash = '';
+    }
     const page = D.pages[p.path];
     url = p.u.href;
     if (!page || page.verify) return null;
     if (kind === 'link' && page.link !== 'shell') return null;
     if (kind === 'fetch' && page.read === 'never') return null;
+    // A page where reading it might change something in InSIS (verify_effect) is never read until confirmed.
+    if (kind === 'fetch' && page.verify_effect) return null;
     const names = [];
     let out = url;
     for (const [name, value] of p.params) {

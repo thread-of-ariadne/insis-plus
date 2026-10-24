@@ -206,6 +206,7 @@
   // Everything InSIS+ keeps, for "Clear stored data" in InSIS+ settings.
   async function clearAll() {
     await session.area.remove(session.key);
+    await session.area.remove(CACHE_KEY);
     const local = (await chrome.storage.local.get(STORE_KEY))[STORE_KEY] || {};
     await chrome.storage.local.set({ [STORE_KEY]: { shared: local.shared, sharedAsked: local.sharedAsked, users: {} } });
   }

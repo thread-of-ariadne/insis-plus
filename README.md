@@ -76,8 +76,10 @@ read or link to). `ui.js` builds the app shell in a closed shadow root and provi
 `bg.js` wipes session data after inactivity. Page modules (`home.js`, `syllabus.js`, `catalog.js`, `pages/*.js`) recognise
 their page by its content and either rebuild it from parsed data or move InSIS's original content into the shell.
 `generic.js` handles every page without a module. Pages are detected by content, not URL, and a module that isn't
-sure does nothing. `sync.js` loads the pages the dashboard needs in a hidden same-origin frame, where the same
-modules only store their data (`ipx.syncOnly`).
+sure does nothing. `sync.js` fetches the pages the dashboard needs as text and hands the parsed document to
+the module that owns each page (`ipx.readers`): no InSIS script runs. `boot.js` shows a skeleton of the shell while
+InSIS's server is still sending a page; `kit.js` holds the page kit and the section registry (one header per
+section).
 
 ## Roadmap
 

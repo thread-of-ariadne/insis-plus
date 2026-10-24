@@ -1033,12 +1033,13 @@
         "course.files"
       ],
       "read": "never",
-      "note": "Course › Files links to the folder; InSIS+ never reads it (opening may mark files as read)",
+      "note": "Course › Materials links to the folder; InSIS+ never reads it until verify_effect is confirmed (manual before/after test, 04-materials.md §5)",
       "link": "shell",
       "links": [
         "ds,id",
         "id"
-      ]
+      ],
+      "verify_effect": "that opening a folder page marks none of its documents as read (the crawl never opened one)"
     },
     "/auth/dok_server/vyhledavani.pl": {
       "node": "courses.files",
@@ -2044,7 +2045,7 @@
     },
     "/auth/student/list.pl": {
       "node": "course.points",
-      "note": "lectures sheet: regular assessment per course; notification settings",
+      "note": "never read until verify_effect is confirmed (safety review 2026-10-24)",
       "also": [
         "course.files",
         "course.overview"
@@ -2053,18 +2054,15 @@
         "no predmet": "courses.mine",
         "predmet=mine": "course.points"
       },
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        "obdobi,predmet,prubezne,studium",
-        "obdobi,studium"
-      ],
       "links": [
         "obdobi,predmet,prubezne,studium",
         "obdobi,studium"
       ],
       "action": "link",
-      "verify_data": "that reading it when the course page opens marks nothing as seen; course-folder links"
+      "verify_data": "course-folder links",
+      "verify_effect": "that reading it when the course page opens marks nothing as seen"
     },
     "/auth/student/mapa_studii.pl": {
       "node": "grades.plan",
@@ -2214,14 +2212,14 @@
       ],
       "read": "background",
       "link": "shell",
-      "fetch": [
-        "obdobi,studium"
-      ],
       "links": [
         "obdobi,studium"
       ],
       "verify_data": "registration results (places confirmed or lost)",
-      "action": "unverified"
+      "action": "unverified",
+      "fetch": [
+        "obdobi,studium"
+      ]
     },
     "/auth/student/spoluzaci.pl": {
       "node": "course.people",
@@ -2908,6 +2906,12 @@
         "id,pracoviste,prehled",
         "prehled"
       ]
+    },
+    "/auth/dok_server/dokumenty_cteni.pl": {
+      "node": "courses.files",
+      "read": "never",
+      "link": "insis-only",
+      "note": "a document's details (čtení = reading, a signed token): probably marks the document as read; only InSIS's own link on InSIS's page (safety review 2026-10-24)"
     }
   },
   "menu_only": {
