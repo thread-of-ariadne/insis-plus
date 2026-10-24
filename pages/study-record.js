@@ -17,7 +17,7 @@
 //   credits: { earned: number | null, registered: number | null },   // from the statistics table, else row sums
 //   average: number | null,                                          // as InSIS states it, else mean of row grades
 //   courses: [{ code, name, href (syllabus), ects: number | null (credits), completion, result, grade: 1–4 | null,
-//               semester, passed: true | false | null (null = no result yet) }],
+//               semester, passed: true | false | null (null = no result yet), entered: 'd.m.yyyy' | '' }],
 // }
 (() => {
   const ipx = globalThis.insisPlus;
@@ -80,7 +80,7 @@
     ['attempt', /attempt|pokus/],
     ['result', /result|vysledek|hodnoceni|znamka/],
     ['by', /entered by|zapsal|hodnotil|examiner|zkousejici/],
-    ['date', /^(entered|zapsan|datum|date)/],
+    ['date', /^(entered|zadano|zapsan|datum|date)/],
     ['ectsGrade', /^ects/],
     ['group', /group|skupina/],
     ['credits', /credit|kredit|^kr\.?$/],
@@ -426,7 +426,7 @@
       credits: { earned: t.earned, registered: t.registered },
       average: t.average,
       courses: t.rows.map((r) => ({ code: r.code, name: r.name, href: r.href, ects: r.credits, completion: r.completion,
-        result: r.result, grade: r.grade, semester: r.semester, passed: r.passed })),
+        result: r.result, grade: r.grade, semester: r.semester, passed: r.passed, entered: r.date })),
     };
     ipx.save();
   }

@@ -74,6 +74,8 @@
       ['studyRecord', links.record?.href],
       ['submissions', links.submissions?.href],
       ['docserver', at('/auth/dok_server/')],
+      // The mail box: only the unread count it shows, for the envelope badge (pages/messages.js).
+      ['messages', at('/auth/posta/slozka.pl')],
     ];
     for (const [key, url] of steps) if (url && stale(key)) await load(url);
 
@@ -85,9 +87,11 @@
   ipx.ready.then(() => {
     // Only for a logged-in student (every logged-in page is under /auth/), in the tab's top window.
     if (!new URL(document.baseURI).pathname.startsWith('/auth/')) return;
+    // Paused in InSIS+ settings: nothing is read in the background.
+    if (ipx.state.plus?.pause) return;
     const s = ipx.state.sync;
     if (s?.running && Date.now() - s.updated < LOCK) return;
-    const needed = stale('portal', 12 * 3600e3) || ['timetable', 'studyRecord', 'submissions', 'docserver'].some((k) => stale(k));
+    const needed = stale('portal', 12 * 3600e3) || ['timetable', 'studyRecord', 'submissions', 'docserver', 'messages'].some((k) => stale(k));
     if (!needed) return;
     // Let the page itself finish first.
     setTimeout(run, 800);

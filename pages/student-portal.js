@@ -16,7 +16,7 @@
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
   const { clean, norm, lang } = ipx;
-  const { h, icon, anchor, takeover, quickActions, PORTAL_ACTIONS, nextClasses, classDays, weekStrip, deadlineList,
+  const { h, icon, anchor, takeover, PORTAL_ACTIONS, nextClasses, classDays, weekStrip, deadlineList,
     facultyColors } = ipx.ui;
 
   const T = {
@@ -179,8 +179,6 @@
             study.progress && h('span', { class: 'delta ' + (study.active ? 'ok' : 'neutral') }, study.progress),
             study.restriction && h('span', { class: 'delta warn' }, study.restriction))),
 
-        h('h2', { class: 'section-title sp-title' }, T.main),
-        quickActions(d.links),
 
         buildMore(d),
 
@@ -213,8 +211,9 @@
     takeover({
       key: 'student-portal',
       css: 'pages/student-portal.css',
-      title: T.title,
-      subtitle: data.head[1] || null,
+      // In the new structure the portal is Study matters › Study status (its links live in the navigation now).
+      title: ipx.nav ? ipx.nav.label('studies.status') : T.title,
+      subtitle: [T.title, data.head[1]].filter(Boolean).join(' · '),
       build: () => {
         // Redrawn when the background sync brings the timetable, credits or deadlines.
         const wrap = h('div', {});

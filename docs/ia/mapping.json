@@ -800,7 +800,7 @@
       "verify": "host to confirm"
     },
     "outlook": {
-      "url": "https://outlook.office.com/mail/",
+      "url": "https://outlook.com/vse.cz",
       "where": [
         "messages.mail"
       ]
@@ -1715,7 +1715,7 @@
         "",
         "fid"
       ],
-      "verify_data": "unread message count"
+      "note": "mail box; states the forwarding address and the unread count (confirmed in a snapshot)"
     },
     "/auth/posta/slozky.pl": {
       "node": "messages.mail",
