@@ -21,6 +21,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { clean, norm, lang } = ipx;
   const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, cover, facultyColors, styleSlotted } = ipx.ui;
 
@@ -73,7 +78,7 @@
 
   // The tab row (Document tree / All my folders / New documents (N) / DS settings / Searching).
   function tabRow() {
-    const table = document.querySelector('#str1 table.portal_menu') || document.querySelector('table.portal_menu');
+    const table = doc.querySelector('#str1 table.portal_menu') || doc.querySelector('table.portal_menu');
     if (!table) return [];
     return [...table.querySelectorAll('a[href]')].map((a) => {
       const text = clean(a.textContent);
@@ -115,7 +120,7 @@
   // "Quota: 40 MiB / Occupied: 0.0 B (0 %) / Free: 40.0 MiB": label + value rows of the small table under the tree.
   function quota() {
     const rows = [];
-    for (const tr of document.querySelectorAll('#str1 tr')) {
+    for (const tr of doc.querySelectorAll('#str1 tr')) {
       const tds = [...tr.querySelectorAll(':scope > td')];
       if (tds.length < 2 || tds.length > 3 || tr.querySelector('table')) continue;
       const label = clean(tds[0].textContent).replace(/:$/, '');
@@ -126,7 +131,7 @@
   }
 
   function parseTree() {
-    const ul = document.querySelector('div.tree > ul');
+    const ul = doc.querySelector('div.tree > ul');
     if (!ul) return null;
     const roots = readNodes(ul, null);
     let count = 0;
@@ -156,10 +161,10 @@
   function parseNew() {
     const tabs = tabRow();
     const active = tabs.find((t) => t.active);
-    const form = [...document.querySelectorAll('form')].find((f) => /nove_dok/.test(f.getAttribute('action') || ''));
-    const table = [...document.querySelectorAll('#str1 table, table')].find((t) => t.querySelector('a[href*="download="], a[href*="dokumenty_cteni"]'));
+    const form = [...doc.querySelectorAll('form')].find((f) => /nove_dok/.test(f.getAttribute('action') || ''));
+    const table = [...doc.querySelectorAll('#str1 table, table')].find((t) => t.querySelector('a[href*="download="], a[href*="dokumenty_cteni"]'));
     const isNewPage = (active && /nove_dok/.test(active.href)) || (form && table);
-    if (!isNewPage || document.querySelector('div.tree')) return null;
+    if (!isNewPage || doc.querySelector('div.tree')) return null;
 
     const heads = table ? [...table.querySelectorAll('thead th, tr.zahlavi > th')].map((th) => norm(th.textContent)) : [];
     const col = (re) => heads.findIndex((t) => re.test(t));
@@ -188,7 +193,7 @@
         file: fileA?.href || null, info: infoA?.href || null, type: mime.toUpperCase(),
       });
     }
-    const refresh = [...document.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
+    const refresh = [...doc.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
     return { kind: 'new', tabs, docs, form, refresh: refresh && { href: refresh.href, text: T.refresh } };
   }
 
@@ -412,7 +417,7 @@
     const tab = newTab(d.tabs);
     if (d.kind === 'tree') {
       ipx.state.docserver = {
-        updated: Date.now(), source: location.href,
+        updated: Date.now(), source: here.href,
         newCount: tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0),
         courses: d.courses.map((n) => ({ code: n.course.code, name: n.course.name, href: n.href, newCount: n.allNew, semester: n.course.semester,
           files: n.files, fresh: n.fresh, allFiles: n.allFiles, tree: slim(n.children) })),
@@ -426,13 +431,19 @@
         if (code) per[code] = (per[code] || 0) + 1;
       }
       ipx.state.docserver = {
-        ...prev, updated: Date.now(), source: location.href,
+        ...prev, updated: Date.now(), source: here.href,
         newCount: d.docs.length || tab?.count || 0,
         courses: (prev.courses || []).map((c) => ({ ...c, newCount: per[c.code] || 0 })),
       };
     }
     ipx.save();
   }
+
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).docserver = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parseTree() || parseNew(); if (data) remember(data); } finally { doc = document; here = location; }
+  };
 
   ipx.ready.then(() => {
     const data = parseTree() || parseNew();
@@ -446,7 +457,7 @@
       return;
     }
 
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     const slotted = page && data.form && data.docs.length && page.contains(data.form) ? [page] : null;
     if (slotted) {
       // Only the original "mark as read" form stays visible, shown on demand.

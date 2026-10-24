@@ -10,12 +10,14 @@ Serve the extension folder and open it:
 A <base> tag keeps InSIS's own CSS, images and links pointing at insis.vse.cz;
 a small shim stands in for the chrome.* APIs the extension uses.
 """
+import json
 import pathlib
 import re
 import sys
 
 SERVER = "http://localhost:8765/"
-SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "course.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "pages/messages.js", "generic.js", "sync.js"]
+# The content scripts in the extension's order (manifest.json is the source).
+SCRIPTS = json.loads((pathlib.Path(__file__).resolve().parent.parent / "manifest.json").read_text(encoding="utf-8"))["content_scripts"][0]["js"]
 
 SHIM = """<script>
 window.chrome = {

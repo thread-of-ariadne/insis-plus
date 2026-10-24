@@ -16,12 +16,18 @@
     const page = document.getElementById('str1');
     if (!page || SKIP.test(location.pathname)) return;
 
-    // The last breadcrumb names the page; the big InSIS heading often names its section ("Student's portal").
+    // Titles follow 03-pages.md: a section's own page is titled by the section (eyebrow: the destination); a page
+    // below it (a person, a folder, a step) keeps InSIS's name for it (eyebrow: the section).
     const crumbs = [...page.querySelectorAll('.breadcrumb-item')].map((li) => clean(li.textContent)).filter(Boolean);
-    const heading = clean(page.querySelector('#titulek h1')?.textContent);
-    const title = crumbs.at(-1) || heading || clean(document.title);
-    // Earlier breadcrumbs are often navigation ("Main page", "Previous page"), so the eyebrow is just one line.
-    const eyebrow = heading && heading !== title ? heading : crumbs.length > 1 ? crumbs.at(-2) : null;
+    const insisName = crumbs.at(-1) || clean(page.querySelector('#titulek h1')?.textContent) || clean(document.title);
+    const nav = ipx.nav;
+    const where = ipx.ui.here();
+    const section = where.node && nav.sectionOf(where.node);
+    const entry = section && nav.target(section);
+    const isEntry = entry && nav.route(entry).path === where.path;
+    const sectionName = section && nav.sectionLabel(section);
+    const title = (isEntry && sectionName) || insisName;
+    const eyebrow = isEntry ? (where.dest && nav.label(where.dest)) : sectionName && sectionName !== title ? sectionName : null;
 
     styleSlotted();
     takeover({ key: 'generic', title, subtitle: eyebrow, slotted: [page] });

@@ -1,64 +1,48 @@
 // InSIS+ — background sync: keeps the dashboard's data fresh without the student opening each page.
 // The dashboard, the sidebar and the portal need data that lives on other InSIS pages (the personal timetable,
-// the study record, submission boxes, new documents). When that data is missing or old, those pages are loaded
-// one after another in a hidden same-origin frame (InSIS allows that: X-Frame-Options SAMEORIGIN). In the frame,
-// the usual page modules recognise the page and store their data (ipx.syncOnly: nothing is drawn, nothing is
-// clicked or submitted, only pages a student can open with a plain link are loaded). Everything stays in
-// chrome.storage.local; open tabs pick it up through storage change events.
+// the study record, submission boxes, new documents). When that data is missing or old, those pages are fetched
+// one after another as plain text and parsed with DOMParser: no InSIS script runs (so neither InSIS's own code nor
+// the analytics it embeds), no image or stylesheet loads, nothing is clicked or submitted. The page module that
+// owns the page parses the fetched document and stores its data (ipx.readers, registered by pages/*.js); open
+// tabs pick it up through storage change events. Only pages a student can open with a plain link are fetched,
+// and only through the URL rule of the mapping (nav.js).
 //
 // ipx.state.sync = { updated: last start (ms), running: bool }   (also a lock between tabs)
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
 
-  const FRAME = 'ipx-sync';
   const MAX_AGE = 3 * 3600e3; // data older than this is loaded again
   const LOCK = 2 * 60e3; // another tab started a sync less than this ago: let it finish
   const TIMEOUT = 25e3;
-
-  // In the frame: tell the tab that started it when this page's data is stored.
-  if (ipx.syncOnly) {
-    ipx.ready.then(() => setTimeout(async () => {
-      await ipx.save();
-      parent.postMessage({ ipxSynced: location.href }, location.origin);
-    }, 0));
-    return;
-  }
 
   const at = (path) => new URL(path, document.baseURI).href;
   // Test pages map InSIS addresses to local snapshots (see test/make_fixture.py); the extension never does.
   const resolve = (url) => globalThis.__ipxFixtureFor?.(url) || url;
   const stale = (key, age = MAX_AGE) => !ipx.state[key]?.updated || Date.now() - ipx.state[key].updated > age;
 
-  // Every background read obeys the URL rule of the mapping (nav.js): only pages marked readable, only with an
-  // allowed parameter set. A page that does not pass is skipped, never "fixed up".
-  function load(url) {
+  // Every background read obeys the URL rule (nav.js): only pages marked readable, only with an allowed parameter
+  // set. A page that does not pass is skipped, never "fixed up". A page no reader recognises (an error page, the
+  // login page after InSIS logged the student out) stores nothing.
+  async function load(key, url) {
     const allowed = ipx.nav ? ipx.nav.safe(url, 'fetch', { copied: true }) : null;
-    if (!allowed) return Promise.resolve();
-    return new Promise((resolveLoad) => {
-      const frame = document.createElement('iframe');
-      frame.name = FRAME;
-      frame.setAttribute('aria-hidden', 'true');
-      frame.tabIndex = -1;
-      frame.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:0;border:0;opacity:0;pointer-events:none';
-      let done = false;
-      const finish = () => {
-        if (done) return;
-        done = true;
-        removeEventListener('message', onMessage);
-        clearTimeout(timer);
-        frame.remove();
-        resolveLoad();
-      };
-      const onMessage = (e) => {
-        if (e.source === frame.contentWindow && e.data?.ipxSynced) finish();
-      };
-      // A page no module recognises (an error page, the login page) never answers: give up after a while.
-      const timer = setTimeout(finish, TIMEOUT);
-      addEventListener('message', onMessage);
-      frame.src = resolve(allowed);
-      document.documentElement.append(frame);
-    });
+    const reader = ipx.readers?.[key];
+    if (!allowed || !reader) return;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
+    try {
+      const res = await fetch(resolve(allowed), { credentials: 'include', signal: ctrl.signal, redirect: 'follow' });
+      if (!res.ok) return;
+      const fetched = new DOMParser().parseFromString(await res.text(), 'text/html');
+      // Links in the fetched page resolve against its InSIS address, as they would on the page itself.
+      fetched.head.prepend(Object.assign(fetched.createElement('base'), { href: allowed }));
+      reader(fetched, allowed);
+      await ipx.save();
+    } catch {
+      // A failed read leaves the old data; the "last checked" times on Home show it.
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   async function run() {
@@ -67,7 +51,7 @@
     ipx.notify();
 
     // The portal first: it has this student's own addresses for the other pages.
-    if (stale('portal', 12 * 3600e3)) await load(at('/auth/student/moje_studium.pl'));
+    if (stale('portal', 12 * 3600e3)) await load('portal', at('/auth/student/moje_studium.pl'));
     const links = ipx.state.portal?.links || {};
     const steps = [
       ['timetable', links.timetable?.href],
@@ -77,7 +61,7 @@
       // The mail box: only the unread count it shows, for the envelope badge (pages/messages.js).
       ['messages', at('/auth/posta/slozka.pl')],
     ];
-    for (const [key, url] of steps) if (url && stale(key)) await load(url);
+    for (const [key, url] of steps) if (url && stale(key)) await load(key, url);
 
     ipx.state.sync = { updated: Date.now(), running: false };
     await ipx.save();

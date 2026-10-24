@@ -25,8 +25,9 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
    where there is one).
    *Notifications* (bell) = things that changed in InSIS, shown once. *Messages* = InSIS's internal mail (its own
    unread badge).
-5. **Progressive disclosure**: ≤6 tabs per page, ordered by frequency, empty ones hidden; destinations with more
-   sections are grouped lists, not tab rows.
+5. **Progressive disclosure**: a destination's sections are a submenu in the sidebar (grouped where the destination
+   has groups), never a tab row; a page has at most one row of view tabs, for views of one thing (a course, one
+   InSIS tool, one list cut different ways), ≤6, empty ones hidden (`03-pages.md` §1).
 6. **Context is explicit but local**: the top bar switches the *study* (only with 2+; a minor track is part of a
    study). The *period* is chosen on each page; where InSIS's page has its own period form, only that form shows.
 7. **InSIS performs every action, on its own page, by the student's own click.**
@@ -82,8 +83,9 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
 
 ## 2. Global layout
 
-- **Sidebar (desktop)**: the seven destinations; at the bottom *All services*. Badges carry text ("Exams, sign-up
-  open").
+- **Sidebar (desktop)**: the seven destinations; the current one opens its sections as a submenu (the page you are
+  on is marked; a course page marks My courses); at the bottom *All services*. Badges carry text ("Exams, sign-up
+  open"). Collapsed sidebar: destinations only.
 - **Top bar (desktop)**: page title and context · study switch (2+ studies) · search (button, "/", Ctrl+K or Alt+K
   where the browser takes Ctrl+K; ignored while typing in an InSIS field) · **Messages** · **Notifications** bell ·
   **Help** (?) · **CS / EN** language switch (InSIS's own language links, copied verbatim from the page like Log out) · **avatar menu**: Account, Change
@@ -93,9 +95,10 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
   Schedule · Study matters · Campus & people · All services (labels in `structure.menu`). (Grades replaces Schedule
   in the bottom bar: students check results more often than the full timetable, and Home already shows today's
   classes.) Touch targets ≥ 44 px.
-- **Page template**: title and context · ≤6 tabs (links with `aria-current`, scrollable, selected tab in view) ·
-  primary action link · content · "Who can help?" footer: a link to the matching topic in Who to ask (Who to ask
-  shows the contacts).
+- **Page template** (`03-pages.md` §2): header (eyebrow, title, ≤2 page actions) · view tabs only for views of one
+  thing (links with `aria-current`, scrollable, selected tab in view) · summary · content · rail · InSIS's own form
+  in a form card when the page holds an action. InSIS's portal bar, breadcrumbs, page heading and decorative icons
+  are never shown.
 - **Wrapped InSIS tables on phones**: horizontal scroll with a sticky key column (course or name, set per page type,
   never a checkbox or order number); card layouts put a `data-label` on non-control cells; inputs, checkboxes and
   hidden fields are never hidden or moved. Tables reflow at 320 px / 400 % zoom.

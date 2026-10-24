@@ -23,6 +23,7 @@
         "nav-data.js",
         "nav.js",
         "ui.js",
+        "kit.js",
         "todo.js",
         "composed.js",
         "course.js",
@@ -35,11 +36,12 @@
         "pages/study-record.js",
         "pages/docserver.js",
         "pages/messages.js",
+        "pages/library.js",
         "generic.js",
         "sync.js"
       ],
       "run_at": "document_idle",
-      "all_frames": true
+      "all_frames": false
     }
   ],
   "web_accessible_resources": [
@@ -51,6 +53,7 @@
         "syllabus.css",
         "catalog.css",
         "course.css",
+        "kit.css",
         "generic.css",
         "pages/*"
       ],

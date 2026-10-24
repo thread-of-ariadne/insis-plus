@@ -1,0 +1,53 @@
+/* InSIS+ page kit (kit.js): rebuilt InSIS pages. Loaded inside the shadow root after shared.css. */
+
+.kit-page { display: flex; flex-direction: column; gap: 18px; max-width: 1100px; min-width: 0; }
+.kit-page .pad { padding: 16px 18px; }
+.kit-page .card-title { margin: 0 0 10px; font-size: 15.5px; font-weight: 700; }
+.kit-cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+.kit-stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+@media (max-width: 1100px) { .kit-cols { grid-template-columns: minmax(0, 1fr); } }
+.faint { color: var(--faint); }
+
+/* Data table: a header row, readable cells, tone stripes; cards on phones */
+.dtable-wrap { overflow-x: auto; padding: 4px 0; }
+.dtable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.dtable th { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.dtable td { padding: 11px 16px; border-bottom: 1px solid var(--line); color: var(--fg-2); vertical-align: top; }
+.dtable tr:last-child td { border-bottom: 0; }
+.dtable .end { text-align: right; white-space: nowrap; }
+.dtable td.main { color: var(--fg); font-weight: 650; }
+.dtable a { color: var(--accent); font-weight: 600; }
+.dtable a:hover { text-decoration: underline; }
+.dtable tr.tone-ok td:first-child { box-shadow: inset 3px 0 0 var(--ok); }
+.dtable tr.tone-bad td:first-child { box-shadow: inset 3px 0 0 var(--bad); }
+.dtable tr.tone-warn td:first-child { box-shadow: inset 3px 0 0 var(--warn); }
+@media (max-width: 640px) {
+  .dtable thead { display: none; }
+  .dtable, .dtable tbody, .dtable tr, .dtable td { display: block; width: 100%; }
+  .dtable tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .dtable tr:last-child { border-bottom: 0; }
+  .dtable td { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; text-align: right; }
+  .dtable td::before { content: attr(data-label); color: var(--muted); font-size: 12.5px; text-align: left; }
+  .dtable td.main { display: block; text-align: left; font-size: 15px; }
+  .dtable td.main::before { content: none; }
+}
+
+/* Facts: label / value pairs */
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 9px 22px; margin: 0; font-size: 14px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; color: var(--fg); font-weight: 600; overflow-wrap: anywhere; }
+.facts a { color: var(--accent); }
+@media (max-width: 520px) { .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; } .facts dd { margin-bottom: 8px; } }
+
+/* InSIS's own form inside a card */
+.form-card { display: flex; flex-direction: column; gap: 6px; }
+.form-lead { margin: 0 0 8px; font-size: 13.5px; line-height: 1.45; }
+
+/* InSIS's message boxes, redrawn */
+.kit-note { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; line-height: 1.45; }
+.kit-note svg { width: 17px; height: 17px; flex: none; margin-top: 1px; }
+.kit-note.bad { background: var(--bad-soft); color: var(--bad); }
+.kit-note.warn { background: var(--warn-soft); color: var(--warn); }
+.kit-note.ok { background: var(--ok-soft); color: var(--ok); }
+.kit-note.info svg { color: var(--accent); }
+.kit-page .muted.small { margin: 0; font-size: 12.5px; }

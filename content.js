@@ -1,10 +1,8 @@
 // InSIS+ — command palette (Ctrl+K) over every InSIS page you have seen.
 // Data never leaves the browser. Also the storage of InSIS+ (personal data per session, settings per user).
 (() => {
-  // Frames are left alone, except the hidden frame sync.js uses to read pages in the background: there page modules
-  // only parse and store their data (ipx.syncOnly), nothing is drawn.
-  const syncOnly = window.top !== window && window.name === 'ipx-sync';
-  if (window.top !== window && !syncOnly) return;
+  // Frames (InSIS's pop-ups and embedded pages) are left alone.
+  if (window.top !== window) return;
 
   const STORE_KEY = 'insisPlus';
   const MAX_LINKS = 2000;
@@ -55,8 +53,11 @@
   // - settings and the small "seen" record, per InSIS user (a hash of InSIS's user id from the page header), in local
   //   storage; nothing at all in Shared computer mode.
 
-  const PERSONAL = ['timetable', 'submissions', 'docserver', 'studyRecord', 'portal', 'sync', 'courses', 'profile',
-    'menu', 'homeUrl', 'messages', 'notices'];
+  // What is kept on disk (local storage, per user): only these settings. Everything else InSIS+ holds is data read
+  // from InSIS and lives in session storage only (PRIVACY.md), so a new kind of data can never be kept by accident.
+  const SETTINGS = ['links', 'fav', 'plus', 'classic', 'sideCollapsed', 'seen'];
+  const FLAGS = ['shared', 'sharedAsked'];
+  const personalKeys = (obj) => Object.keys(obj || {}).filter((k) => !SETTINGS.includes(k) && !FLAGS.includes(k));
   // Data stored by page modules, each with an `updated` time: on save the newer copy wins (another tab, the sync frame).
   const DATA_KEYS = ['timetable', 'submissions', 'docserver', 'studyRecord', 'portal', 'sync', 'messages'];
   const SESSION_KEY = 'insisPlusSession';
@@ -98,11 +99,10 @@
   }
 
   const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
-  const omit = (obj, keys) => Object.fromEntries(Object.entries(obj || {}).filter(([k]) => !keys.includes(k)));
 
   async function wipePersonal() {
     await session.area.remove(session.key);
-    for (const k of PERSONAL) delete state[k];
+    for (const k of personalKeys(state)) delete state[k];
   }
 
   async function load() {
@@ -112,7 +112,7 @@
     shared = !!local.shared;
     // Before 0.7 everything lived in one local object: personal data is dropped, settings move to this user.
     if (local.links || local.fav || local.timetable) {
-      const settings = omit(local, [...PERSONAL, 'users', 'shared', 'lastUser']);
+      const settings = pick(local, SETTINGS);
       const next = { shared, users: {} };
       if (user && !shared) next.users[user] = settings;
       await chrome.storage.local.set({ [STORE_KEY]: next });
@@ -129,7 +129,7 @@
       await session.area.remove(session.key);
       personal = null;
     }
-    const settings = user && !shared ? local.users?.[user] || {} : {};
+    const settings = user && !shared ? pick(local.users?.[user], SETTINGS) : {};
     state = Object.assign({ links: {}, fav: [] }, settings, user ? personal?.data || {} : {});
     state.shared = shared;
     state.sharedAsked = !!local.sharedAsked;
@@ -160,20 +160,12 @@
     if (!user) return;
     const stored = (await session.area.get(session.key))[session.key];
     const storedData = stored?.user === user ? stored.data : {};
-    let data = pick(state, PERSONAL);
-    if (syncOnly) {
-      // The sync frame only adds page data it read; everything else stays as the visible tabs left it.
-      data = { ...storedData };
-      for (const k of DATA_KEYS) if (state[k] && (state[k].updated || 0) > (storedData?.[k]?.updated || 0)) data[k] = state[k];
-      data.courses = { ...storedData?.courses, ...state.courses };
-    } else if (adoptNewer(storedData)) {
-      data = pick(state, PERSONAL);
-      dataListeners.forEach((fn) => fn());
-    }
+    if (adoptNewer(storedData)) dataListeners.forEach((fn) => fn());
+    const data = pick(state, personalKeys(state));
     await session.area.set({ [session.key]: { user, active: Date.now(), data } });
-    if (syncOnly || shared) return;
+    if (shared) return;
     const local = (await chrome.storage.local.get(STORE_KEY))[STORE_KEY] || {};
-    local.users = { ...local.users, [user]: omit(state, [...PERSONAL, 'shared', 'sharedAsked']) };
+    local.users = { ...local.users, [user]: pick(state, SETTINGS) };
     await chrome.storage.local.set({ [STORE_KEY]: local });
   }
 
@@ -203,7 +195,7 @@
     if (!change || area !== session.name) return;
     if (!change.newValue) {
       // Wiped (logout elsewhere, idle timer): forget it here too.
-      for (const k of PERSONAL) delete state[k];
+      for (const k of personalKeys(state)) delete state[k];
       dataListeners.forEach((fn) => fn());
       return;
     }
@@ -494,7 +486,6 @@
   );
 
   const ready = load().then(() => {
-    if (syncOnly) return;
     watchActivity();
     applyTheme();
     indexPage();
@@ -505,7 +496,6 @@
   // Shared with ui.js, sync.js and the page modules (same content-script world).
   globalThis.insisPlus = {
     ready,
-    syncOnly,
     onData: (fn) => dataListeners.push(fn),
     notify: () => dataListeners.forEach((fn) => fn()),
     lang,
