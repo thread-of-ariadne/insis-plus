@@ -300,7 +300,27 @@
 
   // ---------- UI ----------
 
+  // ---------- theme (InSIS+ settings: system / light / dark) ----------
+  // An explicit choice is an attribute: on <html> for InSIS's own content (generic.css), and data-theme on every
+  // InSIS+ shadow host (marked data-ipx-host), whose stylesheets read it with :host([data-theme]).
+  function applyTheme() {
+    const theme = state.plus?.theme;
+    const explicit = theme === 'light' || theme === 'dark' ? theme : null;
+    if (explicit) document.documentElement.dataset.ipxTheme = explicit;
+    else delete document.documentElement.dataset.ipxTheme;
+    for (const el of document.querySelectorAll('[data-ipx-host]')) {
+      if (explicit) el.dataset.theme = explicit;
+      else delete el.dataset.theme;
+    }
+  }
+  function setTheme(theme) {
+    state.plus = { ...state.plus, theme };
+    applyTheme();
+    return save();
+  }
+
   const host = document.createElement('div');
+  host.dataset.ipxHost = '';
   host.id = 'insis-plus-root';
   const root = host.attachShadow({ mode: 'closed' });
   const el = (tag, props = {}, ...kids) => {
@@ -461,6 +481,7 @@
   const ready = load().then(() => {
     if (syncOnly) return;
     watchActivity();
+    applyTheme();
     indexPage();
     save();
     document.body.append(host);
@@ -485,6 +506,8 @@
     setShared,
     clearAll,
     wipe: wipePersonal,
+    setTheme,
+    applyTheme,
     open,
     setFab: (visible) => {
       fab.hidden = !visible;

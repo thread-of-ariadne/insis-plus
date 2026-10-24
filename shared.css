@@ -29,6 +29,7 @@
   --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   all: initial;
+  color-scheme: light;
   display: block;
   font: 15px/1.5 var(--font);
   color: var(--fg);
@@ -36,7 +37,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :host {
+  :host(:not([data-theme="light"])) {
+    color-scheme: dark;
     --canvas: #0c0e13;
     --haze: radial-gradient(1100px 760px at 0 0, #1b2447 0%, #121729 40%, #0c0e13 78%);
     --panel: #14171f;
@@ -62,6 +64,32 @@
     --shadow-raised: 0 4px 12px -6px rgba(0, 0, 0, 0.8);
   }
 }
+:host([data-theme="dark"]) {
+    color-scheme: dark;
+    --canvas: #0c0e13;
+    --haze: radial-gradient(1100px 760px at 0 0, #1b2447 0%, #121729 40%, #0c0e13 78%);
+    --panel: #14171f;
+    --surface: #1b1f2a;
+    --hover: rgba(255, 255, 255, 0.06);
+    --fg: #eceef4;
+    --fg-2: #c5c9d6;
+    --muted: #9aa1b2;
+    --faint: #7b8296;
+    --line: #232734;
+    --chip: #262b39;
+    --accent: #8d9cff;
+    --accent-ink: #0c0e13;
+    --accent-soft: #1f2547;
+    --ok: #4ade80;
+    --ok-soft: #14301f;
+    --bad: #f87171;
+    --bad-soft: #3a1717;
+    --warn: #fbbf24;
+    --warn-soft: #33270f;
+    --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03), 0 12px 28px -18px rgba(0, 0, 0, 0.7);
+    --shadow-panel: 0 16px 40px -24px rgba(0, 0, 0, 0.8);
+    --shadow-raised: 0 4px 12px -6px rgba(0, 0, 0, 0.8);
+  }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -539,8 +567,9 @@ kbd {
 .next-row.first .next-sep { background: color-mix(in srgb, currentColor 25%, transparent); }
 .next-row.first small, .next-row.first .next-time { color: color-mix(in srgb, currentColor 70%, transparent); }
 @media (prefers-color-scheme: dark) {
-  .next-row.first, .next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
+  :host(:not([data-theme="light"])) .next-row.first, :host(:not([data-theme="light"])) .next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 }
+:host([data-theme="dark"]) .next-row.first, :host([data-theme="dark"]) .next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
 
 /* Hours per weekday */
 .hours .card-head .more { color: var(--fg); font-weight: 700; }
@@ -790,3 +819,14 @@ button.avatar { border: 0; cursor: pointer; }
 .btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink, #fff); font: 700 14px var(--font); cursor: pointer; }
 .btn.ghost { background: var(--chip); color: var(--fg); }
 .btn:hover { filter: brightness(1.06); }
+
+/* Segmented choice (InSIS+ settings › Appearance) */
+.segmented { display: flex; flex: none; gap: 4px; padding: 4px; border-radius: 12px; background: var(--chip); }
+.segmented button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: var(--muted); font: 600 14px var(--font); cursor: pointer; }
+.segmented button:hover { color: var(--fg); }
+.segmented button.on { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-raised); }
+@media (max-width: 600px) {
+  .setting:has(.segmented) { flex-wrap: wrap; }
+  .segmented { width: 100%; }
+  .segmented button { flex: 1; padding: 0 8px; }
+}

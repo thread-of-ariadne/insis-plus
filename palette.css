@@ -12,7 +12,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :host {
+  :host(:not([data-theme="light"])) {
     --bg: #1c1f26;
     --fg: #e8eaee;
     --muted: #9aa1ad;
@@ -21,6 +21,14 @@
     --accent-soft: #263049;
   }
 }
+:host([data-theme="dark"]) {
+    --bg: #1c1f26;
+    --fg: #e8eaee;
+    --muted: #9aa1ad;
+    --line: #2e333d;
+    --accent: #8fb0ff;
+    --accent-soft: #263049;
+  }
 
 .fab {
   position: fixed;

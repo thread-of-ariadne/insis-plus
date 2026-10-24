@@ -25,7 +25,7 @@ html.ipx-generic #str1 {
   font: 15px/1.5 "Figtree", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  html.ipx-generic #str1 {
+  html.ipx-generic:not([data-ipx-theme="light"]) #str1 {
     --surface: #1b1f2a;
     --fg: #eceef4;
     --fg-2: #c5c9d6;
@@ -41,6 +41,21 @@ html.ipx-generic #str1 {
     --shadow-raised: 0 4px 12px -6px rgba(0, 0, 0, 0.8);
   }
 }
+html.ipx-generic[data-ipx-theme="dark"] #str1 {
+    --surface: #1b1f2a;
+    --fg: #eceef4;
+    --fg-2: #c5c9d6;
+    --muted: #9aa1b2;
+    --faint: #7b8296;
+    --line: #232734;
+    --chip: #262b39;
+    --stripe: #181c26;
+    --accent: #8d9cff;
+    --accent-ink: #0c0e13;
+    --accent-soft: #1f2547;
+    --shadow-card: 0 12px 28px -18px rgba(0, 0, 0, 0.7);
+    --shadow-raised: 0 4px 12px -6px rgba(0, 0, 0, 0.8);
+  }
 
 /* The shell's top bar already shows the title and trail */
 html.ipx-generic #str1 nav[aria-label="breadcrumb"],

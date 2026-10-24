@@ -17,7 +17,7 @@ deleted:
 itself), in the extension's local storage:
 
 - pinned pages and the addresses and titles of InSIS pages you opened (for Ctrl+K search);
-- interface choices (collapsed sidebar, Classic view per page type, background reads on or off);
+- interface choices (appearance, collapsed sidebar, Classic view per page type, background reads on or off);
 - a small record for Notifications: the time of your last visit to Notifications and the last count of new
   documents (plain values; nothing about your grades or courses).
 

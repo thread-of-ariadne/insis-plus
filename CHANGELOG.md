@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+- Appearance in InSIS+ settings: follow the system, or always light or dark. Applied at once to the shell, the
+  search palette and InSIS's own content; kept per user like other settings.
+
 ## [0.7.0] - 2026-10-24
 
 ### Added
