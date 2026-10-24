@@ -78,14 +78,23 @@
     return { area: chrome.storage.local, name: 'local', key: 'insisPlusVolatile' };
   }
 
-  // InSIS's header shows the logged-in user's photo as /img.pl?userunid=<id> on every logged-in page.
+  // InSIS's header names the logged-in user on every logged-in page: <span id="logs"><strong>Přihlášen:</strong> Name</span>.
+  // (The header's img.pl?userunid= images are InSIS's own icons, the same for everyone.) Only a one-way hash is kept.
+  const hash = async (text) => {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`insis-plus:${text}`));
+    return [...new Uint8Array(digest).slice(0, 8)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  };
   async function currentUser() {
+    const logs = document.getElementById('logs');
+    if (!logs) return null;
+    const name = clean([...logs.childNodes].filter((n) => n.nodeName !== 'STRONG').map((n) => n.textContent).join(' '));
+    return name ? hash(`name:${name}`) : null;
+  }
+  // Settings kept before 0.7.1 sit under the hash of the shared logout icon's number.
+  async function legacyUser() {
     const img = document.querySelector('#navigace img[src*="userunid="], img.in-header[src*="userunid="]');
     const id = img && /userunid=(\d+)/.exec(img.getAttribute('src'))?.[1];
-    if (!id) return null;
-    const bytes = new TextEncoder().encode(`insis-plus:${id}`);
-    const digest = await crypto.subtle.digest('SHA-256', bytes);
-    return [...new Uint8Array(digest).slice(0, 8)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    return id ? hash(id) : null;
   }
 
   const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
@@ -108,6 +117,12 @@
       if (user && !shared) next.users[user] = settings;
       await chrome.storage.local.set({ [STORE_KEY]: next });
       Object.assign(local, next);
+    }
+    const legacy = user && !shared && local.users && await legacyUser();
+    if (legacy && legacy !== user && local.users[legacy]) {
+      local.users[user] = local.users[user] || local.users[legacy];
+      delete local.users[legacy];
+      await chrome.storage.local.set({ [STORE_KEY]: local });
     }
     let personal = (await session.area.get(session.key))[session.key];
     if (personal && (personal.user !== user || Date.now() - (personal.active || 0) > IDLE_MS)) {

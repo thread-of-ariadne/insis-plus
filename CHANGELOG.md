@@ -6,9 +6,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-24
+
 ### Added
 - Appearance in InSIS+ settings: follow the system, or always light or dark. Applied at once to the shell, the
   search palette and InSIS's own content; kept per user like other settings.
+- Course › Overview shows the course's syllabus inside the page (facts, aims, outcomes, content, assessment,
+  literature, time load) next to the next classes and what is coming; the separate Syllabus tab is gone.
+- Course › Materials shows the course folder's subfolders right away (file counts, new files); a folder opens in
+  InSIS on your click. Courses › Materials lists every course with its folders.
+- Study matters and Campus & people are overviews: your study and its state, things to handle, your teachers this
+  semester; the sections in compact columns, and as a submenu in the sidebar while you are there.
+
+### Changed
+- One course card everywhere (Home, My courses, Materials).
+- InSIS's own tab rows (document server views, portal tabs) are a thin underlined row instead of a second segmented
+  bar under the destination tabs. The document server's whole-tree page keeps only the tree and links to Materials.
+- Course People lists the teachers from the syllabus (with role and person page).
+
+### Fixed
+- The InSIS user was recognised by an icon in InSIS's header that is the same for everyone, so per-user settings
+  and the "another user logged in" wipe did not tell users apart. The user is now recognised by a one-way hash of
+  the logged-in name; settings kept so far move over once.
+- Links in public InSIS pages shown inside InSIS+ (e.g. a teacher's page in the syllabus) were turned into plain text.
 
 ## [0.7.0] - 2026-10-24
 
@@ -135,7 +155,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 - Ctrl+K search over InSIS pages, indexed as you browse; favourites and frequently used pages.
 
-[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.8.0...HEAD
 [0.5.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.2.0...v0.3.0

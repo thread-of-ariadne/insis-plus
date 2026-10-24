@@ -20,6 +20,9 @@
       clear: 'Smazat uložená data', clearText: 'Smaže vše, co InSIS+ uložil, kromě volby sdíleného počítače.', clearButton: 'Smazat', cleared: 'Smazáno.',
       newFiles: (n) => `${n} nových dokumentů`, result: (c, n) => `Výsledek: ${c} ${n}`, fresh: 'nové', noNotifications: 'Zatím nic nového.',
       notifHint: 'Upozornění ukazují, co se v InSIS změnilo. Zprávy v InSIS najdete pod ikonou obálky.',
+      myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
+      studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
+      myTeachers: 'Tvoji vyučující v tomto semestru', findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
       nextDegree: 'Přihlášky ke studiu jsou v InSIS pod položkou Přihláška ke studiu na hlavní stránce (v klasickém zobrazení). InSIS+ je zatím neotevírá. Pokud si nejste jistí postupem, zeptejte se na studijním oddělení.' },
     en: { soon: 'This InSIS+ page is still being built.', open: 'Open in InSIS', settingsLead: 'Settings of the InSIS+ extension.',
       classic: 'Classic InSIS look', classicText: 'Switch the InSIS+ look off on any page with Classic view at the bottom of the sidebar.',
@@ -31,6 +34,9 @@
       clear: 'Clear stored data', clearText: 'Deletes everything InSIS+ stored, except the shared-computer choice.', clearButton: 'Clear', cleared: 'Cleared.',
       newFiles: (n) => `${n} new documents`, result: (c, n) => `Result: ${c} ${n}`, fresh: 'new', noNotifications: 'Nothing new yet.',
       notifHint: 'Notifications show what changed in InSIS. InSIS messages are under the envelope icon.',
+      myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
+      studyUnknown: 'Your study details have not loaded yet.', toHandle: 'To handle', nothingToHandle: 'Nothing waiting.',
+      myTeachers: 'Your teachers this semester', findPerson: 'Find a person', teachersUnknown: 'Your teachers appear once your timetable has loaded.',
       nextDegree: 'Study applications are in InSIS under Study application form on the main page (in Classic view). InSIS+ does not open them yet. If you are unsure how to apply, ask the study department.' },
   }[lang];
 
@@ -52,9 +58,84 @@
     }));
   }
 
-  for (const dest of ['matters', 'campus', 'all', 'help', 'account']) {
+  for (const dest of ['all', 'help', 'account']) {
     register(`dest.${dest}`, () => ({ title: nav.label(dest), build: () => groupedList(dest) }));
   }
+
+  // ---------- Study matters and Campus & people: what is going on first, then the sections ----------
+  // (docs/ia/02-redesign.md §3). The sections are also a submenu in the sidebar while you are in the destination.
+
+  // The destination's groups as compact columns: one card per group, a plain row per section with its gloss.
+  function groupColumns(dest) {
+    const groups = nav.tabs[dest];
+    return h('div', { class: 'gcols' }, Object.entries(groups).map(([group, nodes]) => {
+      const links = nodeLinks(nodes);
+      return links.length > 0 && h('section', { class: 'card gcol' },
+        h('h2', { class: 'card-title' }, nav.label(group)),
+        h('div', { class: 'gcol-items' }, links.map((l) => anchor(l, { class: 'gcol-item' },
+          h('span', { class: 'glist-text' }, h('strong', {}, l.text), l.gloss && h('small', {}, l.gloss)),
+          h('span', { class: 'glist-go' }, icon('arrow'))))));
+    }));
+  }
+
+  const todoRows = (items) => h('div', { class: 'todo-mini' }, items.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
+    h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
+    it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))));
+
+  register('dest.matters', () => ({
+    title: nav.label('matters'),
+    build: () => {
+      const s = ipx.state.portal?.study;
+      const restricted = s?.restriction && !/^[-–—\s]*$/.test(s.restriction);
+      const statusHref = nav.target('studies.status');
+      // Things to handle that belong to no course: a restriction, InSIS's personal data check.
+      const todo = ipx.todo ? ipx.todo.items().filter((it) => !it.code) : [];
+      return h('div', { class: 'dest-page' },
+        h('div', { class: 'dest-top' },
+          h('section', { class: 'card pad study-card' },
+            h('div', { class: 'card-head' }, h('h2', {}, T.myStudy), statusHref && anchor({ href: statusHref }, { class: 'more' }, T.details)),
+            s ? [
+              h('p', { class: 'study-name' }, s.name),
+              s.detail && h('p', { class: 'muted' }, s.detail),
+              h('p', { class: 'study-facts' },
+                s.faculty && h('span', { class: 'chip' }, s.faculty),
+                s.progress && h('span', { class: 'chip' }, s.progress),
+                h('span', { class: `delta ${restricted ? 'bad' : 'ok'}` }, restricted ? `${T.restricted}: ${s.restriction}` : T.noRestriction)),
+            ] : h('p', { class: 'muted' }, T.studyUnknown)),
+          h('section', { class: 'card pad' },
+            h('h2', { class: 'card-title' }, T.toHandle),
+            todo.length ? todoRows(todo) : h('p', { class: 'muted' }, T.nothingToHandle))),
+        groupColumns('matters'));
+    },
+  }));
+
+  register('dest.campus', () => ({
+    title: nav.label('campus'),
+    build: () => {
+      // Teachers of this semester's classes, from the personal timetable: name, the courses, their InSIS page.
+      const people = new Map();
+      for (const e of ipx.state.timetable?.events || []) {
+        const list = e.people?.length ? e.people : (e.teacher || '').split(/,\s*/).filter(Boolean).map((text) => ({ text }));
+        for (const p of list) {
+          const key = ipx.clean(p.text);
+          if (!key) continue;
+          const it = people.get(key) || { text: key, href: p.href && nav.safe(p.href, 'link', { copied: true }), codes: new Set() };
+          if (e.code) it.codes.add(e.code);
+          people.set(key, it);
+        }
+      }
+      const list = [...people.values()].sort((a, b) => a.text.localeCompare(b.text, lang));
+      return h('div', { class: 'dest-page' },
+        h('section', { class: 'card pad' },
+          h('div', { class: 'card-head' }, h('h2', {}, T.myTeachers), nav.target('campus.people') && anchor({ href: nav.target('campus.people') }, { class: 'more' }, T.findPerson)),
+          list.length ? h('div', { class: 'people-grid' }, list.map((p) => (p.href ? anchor : (l, props, ...k) => h('span', props, ...k))(
+            { href: p.href }, { class: 'person' },
+            h('span', { class: 'avatar sm' }, ipx.ui.initials(p.text)),
+            h('span', { class: 'person-text' }, h('strong', {}, p.text), p.codes.size > 0 && h('small', {}, [...p.codes].join(', '))))))
+            : h('p', { class: 'muted' }, T.teachersUnknown)),
+        groupColumns('campus'));
+    },
+  }));
 
   // Sections whose InSIS pages are not verified yet: say where to go and who to ask (docs/ia/02-redesign.md §3).
   const signpost = (node, text) => register(node, () => ({

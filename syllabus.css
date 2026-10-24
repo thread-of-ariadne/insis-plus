@@ -76,15 +76,7 @@ details.legend { margin-top: 14px; }
 details.legend summary { color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; }
 details.legend[open] summary { margin-bottom: 10px; }
 
-/* Lecturers, like the schedule cards of the reference */
-.people { display: flex; flex-direction: column; gap: 8px; }
-.person { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; }
-.person:hover { border-color: var(--accent); }
-.avatar.sm { width: 38px; height: 38px; font-size: 13px; }
-.person-text { min-width: 0; }
-.person strong { display: block; font-size: 14px; font-weight: 650; }
-.person small { color: var(--muted); font-size: 12.5px; }
-.person small::first-letter { text-transform: uppercase; }
+/* Lecturers: .people / .person live in shared.css */
 
 /* Charts */
 .chart { display: flex; flex-direction: column; gap: 16px; }

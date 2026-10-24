@@ -19,3 +19,26 @@
 @media (max-width: 760px) {
   .course-grid { grid-template-columns: minmax(0, 1fr); }
 }
+.course-syllabus { min-width: 0; }
+.course-syllabus .kpis { margin-bottom: 0; }
+.course-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; font-size: 14px; }
+.course-links a { color: var(--accent); font-weight: 600; }
+.course-links a:hover { text-decoration: underline; }
+.course-head { flex-direction: row; align-items: center; gap: 12px; }
+
+/* Course › Materials: the course folder's subfolders, one row each, indented by depth. */
+.folder-list { display: flex; flex-direction: column; margin: 0 -10px; }
+.folder-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px 9px calc(10px + var(--depth, 0) * 22px); border-radius: 10px; color: var(--fg); }
+a.folder-row:hover { background: var(--hover, color-mix(in srgb, var(--accent) 7%, transparent)); }
+a.folder-row:hover .glist-go { color: var(--accent); }
+.folder-row .ds-ico { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 9px; background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+.folder-row .ds-ico svg { width: 17px; height: 17px; }
+.folder-row .glist-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.folder-row .glist-text strong { font-size: 14.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-row .glist-text small { color: var(--muted); font-size: 12.5px; }
+.folder-row .glist-go { color: var(--faint); }
+.muted.small { margin: 12px 0 0; font-size: 12.5px; }
+.folder-row.is-empty .glist-text strong { color: var(--muted); font-weight: 500; }
+.files-course .card-head { align-items: center; }
+.files-course .course-code { font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; }
+.files-course h2 a:hover { color: var(--accent); }

@@ -72,20 +72,24 @@ html.ipx-generic #str1 b, html.ipx-generic #str1 strong { color: var(--fg); }
 html.ipx-generic #str1 .uf-icon svg { width: 16px; height: 16px; vertical-align: -3px; }
 html.ipx-generic #str1 .uf-icon.xs svg, html.ipx-generic #str1 .uf-icon.xxs svg { width: 14px; height: 14px; }
 
-/* Tab rows (portal_menu) as a segmented control */
-html.ipx-generic #str1 table.portal_menu { margin: 4px 0 20px; padding: 3px; border-collapse: separate; border-spacing: 0; border-radius: 12px; background: var(--chip); box-shadow: none; }
-html.ipx-generic #str1 table.portal_menu td { padding: 0 !important; border: 0 !important; background: none !important; }
+/* InSIS's own tab rows (portal_menu): a quiet underlined row on one line, under InSIS+'s destination tabs */
+html.ipx-generic #str1 table.portal_menu { display: block; margin: 4px 0 20px; overflow-x: auto; scrollbar-width: none; border-collapse: collapse; border-bottom: 1px solid var(--line); background: none; box-shadow: none; }
+html.ipx-generic #str1 table.portal_menu tbody, html.ipx-generic #str1 table.portal_menu tr { display: flex; gap: 22px; }
+html.ipx-generic #str1 table.portal_menu td { padding: 0 !important; border: 0 !important; background: none !important; white-space: nowrap; }
 html.ipx-generic #str1 table.portal_menu a {
   display: inline-block;
-  padding: 7px 14px;
-  border-radius: 9px;
+  padding: 2px 0 10px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
 }
 html.ipx-generic #str1 table.portal_menu a:hover { color: var(--fg); }
-html.ipx-generic #str1 table.portal_menu b a { background: var(--surface); color: var(--fg); font-weight: 700; box-shadow: var(--shadow-raised); }
+html.ipx-generic #str1 table.portal_menu b a { border-bottom-color: var(--accent); color: var(--fg); font-weight: 700; }
+/* InSIS's separators between tabs ("|") */
+html.ipx-generic #str1 table.portal_menu td:not(:has(a)) { display: none; }
 
 /* Data tables: the ones with a header row (zahlavi) become cards; layout tables stay invisible */
 html.ipx-generic #str1 table { border-collapse: collapse; font-size: 14px; }

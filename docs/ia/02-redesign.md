@@ -109,7 +109,7 @@ covers **157 page types**: those 138 plus 19 seen as links but deliberately not 
 ```
 Home                    To do · My courses · InSIS notices | rail: This week · Timetable · New materials · Teaching hours
 Courses                 My courses · Materials · All submissions · Registration & enrolment · Catalogue · Course evaluation
-  └ Course page         Overview · Files · Submissions · Points · People · Syllabus
+  └ Course page         Overview (with the syllabus) · Materials · Submissions · Points · People
 Schedule                My week · Academic calendar · Timetable search · Export to calendar
 Exams                   My dates · Available dates · Past · Not yet scheduled · Online tests       (header: exam period dates)
   └ Exam date           (InSIS page: details; InSIS's own link to who is registered)
@@ -151,12 +151,11 @@ right rail (this week, timetable, new materials, teaching hours). On phones the 
   unmatched records stay visible under "Not matched – browse all"). Empty tabs are hidden.
   | Tab | Contents (InSIS sources) |
   |---|---|
-  | Overview | next classes (personal timetable), weekly plan (course e-plans), teachers with office hours, completion, credits, my status; while open: an online test or quiz of this course to do, link to the course evaluation list; link to InSIS's lectures sheet (notification settings are there) |
-  | Files | a link to the course's document-server folder when matched (the folder link is copied from the lectures sheet or the document server's tree, where the crawl shows course-folder links; read when the course page opens; to verify — until then Files links to all folders), else to all folders; a Moodle link once its address is confirmed ("some teachers put slides in Moodle instead") |
+  | Overview | the course's syllabus inside the page (facts as KPIs, aims, learning outcomes, content, assessment, literature, time load; read when the course page opens, links pass the URL rule), with next classes and "What is coming" on top of its right column; links to the full syllabus and the lectures sheet in InSIS. Still planned: weekly plan (course e-plans), teachers with office hours; while open: an online test or quiz of this course to do, link to the course evaluation list; link to InSIS's lectures sheet (notification settings are there) |
+  | Materials | the course folder's subfolders right in the tab (name, file count, new files), from the document server's tree page read in the background; each folder opens in InSIS on the student's click (opening a folder may mark files as read, so InSIS+ never reads folder pages); else a link to all folders; a Moodle hint |
   | Submissions | the course's boxes (individual or group as InSIS states; for group boxes a teammate's upload counts), topic sign-up rows whose course code matches |
   | Points / Body | points so far as InSIS's own text (never totals), result and attempts, this course's exam dates, online tests when matched |
   | People | teachers: office hours, e-mail address (opens your own mail app; "teachers read their university e-mail"), and "Write in InSIS" (InSIS's own compose link, copied from InSIS's page); seminar groups and classmates (first page; InSIS link for more) |
-  | Syllabus | redesigned syllabus, pass rates |
 - **Registration & enrolment / Registrace a zápis** (always here; a badge during rounds, and the round as a To do item on Home): the rounds
   with dates (from the academic year schedule, the same data as the Academic calendar) and plain explanations —
   *registration* = your wishes ranked by priority, *enrolment* = confirmed places, changes after enrolment — then
@@ -166,9 +165,10 @@ right rail (this week, timetable, new materials, teaching hours). On phones the 
 - **Catalogue**: InSIS's course search (choose the period on InSIS's form); syllabi of any course; pass rates.
 - **Course evaluation / Anketa**: InSIS's list of questionnaires.
 - **Materials / Materiály** (second tab of Courses, right after My courses — the document server is one of the most
-  used places): my courses first, each with its new-file count and its folder; then InSIS's document server views
-  (new documents, all my folders, the whole tree, search, settings), the e-library and the Moodle link (once
-  confirmed).
+  used places): one card per course of this period with its new-file count and its top-level folders as rows (a row
+  opens that folder in InSIS; the course name opens the course's Materials tab); then InSIS's document server views
+  (new documents, the whole tree, search) and the e-library. The same course card (cover, code, name, next class,
+  deadline, new files) is used on Home and My courses. InSIS's whole-tree page keeps only the tree and points here.
 
 ### Schedule
 - **My week** (opened by "Full timetable →" on Home): InSIS+'s week view of the personal timetable with the week
@@ -209,7 +209,10 @@ Available dates with `zalozka=1`, so the right tab stays highlighted.
   missing ("am I on track to graduate"), map of my study, my study plan.
 
 ### Study matters / Studijní záležitosti
-A grouped list (each row with a short line and, where known, a live value); groups side by side on desktop.
+An overview, not a page of links: **Your study** (programme, form, faculty, state, restriction or "No restriction",
+from the Student's portal) and **To handle** (To do items that belong to no course: a restriction, InSIS's personal
+data check); then the groups as compact columns, each row with its short line. In the sidebar the destination opens
+its sections as a submenu while you are in it (the InSIS page you opened is highlighted there).
 
 | Group › Section | Contents |
 |---|---|
@@ -224,7 +227,8 @@ A grouped list (each row with a short line and, where known, a live value); grou
 | Thesis, exchange & career › Next degree | study application forms (e.g. master's): *the page was not opened in the crawl; until verified this row explains where to apply and links to Who to ask*; admission documents delivered to me are under Confirmations & decisions |
 
 ### Campus & people / Kampus a lidé
-A grouped list.
+An overview: **Your teachers this semester** (from the personal timetable: name, the courses, their InSIS person
+page), then the groups as compact columns; a submenu in the sidebar like Study matters.
 - **Contacts**: **Who to ask / Na koho se obrátit** (whom to contact by faculty and topic, the Study Department
   page, link to Help › Ask a question) · **People** (InSIS's person search, opened unchanged; person pages with
   contacts, office hours, teaching, theses) · **Departments** (structure, staff, phone directory, supervised

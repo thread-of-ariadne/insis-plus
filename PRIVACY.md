@@ -13,7 +13,7 @@ deleted:
 - when a different InSIS user logs in in the same browser;
 - after 10 minutes without activity in InSIS, even if no InSIS tab is open.
 
-**Your settings**, per InSIS user (identified by a one-way hash of InSIS's internal user number, never the number
+**Your settings**, per InSIS user (identified by a one-way hash of the name InSIS shows as logged in, never the name
 itself), in the extension's local storage:
 
 - pinned pages and the addresses and titles of InSIS pages you opened (for Ctrl+K search);

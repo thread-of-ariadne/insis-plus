@@ -40,6 +40,8 @@ window.__ipxFixtureFor = (url) => {
   const map = [[/rozvrh_student/, 'timetable-personal'], [/moje_studium/, 'student-portal'],
     [/pruchod_studiem/, 'study-record'], [/odevzdavarny/, 'submissions', 'submissions-cs-real'], [/dok_server\/$/, 'docserver'],
     [/posta\/slozka/, 'mailbox', 'mailbox']];
+  // Public pages (syllabi) come from the public snapshots one folder up.
+  if (/syllabus\.pl/.test(url)) return new URL(cs ? '../syllabus-cs.html' : '../syllabus-en.html', location.href).href;
   const hit = map.find(([re]) => re.test(url));
   return hit && new URL((cs ? hit[2] || hit[1] + '-cs' : hit[1]) + '.built.html', location.href).href;
 };

@@ -23,12 +23,16 @@
    | Open | What you should see |
    |---|---|
    | Předměty | Tabs Moje předměty · Materiály · Všechny odevzdávárny · Registrace a zápis · Katalog · Anketa |
-   | A course card | The course page with Souhrn · Materiály · Odevzdávárny · Body · Lidé · Sylabus; Lidé lists classmates |
-   | Předměty › Materiály | Your course folders with new counts, then InSIS's document server views |
+   | A course card | The course page with Souhrn · Materiály · Odevzdávárny · Body · Lidé. Souhrn shows the syllabus (credits, completion, aims, content, assessment, literature) with next classes and teachers on the right; Lidé lists teachers and classmates |
+   | Course › Materiály | The course folder's subfolders with file counts and new files, right in the tab; a row opens that folder in InSIS |
+   | Předměty › Materiály | One card per course with its folders (no extra click), then InSIS's document server views. Moje předměty, Materiály and Přehled use the same course card |
+   | Dokumentový server (Celý strom) | The whole tree; its own views as a thin underlined row (no second tab bar) and a link to Materiály |
    | Rozvrh | Your personal timetable (week view) with tabs Můj týden · Harmonogram · Hledání rozvrhů · Export |
    | Zkoušky | InSIS's exam list with the tabs Moje termíny · Volné termíny · Proběhlé · Zatím bez termínu · Testy |
    | Známky a kredity | The e-index (Výsledky) and Co mi chybí |
-   | Studijní záležitosti, Kampus a lidé, All services | Grouped lists; each row opens the InSIS page |
+   | Studijní záležitosti | Your study (programme, state, restriction) and K vyřízení on top, then the sections in compact columns; the sidebar opens the sections as a submenu |
+   | Kampus a lidé | Your teachers this semester (each opens their person page), then the sections; a submenu in the sidebar |
+   | All services | Grouped list; each row opens the InSIS page |
    | Envelope (Messages) | InSIS's mail box with "Where do messages arrive?" and a button to Outlook |
    | Bell (Notifications) | New documents and newly entered results; opening it clears the dot |
    | Any other InSIS page | The shell around the original page, with the right section highlighted |
