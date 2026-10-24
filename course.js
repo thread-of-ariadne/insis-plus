@@ -190,7 +190,7 @@
       ...d, href: d.folderId && nav.safe(new URL(`/auth/dok_server/slozka.pl?id=${d.folderId}`, document.baseURI).href, 'link'),
     }));
   }
-  const docRow = (d, withCourse) => {
+  const docRow = (d, withCourse, inCourse) => {
     const when = d.date ? new Date(d.date).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
     const inner = [
       h('span', { class: 'doc-type' }, (d.type || '').slice(0, 4) || icon('file')),
@@ -198,7 +198,9 @@
         h('small', {}, [withCourse && d.code, d.code && d.folderName.startsWith(d.code) ? T.courseFiles : folderLabel(d.folderName), d.author, when].filter(Boolean).join(' · '))),
       h('span', { class: 'delta bad' }, T.newShort(1).replace(/^1 /, '')),
     ];
-    return d.href ? anchor({ href: `${d.href}#ipx-file=${d.id}` }, { class: 'doc-row' }, ...inner) : h('span', { class: 'doc-row' }, ...inner);
+    // From a course page the folder opens inside the course; elsewhere (By course) in the Materials context.
+    const hash = `#ipx-file=${d.id}${inCourse ? '&ipx-in=course' : ''}`;
+    return d.href ? anchor({ href: `${d.href}${hash}` }, { class: 'doc-row' }, ...inner) : h('span', { class: 'doc-row' }, ...inner);
   };
   function freshBlock(code, limit, withCourse) {
     const ds = ipx.state.docserver;
@@ -209,7 +211,7 @@
     return h('section', { class: 'card pad fresh-block' },
       h('div', { class: 'card-head' }, h('h2', {}, withCourse ? T.newInCourses : T.newInCourse),
         newTab && anchor({ href: newTab }, { class: 'more' }, T.openNew)),
-      h('div', { class: 'doc-list' }, list.map((d) => docRow(d, withCourse))),
+      h('div', { class: 'doc-list' }, list.map((d) => docRow(d, withCourse, !withCourse))),
       at && h('p', { class: 'muted small' }, T.fromList(at)));
   }
 
@@ -310,7 +312,7 @@
           n.fresh > 0 && h('span', { class: 'delta bad' }, T.newShort(n.fresh)),
           to && h('span', { class: 'glist-go' }, icon('arrow')),
         ];
-        return to ? anchor({ href: to }, { class: 'folder-row' }, ...inner) : h('span', { class: 'folder-row' }, ...inner);
+        return to ? anchor({ href: `${to}#ipx-in=course` }, { class: 'folder-row' }, ...inner) : h('span', { class: 'folder-row' }, ...inner);
       };
       return [
         freshBlock(c.code, 20, false),
@@ -457,7 +459,10 @@
   // stored) is part of that course, one level down: the course's title and view tabs with Materials active, the
   // sidebar on My courses, and the path "Materials › Lecture · Fri 14:00" (04-materials.md §4.1). Registered before
   // Materials, which takes the folders outside courses.
+  // Only when the student came from the course (the course's links carry #ipx-in=course): from All folders the
+  // same folder page stays in the tree's context, so the student is never thrown from one place to another.
   const folderHere = () => {
+    if (!/[#&]ipx-in=course\b/.test(location.hash)) return null;
     const r = nav.route(document.baseURI.split('#')[0]);
     const id = r.params?.get?.('id');
     const code = id && ipx.state.docserver?.folders?.[id];
@@ -494,6 +499,23 @@
     },
   });
 
+  // The path of the folder page at hand through InSIS's tree, each step opening that level of All folders
+  // (dok_server/#ipx-folder=<id>); the folder itself last. Canonical: from the folder's place, not from history.
+  function treePath() {
+    const r = nav.route(document.baseURI.split('#')[0]);
+    if (r.path !== '/auth/dok_server/slozka.pl') return null;
+    const index = ipx.state.docserver?.index || {};
+    const id = r.params?.get?.('id');
+    const chain = [];
+    for (let at = id, guard = 0; at && index[at] && guard < 20; at = index[at][1], guard++) chain.unshift([at, index[at][0]]);
+    const tree = plainLink('/auth/dok_server/');
+    if (!chain.length || !tree) return null;
+    const step = (fid, name) => anchor({ href: `${tree}#ipx-folder=${encodeURIComponent(fid)}` }, {}, folderLabel(name));
+    return h('nav', { class: 'folder-path', 'aria-label': T.foldersTitle },
+      anchor({ href: tree }, {}, T.allFoldersTab),
+      chain.flatMap(([fid, name], i) => [' › ', i === chain.length - 1 ? h('strong', {}, folderLabel(name)) : step(fid, name)]));
+  }
+
   // Materials settings: a page below the section (eyebrow Materials, title Settings) with its own view tabs, not the
   // Materials row. Until InSIS's other "All my folders" views are verified: E-mail and display · Your folders.
   ipx.kit.section({
@@ -515,7 +537,9 @@
     id: 'materials',
     title: () => nav.sectionLabel('courses.files'),
     subtitle: () => nav.label('courses'),
-    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search', '/auth/dok_server/slozka.pl': null },
+    // A folder page outside a course's context is a place in All folders: that tab stays marked.
+    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search', '/auth/dok_server/slozka.pl': 'tree' },
+    lead: () => treePath(),
     views: () => {
       const fresh = courseNewCount();
       return [
