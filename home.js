@@ -290,6 +290,13 @@
     ipx.state.homeUrl = location.href.split('#')[0];
     ipx.save();
 
+    // An InSIS+ page (Study matters, All services, …) lives on this address after "#ipx:".
+    const where = ipx.ui.here();
+    if (where.composed && where.node !== 'home' && ipx.composed) {
+      ipx.composed.show(where);
+      return;
+    }
+
     const hour = new Date().getHours();
     const greet = hour < 11 ? T.morning : hour < 18 ? T.day : T.evening;
     const date = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
@@ -297,7 +304,6 @@
     takeover({
       key: 'home',
       css: 'home.css',
-      active: 'home',
       title: name ? `${greet}, ${name.split(' ')[0]}` : T.welcome,
       subtitle: date.charAt(0).toUpperCase() + date.slice(1),
       build: () => {

@@ -1,31 +1,26 @@
-// InSIS+ — the app shell shared by every redesigned page: sidebar with the whole InSIS menu,
-// top bar with search and counters, and the switch back to the classic page.
+// InSIS+ — the app shell shared by every redesigned page: the sidebar with the seven destinations of the new
+// structure (docs/ia/02-redesign.md), the top bar (search, messages, notifications, help, language, account),
+// the destination's tabs, and the switch back to the classic page.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx) return;
   const { lang, clean, norm } = ipx;
 
   const T = {
-    cs: { classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', dashboard: 'Přehled', search: 'Hledat v InSIS…',
-      menu: 'Menu', collapse: 'Sbalit panel', expand: 'Rozbalit panel', docs: 'Dokumenty', tasks: 'Úkoly',
-      note: 'Neoficiální rozšíření. Data zůstávají ve vašem prohlížeči.', public: 'Veřejné informace',
-      catalogue: 'Katalog předmětů', timetables: 'Rozvrhy', myTimetable: 'Můj rozvrh', plans: 'Studijní plány', people: 'Osoby na VŠE',
-      study: 'Studium', comms: 'Komunikace', account: 'Účet a nastavení', other: 'Ostatní',
-      filter: 'Filtrovat menu…', pin: 'Připnout', unpin: 'Odepnout', found: 'Nalezeno', nothing: 'Nic nenalezeno',
-      pinned: 'Připnuté', mainItems: 'Hlavní', more: 'Další služby', originalLabel: 'Členění InSIS',
-      originalToggle: 'Původní členění', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
+    cs: { classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', search: 'Hledat v InSIS…',
+      menu: 'Menu', collapse: 'Sbalit panel',
+      note: 'Neoficiální rozšíření. Data zůstávají ve vašem prohlížeči.', unpin: 'Odepnout',
+      pinned: 'Připnuté', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
       inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', creditsOf: (a, b) => `${a} z ${b} kreditů`, creditsN: (a) => `${a} kreditů`, nothingDue: 'Nic nečeká na odevzdání', tomorrowAt: 'zítra',
-      inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`) },
-    en: { classic: 'Classic view', back: 'InSIS+ view', dashboard: 'Dashboard', search: 'Search InSIS…',
-      menu: 'Menu', collapse: 'Collapse sidebar', expand: 'Expand sidebar', docs: 'Documents', tasks: 'Tasks',
-      note: 'Unofficial extension. Your data stays in your browser.', public: 'Public information',
-      catalogue: 'Course catalogue', timetables: 'Timetables', myTimetable: 'My timetable', plans: 'Study plans', people: 'Persons at VŠE',
-      study: 'Study', comms: 'Communication', account: 'Account & settings', other: 'Other',
-      filter: 'Filter menu…', pin: 'Pin', unpin: 'Unpin', found: 'Found', nothing: 'Nothing found',
-      pinned: 'Pinned', mainItems: 'Main', more: 'More services', originalLabel: 'InSIS grouping',
-      originalToggle: 'Original grouping', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
+      inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), navigation: 'Navigace', account: 'Účet',
+      pageHelp: 'Nápověda k této stránce', allHelp: 'Veškerá nápověda' },
+    en: { classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
+      menu: 'Menu', collapse: 'Collapse sidebar',
+      note: 'Unofficial extension. Your data stays in your browser.', unpin: 'Unpin',
+      pinned: 'Pinned', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
       inMin: (n) => `in ${n} min`, inHours: (n) => `in ${n} h`, todayAt: 'today', creditsOf: (a, b) => `${a} of ${b} credits`, creditsN: (a) => `${a} credits`, nothingDue: 'Nothing due', tomorrowAt: 'tomorrow',
-      inDays: (n) => `in ${n} days` },
+      inDays: (n) => `in ${n} days`, navigation: 'Navigation', account: 'Account',
+      pageHelp: 'Help for this page', allHelp: 'All help' },
   }[lang];
 
   // The places students use most: always visible in the sidebar ("Main"); home.js also uses them to spot the main page.
@@ -83,24 +78,8 @@
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
   };
-
-  // Sidebar group icon by InSIS section title (English and Czech, diacritic-free).
-  const GROUP_ICONS = [
-    [/public|verejn/, 'globe'],
-    [/my college|moje|studium|study/, 'cap'],
-    [/learning|elearn/, 'book'],
-    [/science|research|veda|vyzkum/, 'flask'],
-    [/personal manage|osobni sprav|osobni/, 'mail'],
-    [/agenda/, 'check'],
-    [/technolog/, 'cpu'],
-    [/documentation|dokumentace/, 'file'],
-    [/adjust|uprav|prizpus/, 'layout'],
-    [/set-?up|nastaveni/, 'gear'],
-    [/protection|ochrana/, 'shield'],
-    [/mobile|aplikace|app/, 'phone'],
-  ];
-  const groupIcon = (title) => GROUP_ICONS.find(([re]) => re.test(norm(title)))?.[1] || 'layers';
 
   function h(tag, props = {}, ...kids) {
     const el = document.createElement(tag);
@@ -143,194 +122,132 @@
       .map((a) => ({ href: a.href, text: clean(a.textContent) }));
   }
 
-  // ---------- sidebar ----------
+  // ---------- navigation (docs/ia/02-redesign.md §2–3; data in nav-data.js) ----------
 
-  // The full menu is only on the InSIS main page; home.js stores it, every other page reuses it.
-  function menu() {
-    if (ipx.state.menu?.length) return ipx.state.menu;
-    const at = (path) => new URL(path, document.baseURI).href;
-    return [{ title: T.public, links: [
-      { href: at('/katalog/'), text: T.catalogue },
-      { href: at('/katalog/rozvrhy_view.pl'), text: T.timetables },
-      { href: at('/katalog/plany.pl'), text: T.plans },
-      { href: at('/lide/'), text: T.people },
-    ] }];
-  }
-
-  const samePage = (href) => {
-    try {
-      const u = new URL(href);
-      const strip = (p) => p.replace(/index\.pl$/, '');
-      return u.origin === location.origin && strip(u.pathname) === strip(location.pathname) && u.search === location.search;
-    } catch {
-      return false;
-    }
-  };
-
-  // InSIS groups its ~60 menu items by how the system is built. The sidebar regroups them by what a student
-  // wants to do: a few main items always visible, four task groups, and "Other" for the rarely used rest.
-  // Rules match diacritic-free link text in Czech and English; anything unmatched lands in "Other", never lost.
-  // Checked against the real Czech and English menus (see docs/pages.md). Order of TASKS is the matching order.
-  const OTHER_FIRST = /documentation|dokumentace|integrator|licen|statisti|publication|publikac|biograph|zivotopis|\bcvs?\b|google play|app store|about app|o aplikaci|frequently asked|caste dotazy|my operations|me operace|moje operace|development projects|projekty na rozvoj|user support|uzivatelska podpora|further information|dalsi informace/;
-  const TASKS = [
-    { id: 'account', icon: 'gear', re: /settings|nastaveni|photo|fotograf|portlet|favourites menu|oblibene|office ?365|otp|one-time|jednorazov|\beid\b|identit|delegat|personal data|osobni(ch)? udaj|approval|souhlas|access control|pristupov|account|uct|e-mail|univerzitni posty|doruc|identification card|identifikacni kart|paired devices|sparovan|password|hesl|login|prihlaseni|povereni|authori[sz]ation|bank/ },
-    { id: 'docs', icon: 'file', re: /document|dokument|storage|uloziste|printout|tisk/ },
-    { id: 'comms', icon: 'mail', re: /news|novin|discussion|diskus|diskuz|forum|fora\b|contact cent|kontaktni|noticeboard|vyveska|mail|zprav/ },
-    { id: 'study', icon: 'cap', re: /attainment|hodnoceni|evaluation|evaluace|anket|survey|pruzkum|application form|prihlask|thematic|tematick|department|pracovist|election|volb|volic|catalog|katalog|exam|zkous|zapis|studi|predmet|course|kurz|timetable|rozvrh|plan|^tasks?$|^ukoly$|library|knihovn|vypujc|financ|graduat|absolvent|thes[ie]s|zaverecn|u3v/ },
+  const nav = () => ipx.nav;
+  const DESTS = [
+    { id: 'home', icon: 'home' },
+    { id: 'courses', icon: 'book', first: 'courses.mine' },
+    { id: 'schedule', icon: 'calendar', first: 'schedule.week' },
+    { id: 'exams', icon: 'check', first: 'exams.mine' },
+    { id: 'grades', icon: 'award', first: 'grades.results' },
+    { id: 'matters', icon: 'file', landing: 'dest.matters' },
+    { id: 'campus', icon: 'people', landing: 'dest.campus' },
   ];
 
-  function classify(groups) {
-    const main = [];
-    const out = Object.fromEntries([...TASKS.map((t) => [t.id, []]), ['other', []]]);
-    const seen = new Set();
-    for (const l of groups.flatMap((g) => g.links)) {
-      const t = norm(l.text);
-      if (seen.has(l.href) || seen.has(t)) continue;
-      seen.add(l.href).add(t);
-      const m = MAIN.findIndex((x) => x.re.test(t));
-      if (m >= 0 && !main.some((x) => x.i === m)) {
-        main.push({ ...l, i: m, icon: MAIN[m].icon });
-        continue;
-      }
-      if (OTHER_FIRST.test(t)) {
-        out.other.push(l);
-        continue;
-      }
-      out[TASKS.find((x) => x.re.test(t))?.id || 'other'].push(l);
+  // Where this page sits in the new structure. Test pages carry the InSIS address in <base>, so the base URL
+  // (plus the page's own hash) is the page's identity.
+  function here() {
+    if (!nav()) return { node: null, dest: null };
+    const r = nav().route(document.baseURI.split('#')[0] + location.hash);
+    // A page the mapping does not know (e.g. the page after a form was sent) keeps the place of the page before it.
+    if (!r.node) {
+      try {
+        const last = JSON.parse(sessionStorage.getItem('ipx-last-node') || 'null');
+        if (last && document.referrer && new URL(document.referrer).origin === location.origin) return { ...r, ...last, inherited: true };
+      } catch {}
+    } else {
+      try { sessionStorage.setItem('ipx-last-node', JSON.stringify({ node: r.node, dest: r.dest })); } catch {}
     }
-    main.sort((a, b) => a.i - b.i);
-    // The menu's "Timetables" is the public search. Once the portal gave us the student's own timetable, Main
-    // links to that, and the public search moves to Study.
-    const mine = ipx.state.portal?.links?.timetable;
-    const pub = main.findIndex((l) => l.icon === 'calendar');
-    if (mine && pub >= 0) {
-      out.study.unshift(main[pub]);
-      main[pub] = { href: mine.href, text: T.myTimetable, icon: 'calendar', i: main[pub].i };
-    }
-    // TASKS is ordered for matching (most specific first); show groups in order of how often students need them.
-    const shown = ['study', 'comms', 'docs', 'account'].map((id) => TASKS.find((x) => x.id === id));
-    return { main, groups: [...shown.map((x) => ({ id: x.id, title: T[x.id], icon: x.icon, links: out[x.id] })),
-      { id: 'other', title: T.other, icon: 'layers', links: out.other }].filter((g) => g.links.length) };
+    return r;
   }
 
-  function sidebar(active) {
-    const home = ipx.state.homeUrl || new URL('/', document.baseURI).href;
-    const filter = h('input', { class: 'filter', type: 'search', placeholder: T.filter, 'aria-label': T.filter, autocomplete: 'off' });
+  function destHref(d) {
+    if (d.id === 'home') return ipx.state.homeUrl || new URL('/auth/', document.baseURI).href;
+    if (d.landing) return nav().composedUrl(d.landing);
+    return nav().target(d.first) || nav().composedUrl(`dest.${d.id}`);
+  }
+
+  // Links for a list of nodes (a destination's tabs or grouped sections), leaving out nodes with no reachable page.
+  function nodeLinks(nodes) {
+    return nodes.map((n) => ({ node: n, href: nav().target(n), text: nav().label(n), gloss: nav().gloss(n) })).filter((l) => l.href);
+  }
+
+  function sidebar() {
+    const where = here();
     const body = h('div', { class: 'nav-body' });
 
-    const isPinned = (href) => ipx.state.fav.includes(href);
-    const togglePin = (l) => {
-      const i = ipx.state.fav.indexOf(l.href);
+    const unpin = (href) => {
+      const i = ipx.state.fav.indexOf(href);
       if (i >= 0) ipx.state.fav.splice(i, 1);
-      else {
-        ipx.state.fav.push(l.href);
-        ipx.state.links[l.href] ||= { t: l.text, c: '', v: 0, s: Date.now() };
-      }
       ipx.save();
       render();
       pinListeners.forEach((fn) => fn());
     };
 
-    ipx.onData?.(() => render());
-    const item = (l, ic) => h('div', { class: 'nav-row' + (ic ? ' has-icon' : '') },
-      anchor(l, { class: 'nav-item' + (samePage(l.href) ? ' active' : ''), title: l.text },
-        ic && icon(ic), h('span', { class: 'label' }, l.text)),
-      h('button', { class: 'pin' + (isPinned(l.href) ? ' on' : ''), type: 'button',
-        title: isPinned(l.href) ? T.unpin : T.pin, 'aria-label': isPinned(l.href) ? T.unpin : T.pin,
-        onclick: () => togglePin(l) }, icon('star')));
-
-    // One group open at a time; the group of the current page opens by itself.
-    const group = (g) => {
-      const isOpen = ipx.state.openGroup === g.id || g.links.some((l) => samePage(l.href));
-      return h('div', { class: 'group' + (isOpen ? ' open' : '') },
-        h('button', { class: 'group-head', type: 'button', title: g.title, 'aria-expanded': String(isOpen),
-          onclick: () => {
-            if (ipx.state.sideCollapsed && innerWidth > 900) setCollapsed(false);
-            ipx.state.openGroup = isOpen && !ipx.state.sideCollapsed ? null : g.id;
-            ipx.save();
-            render();
-          } },
-          icon(g.icon), h('span', { class: 'label' }, g.title), h('b', { class: 'count' }, String(g.links.length)),
-          h('span', { class: 'chev' }, icon('chevron'))),
-        h('div', { class: 'group-items' }, g.links.map((l) => item(l))));
-    };
-
     function render() {
-      const original = ipx.state.navMode === 'original';
-      const source = menu();
-      const { main, groups } = original
-        ? { main: [], groups: source.map((g) => ({ id: `o:${g.title}`, title: g.title, icon: groupIcon(g.title), links: g.links })) }
-        : classify(source);
-      const all = [...main, ...groups.flatMap((g) => g.links)];
-      const pins = ipx.state.fav.map((url) => all.find((l) => l.href === url) || (ipx.state.links[url] && { href: url, text: ipx.state.links[url].t })).filter(Boolean);
-      const q = norm(filter.value);
-
-      const fill = (...kids) => body.replaceChildren(...kids.flat(Infinity).filter((k) => k instanceof Node));
-
-      if (q) {
-        const hits = all.filter((l) => q.split(' ').every((w) => norm(l.text).includes(w)));
-        fill(
-          h('p', { class: 'side-label' }, T.found),
-          hits.length ? hits.map((l) => item(l, l.icon)) : h('p', { class: 'side-empty' }, T.nothing));
-        return;
-      }
-
-      fill(
-        h('a', { class: 'nav-item top' + (active === 'home' ? ' active' : ''), href: home, title: T.dashboard },
-          icon('home'), h('span', { class: 'label' }, T.dashboard)),
-        // A pinned main item moves up to Pinned instead of showing twice.
-        pins.length && [h('p', { class: 'side-label' }, T.pinned), pins.map((l) => item(l, l.icon))],
-        main.length && [h('p', { class: 'side-label' }, T.mainItems), main.filter((l) => !isPinned(l.href)).map((l) => item(l, l.icon))],
-        h('p', { class: 'side-label' }, original ? T.originalLabel : T.more),
-        groups.map(group));
+      const items = DESTS.map((d) => {
+        const on = where.dest === d.id;
+        return h('a', { class: 'nav-item has-icon' + (on ? ' active' : ''), href: destHref(d), title: nav().label(d.id),
+          'aria-current': on ? 'page' : null }, icon(d.icon), h('span', { class: 'label' }, nav().label(d.id)));
+      });
+      const pinned = ipx.state.fav.map((url) => ipx.state.links[url] && { href: url, text: ipx.state.links[url].t }).filter(Boolean);
+      body.replaceChildren(...[
+        h('div', { class: 'dests' }, items),
+        pinned.length > 0 && h('p', { class: 'side-label' }, T.pinned),
+        pinned.map((l) => h('div', { class: 'nav-row' },
+          anchor(l, { class: 'nav-item', title: l.text }, h('span', { class: 'label' }, l.text)),
+          h('button', { class: 'pin on', type: 'button', title: T.unpin, 'aria-label': `${T.unpin}: ${l.text}`, onclick: () => unpin(l.href) }, icon('star')))),
+      ].flat().filter(Boolean));
     }
-
-    filter.addEventListener('input', render);
-    filter.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        filter.value = '';
-        render();
-      } else if (e.key === 'Enter') {
-        body.querySelector('a.nav-item')?.click();
-      }
-      e.stopPropagation();
-    });
-
-    const modeBtn = h('button', { class: 'nav-item mode', type: 'button', onclick: () => {
-      ipx.state.navMode = ipx.state.navMode === 'original' ? 'tasks' : 'original';
-      ipx.save();
-      modeBtn.setAttribute('aria-pressed', String(ipx.state.navMode === 'original'));
-      render();
-    } }, icon('list'), h('span', { class: 'label' }, T.originalToggle), h('span', { class: 'switch' }));
-    modeBtn.setAttribute('aria-pressed', String(ipx.state.navMode === 'original'));
-
     render();
-    return h('aside', { class: 'side' },
+    ipx.onData?.(render);
+    onPinsChange(render);
+
+    const allOn = where.dest === 'all';
+    return h('aside', { class: 'side', 'aria-label': T.navigation },
       h('div', { class: 'side-head' },
-        h('a', { class: 'brand', href: home },
+        h('a', { class: 'brand', href: destHref(DESTS[0]) },
           h('span', { class: 'mark' }, 'VŠE'),
           h('span', { class: 'brand-name' }, 'InSIS', h('i', {}, '+'))),
         h('button', { class: 'icon-btn collapse', type: 'button', title: T.collapse, 'aria-label': T.collapse,
           onclick: () => setCollapsed(!ipx.state.sideCollapsed) }, icon('panel'))),
-      h('div', { class: 'filter-wrap' }, icon('search'), filter),
       h('nav', { class: 'side-nav' }, body),
       h('div', { class: 'side-foot' },
-        modeBtn,
-        h('button', { class: 'nav-item', type: 'button', onclick: () => setClassic(true) }, icon('layout'), h('span', { class: 'label' }, T.classic)),
+        h('a', { class: 'nav-item has-icon' + (allOn ? ' active' : ''), href: nav().composedUrl('dest.all'), 'aria-current': allOn ? 'page' : null },
+          icon('layers'), h('span', { class: 'label' }, nav().label('all'))),
+        h('button', { class: 'nav-item has-icon', type: 'button', onclick: () => setClassic(true) }, icon('layout'), h('span', { class: 'label' }, T.classic)),
         h('p', { class: 'side-note' }, T.note)));
   }
 
   // ---------- top bar ----------
 
+  // A small menu that opens under its button (Help, avatar). Closes on Escape or a click outside.
+  function popMenu(button, label, items) {
+    const panel = h('div', { class: 'pop', role: 'menu', hidden: true }, items.filter(Boolean).map((it) =>
+      it.href ? anchor(it, { class: 'pop-item' + (it.phone ? ' phone-only' : ''), role: 'menuitem' }, it.icon && icon(it.icon), h('span', {}, it.text))
+        : h('p', { class: 'pop-note' }, it.text)));
+    const wrap = h('div', { class: 'pop-wrap' }, button, panel);
+    button.setAttribute('aria-haspopup', 'menu');
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', label);
+    const close = () => { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); };
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = panel.hidden;
+      wrap.getRootNode().querySelectorAll?.('.pop').forEach((p) => { p.hidden = true; });
+      panel.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+    });
+    wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { close(); button.focus(); } });
+    document.addEventListener('click', close);
+    return wrap;
+  }
+
+  // InSIS's own links on this page, copied verbatim (Log out, the page's context help).
+  const pageLink = (re) => [...document.querySelectorAll('a[href]')].find((a) => re.test(a.getAttribute('href')));
+
   function topBar(title, subtitle, extra) {
     const p = ipx.state.profile || {};
-    // A red dot says "something new"; the exact number is in the label and on the dashboard.
-    const badge = (link, label, ic) => {
-      if (!link) return null;
-      const text = link.count != null ? `${label}: ${link.count}` : label;
-      return h('a', { class: 'chip-btn', href: link.href, title: text, 'aria-label': text },
-        icon(ic), link.count > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' }));
-    };
+    const at = (path) => new URL(path, document.baseURI).href;
+    const mail = nav().target('messages.mail');
+    const logout = pageLink(/logout\.pl/)?.href || at('/auth/system/logout.pl');
+    const help = pageLink(/help\.pl/);
+    const unread = ipx.state.messages?.unread;
+    const newFiles = p.docs?.count;
+
+    const helpBtn = h('button', { class: 'chip-btn', type: 'button' }, h('b', { class: 'q' }, '?'));
+    const avatarBtn = h('button', { class: 'avatar', type: 'button', title: p.name || T.account }, p.name ? initials(p.name) : icon('people'));
 
     return h('header', { class: 'topbar' },
       h('button', { class: 'icon-btn burger', type: 'button', 'aria-label': T.menu, onclick: () => shellEl.classList.toggle('drawer') }, icon('burger')),
@@ -341,10 +258,47 @@
         extra,
         h('button', { class: 'searchbox', type: 'button', onclick: () => ipx.open() },
           icon('search'), h('span', {}, T.search), h('kbd', {}, 'Ctrl K')),
-        badge(p.docs, T.docs, 'file'),
-        badge(p.tasks, T.tasks, 'check'),
-        langLinks().map((l) => anchor(l, { class: 'lang', title: l.text }, LANG_CODES[norm(l.text)] || l.text.slice(0, 2))),
-        p.name && h('span', { class: 'avatar', title: p.name }, initials(p.name))));
+        mail && h('a', { class: 'chip-btn', href: mail, title: nav().label('messages'), 'aria-label': unread ? `${nav().label('messages')}: ${unread}` : nav().label('messages') },
+          icon('mail'), unread > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
+        h('a', { class: 'chip-btn', href: nav().composedUrl('notifications'), title: nav().label('notifications'),
+          'aria-label': newFiles ? `${nav().label('notifications')}: ${newFiles}` : nav().label('notifications') },
+          icon('bell'), newFiles > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
+        popMenu(helpBtn, nav().label('help'), [
+          { href: nav().target('campus.office'), text: nav().label('campus.office'), icon: 'people' },
+          { href: nav().target('help.ask'), text: nav().label('help.ask'), icon: 'mail' },
+          help && { href: help.href, target: '_blank', text: T.pageHelp, icon: 'info' },
+          { href: nav().composedUrl('dest.help'), text: T.allHelp, icon: 'book' },
+        ].filter((x) => !x || x.href)),
+        h('span', { class: 'langs' }, langLinks().map((l) => anchor(l, { class: 'lang', title: l.text }, LANG_CODES[norm(l.text)] || l.text.slice(0, 2)))),
+        popMenu(avatarBtn, nav().label('account'), [
+          p.name && { text: p.name },
+          { href: nav().composedUrl('dest.account'), text: nav().label('account'), icon: 'gear' },
+          nav().safe(at('/auth/system/zmena_hesla.pl')) && { href: at('/auth/system/zmena_hesla.pl'), text: nav().label('password'), icon: 'shield' },
+          { href: nav().composedUrl('plus.settings'), text: nav().label('plus'), icon: 'layout' },
+          ...langLinks().map((l) => ({ ...l, icon: 'globe', phone: true })),
+          { href: logout, text: nav().label('logout'), icon: 'back' },
+        ])));
+  }
+
+  // Phones: the four most used destinations and Menu (the sidebar as a drawer) at the bottom (docs/ia/02-redesign.md §2).
+  function bottomBar() {
+    const where = here();
+    const items = ['home', 'courses', 'exams', 'grades'].map((id) => DESTS.find((d) => d.id === id));
+    return h('nav', { class: 'bottom-bar', 'aria-label': T.navigation },
+      items.map((d) => h('a', { href: destHref(d), class: where.dest === d.id ? 'on' : null, 'aria-current': where.dest === d.id ? 'page' : null },
+        icon(d.icon), h('span', {}, nav().shortLabel(d.id)))),
+      h('button', { type: 'button', onclick: () => shellEl.classList.toggle('drawer') }, icon('burger'), h('span', {}, nav().shortLabel('menu'))));
+  }
+
+  // The destination's tabs under the top bar (links, the current one marked); none on pages without tabs.
+  function tabRow() {
+    const where = here();
+    const list = nav().tabs[where.dest];
+    if (!Array.isArray(list) || where.node?.startsWith('course.')) return null;
+    const links = nodeLinks(list);
+    if (links.length < 2) return null;
+    return h('nav', { class: 'dest-tabs', 'aria-label': nav().label(where.dest) },
+      links.map((l) => h('a', { href: l.href, class: l.node === where.node ? 'on' : null, 'aria-current': l.node === where.node ? 'page' : null }, l.text)));
   }
 
   // ---------- page takeover ----------
@@ -355,7 +309,7 @@
 
   // Replaces the original page with the InSIS+ shell rendered in a closed shadow root.
   // `slotted` nodes stay in the light DOM (so InSIS's own scripts and forms keep working) and show in the content area.
-  function takeover({ key, css, active, title, subtitle, extra, build, slotted }) {
+  function takeover({ key, css, title, subtitle, extra, build, slotted }) {
     // In the hidden background-sync frame, modules only store their data.
     if (ipx.syncOnly) return null;
     if (!document.getElementById('insis-plus-takeover-style')) {
@@ -394,11 +348,13 @@
 
     shellEl = h('div', { class: 'shell' + (ipx.state.sideCollapsed ? ' collapsed' : '') });
     shellEl.append(
-      sidebar(active),
+      sidebar(),
       h('div', { class: 'scrim', onclick: () => shellEl.classList.remove('drawer') }),
       h('div', { class: 'main' },
         topBar(title, subtitle, extra),
-        h('main', { class: 'content' }, build ? build() : null, slotted ? h('slot') : null)));
+        tabRow(),
+        h('main', { class: 'content' }, build ? build() : null, slotted ? h('slot') : null)),
+      bottomBar());
     const pill = h('button', { class: 'pill', type: 'button', onclick: () => setClassic(false) }, icon('layout'), T.back);
 
     const sharedCss = h('link', { rel: 'stylesheet', href: chrome.runtime.getURL('shared.css') });
@@ -730,7 +686,7 @@
   const onPinsChange = (fn) => pinListeners.push(fn);
 
   ipx.ui = {
-    PORTAL_ACTIONS, quickActions, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
+    PORTAL_ACTIONS, quickActions, here, nodeLinks, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
     facultyFromCode, facultyFor, linkTabs, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
     kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,
