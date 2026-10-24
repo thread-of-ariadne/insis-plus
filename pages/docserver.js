@@ -41,7 +41,7 @@
     cs: { tag: 'nové', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`,
       inside: (n) => `${n} ${ipx.kit.plural(n, 'nový dokument', 'nové dokumenty', 'nových dokumentů')} v podsložkách`,
       files: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`,
-      byCourseTab: 'Podle předmětů', treeTab: 'Strom dokumentů', searchTab: 'Hledat', views: 'Pohledy na materiály', settings: 'Nastavení', myFolders: 'Moje složky',
+      jump: 'Přejít na složku…', top: 'Všechny složky', pathLabel: 'Cesta ke složce', emptyFolder: 'prázdná', emptyFolders: (n) => `${n} ${ipx.kit.plural(n, 'prázdná složka', 'prázdné složky', 'prázdných složek')}`, filesHere: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')} v této složce`, filesHereHint: 'Otevře složku v InSIS', byCourseTab: 'Podle předmětů', treeTab: 'Strom dokumentů', searchTab: 'Hledat', views: 'Pohledy na materiály', settings: 'Nastavení', myFolders: 'Moje složky',
       byCourse: 'Novinky ve vašich předmětech', byCourseNews: (c) => `Nové soubory v: ${c}. Podle předmětů je máte pohromadě.`,
       allHint: 'Všechny složky, které vám InSIS ukazuje. Složky s novými dokumenty jsou rozbalené.',
       expand: 'Rozbalit vše', collapse: 'Sbalit vše', filter: 'Hledat složku…', noMatch: 'Žádná složka neodpovídá.',
@@ -54,7 +54,7 @@
     en: { tag: 'new', fresh: 'New documents', newBadge: (n) => `${n} new`,
       inside: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in subfolders`,
       files: (n) => `${n} ${n === 1 ? 'file' : 'files'}`,
-      byCourseTab: 'By course', treeTab: 'Document tree', searchTab: 'Search', views: 'Views of your materials', settings: 'Settings', myFolders: 'My folders',
+      jump: 'Jump to folder…', top: 'All folders', pathLabel: 'Folder path', emptyFolder: 'empty', emptyFolders: (n) => `${n} empty ${n === 1 ? 'folder' : 'folders'}`, filesHere: (n) => `${n} ${n === 1 ? 'file' : 'files'} in this folder`, filesHereHint: 'Opens the folder in InSIS', byCourseTab: 'By course', treeTab: 'Document tree', searchTab: 'Search', views: 'Views of your materials', settings: 'Settings', myFolders: 'My folders',
       byCourse: 'News in your courses', byCourseNews: (c) => `New files in ${c}. By course shows them together.`,
       allHint: 'Every folder InSIS shows you. Folders with new documents are open.',
       expand: 'Expand all', collapse: 'Collapse all', filter: 'Find a folder…', noMatch: 'No folder matches.',
@@ -194,6 +194,8 @@
         author: personA ? { text: clean(personA.textContent), href: personA.href, target: personA.target ? '_blank' : null } : null,
         dateText: clean(dateTd?.textContent), date: parseDate(dateTd?.textContent),
         file: fileA?.href || null, info: infoA?.href || null, type: mime.toUpperCase(),
+        // InSIS's folder cell of the row (never stored): gets the course chip, styled in place.
+        cell: folderTd >= 0 ? tds[folderTd] : null,
       });
     }
     const refresh = [...doc.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl(\?lang=\w+)?$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
@@ -222,83 +224,90 @@
 
   const newBadge = (n) => n > 0 && h('span', { class: 'delta bad' }, T.newBadge(n));
 
-  // ---------- document tree ----------
-
-  // Collapsible folder tree. open(node) decides the initial state; the li elements are kept for filtering.
-  function folderTree(nodes, open, els) {
-    return h('ul', { class: 'ds-tree' }, nodes.map((n) => {
-      const kids = n.children.length;
-      const li = h('li', { class: 'ds-node' + (n.allNew ? ' has-new' : '') + (kids && open(n) ? ' open' : '') });
-      const btn = kids
-        ? h('button', { class: 'ds-toggle', type: 'button', 'aria-expanded': String(li.classList.contains('open')),
-            'aria-label': `${T.open}: ${n.name}`,
-            onclick: () => setOpen(li, !li.classList.contains('open')) }, icon('chevron'))
-        : h('span', { class: 'ds-toggle-gap', 'aria-hidden': 'true' });
-      const inside = n.allNew - n.fresh;
-      li.append(
-        h('div', { class: 'ds-row' },
-          btn, folderIcon(),
-          linkOr(n.href, { class: 'ds-name', title: n.name }, n.name),
-          h('span', { class: 'ds-counts' },
-            inside > 0 && h('span', { class: 'ds-dot', title: T.inside(inside), 'aria-label': T.inside(inside) }),
-            newBadge(n.fresh),
-            n.files > 0 && h('span', { class: 'ds-files', title: T.files(n.files) }, String(n.files)))),
-        ...(kids ? [folderTree(n.children, open, els)] : []));
-      els?.set(n, li);
-      return li;
-    }));
-  }
-  function setOpen(li, on) {
-    if (!li.querySelector(':scope > ul')) return;
-    li.classList.toggle('open', on);
-    li.querySelector(':scope > .ds-row > .ds-toggle')?.setAttribute('aria-expanded', String(on));
-  }
-
+  // ---------- All folders: a drill-down browser (04-materials.md §4.2) ----------
+  // One level at a time, like Finder or Google Drive: a path at the top (canonical: from the top of InSIS's tree to
+  // the folder, never from where the student came from), then the folder's subfolders as rows. A row with
+  // subfolders opens that level here; a folder's own files are on InSIS's folder page (the first row, "n files in
+  // this folder"); a course folder opens the course's Materials tab. The level shown is kept in the address
+  // (#ipx-folder=<id>), so Back, reload and a new tab come back to the same place. "Jump to folder" searches every
+  // folder name and shows each result with its path. No expand/collapse anywhere.
   function buildTree(d) {
-    const tab = newTab(d.tabs);
-    const newCount = tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0);
-    const withNews = d.courses.filter((n) => n.allNew > 0);
+    const byId = new Map();
+    let seq = 0;
+    walk(d.roots, (n) => { n.key = n.id || `n${++seq}`; byId.set(String(n.key), n); });
+    const courseOfNode = (n) => n.course || ancestors(n).find((p) => p.course)?.course || null;
+    const levelFromHash = () => byId.get(decodeURIComponent((/#ipx-folder=([\w-]+)/.exec(location.hash) || [])[1] || '')) || null;
+    const view = h('div', { class: 'ds-browser' });
 
-    const els = new Map();
-    const inCourse = (n) => n.course || ancestors(n).some((p) => p.course);
-    const whole = folderTree(d.roots, (n) => n.allNew > 0 && !inCourse(n), els);
-    const filter = h('input', { class: 'ds-filter', type: 'search', placeholder: T.filter, 'aria-label': T.filter, autocomplete: 'off' });
-    const noMatch = h('p', { class: 'muted ds-nomatch', hidden: '' }, T.noMatch);
-    const defaults = new Map([...els].map(([n, li]) => [li, li.classList.contains('open')]));
-    const runFilter = () => {
-      const q = norm(filter.value);
-      const visit = (n) => {
-        const li = els.get(n);
-        const kidHit = n.children.map(visit).some(Boolean);
-        const hit = !q || norm(n.name).includes(q) || kidHit;
-        li.hidden = !hit;
-        if (q) setOpen(li, kidHit);
-        else setOpen(li, defaults.get(li));
-        return hit;
-      };
-      const any = d.roots.map(visit).some(Boolean);
-      noMatch.hidden = any;
+    const folderLink = (n) => {
+      const c = courseOfNode(n);
+      // A course's folders belong to the course page (its Materials tab), not to this browser.
+      if (c) return { href: nav.composedUrl('course.files', c.code), course: c };
+      if (n.children.length) return { level: n };
+      return { href: safe(n.href) };
     };
-    filter.addEventListener('input', runFilter);
-    const all = (on) => { filter.value = ''; runFilter(); els.forEach((li) => setOpen(li, on)); };
+    const go = (n) => {
+      // Absolute, from the page's own address (a <base> must not change where the state points).
+      history.pushState(null, '', location.href.split('#')[0] + (n ? `#ipx-folder=${encodeURIComponent(n.key)}` : ''));
+      render();
+    };
+    const row = (n, withPath) => {
+      const to = folderLink(n);
+      const inner = [
+        folderIcon(),
+        h('span', { class: 'ds-row-text' }, h('strong', {}, n.name),
+          h('small', {}, [withPath && ancestors(n).map((p) => p.name).join(' › '), to.course && to.course.code,
+            n.allFiles > 0 ? T.files(n.allFiles) : T.emptyFolder].filter(Boolean).join(' · '))),
+        n.allNew > 0 && newBadge(n.allNew),
+        icon('arrow'),
+      ];
+      if (to.level) return h('button', { type: 'button', class: 'ds-row', onclick: () => go(to.level) }, ...inner);
+      return to.href ? h('a', { class: 'ds-row', href: to.href }, ...inner) : h('span', { class: 'ds-row' }, ...inner);
+    };
+
+    const filter = h('input', { class: 'ds-filter', type: 'search', placeholder: T.jump, 'aria-label': T.jump, autocomplete: 'off' });
+    filter.addEventListener('input', () => render());
+
+    function render() {
+      const level = levelFromHash();
+      const q = norm(filter.value);
+      const kids = level ? level.children : d.roots;
+      const path = level ? [...ancestors(level), level] : [];
+      let body;
+      if (q) {
+        const hits = [];
+        walk(d.roots, (n) => { if (norm(n.name).includes(q)) hits.push(n); });
+        body = hits.length ? h('div', { class: 'ds-rows' }, hits.slice(0, 80).map((n) => row(n, true))) : h('p', { class: 'muted ds-nomatch' }, T.noMatch);
+      } else {
+        const own = level && level.files > 0 && safe(level.href);
+        const empty = kids.filter((n) => !n.allFiles && !n.children.length);
+        const shown = kids.filter((n) => n.allFiles || n.children.length);
+        body = h('div', { class: 'ds-rows' },
+          own && h('a', { class: 'ds-row ds-own', href: own }, icon('file'),
+            h('span', { class: 'ds-row-text' }, h('strong', {}, T.filesHere(level.files)), h('small', {}, T.filesHereHint)),
+            newBadge(level.fresh), icon('arrow')),
+          shown.map((n) => row(n, false)),
+          empty.length > 0 && h('p', { class: 'muted ds-empty-line' }, T.emptyFolders(empty.length)),
+          !own && !shown.length && !empty.length && h('p', { class: 'muted' }, T.emptyFolder));
+      }
+      view.replaceChildren(
+        h('nav', { class: 'ds-path', 'aria-label': T.pathLabel },
+          path.length ? h('button', { type: 'button', class: 'ds-crumb', onclick: () => go(null) }, T.top) : h('strong', {}, T.top),
+          path.map((n, i) => [h('span', { class: 'ds-sep', 'aria-hidden': 'true' }, '›'),
+            i === path.length - 1 ? h('strong', {}, n.name) : h('button', { type: 'button', class: 'ds-crumb', onclick: () => go(n) }, n.name)])),
+        body);
+    }
+    addEventListener('popstate', render);
+    render();
 
     // The quota as one quiet line, in InSIS's own words ("Quota 40 MiB · Occupied 0.0 B (0 %) · Free 40.0 MiB").
     const quotaLine = d.quota && h('p', { class: 'muted ds-quota' }, `${T.storage}: `,
       d.quota.map((r) => `${r.label} ${r.value}${r.extra ? ` ${r.extra}` : ''}`).join(' · '));
 
     return h('div', { class: 'ds' },
-      materials.tabs(d.kind === 'tree' ? 'tree' : 'new'),
-      // Summary: which of the student's courses have new files; the files themselves are one tab away.
-      withNews.length > 0 && h('a', { class: 'card ds-pointer', href: nav.composedUrl('courses.files') },
-        h('span', { class: 'ds-pointer-text' }, h('strong', {}, T.byCourse),
-          h('small', {}, T.byCourseNews(withNews.map((n) => n.course.code).join(', ')))),
-        newCount > 0 && newBadge(newCount), icon('arrow')),
-      h('div', { class: 'ds-tools' },
-        h('label', { class: 'ds-filter-wrap' }, icon('search'), filter),
-        h('button', { class: 'ds-btn', type: 'button', onclick: () => all(true) }, T.expand),
-        h('button', { class: 'ds-btn', type: 'button', onclick: () => all(false) }, T.collapse)),
-      h('p', { class: 'muted ds-sub' }, T.allHint),
-      h('div', { class: 'card ds-whole' }, whole, noMatch),
+      materials.tabs('tree'),
+      h('label', { class: 'ds-filter-wrap' }, icon('search'), filter),
+      h('div', { class: 'card ds-whole' }, view),
       quotaLine);
   }
 
@@ -380,6 +389,8 @@
     const tab = newTab(d.tabs);
     if (d.kind === 'tree') {
       ipx.state.docserver = {
+        // The New list the student last opened stays (it has its own time).
+        fresh: prev.fresh, freshPartial: prev.freshPartial, newUpdated: prev.newUpdated,
         updated: Date.now(), source: here.href,
         newCount: tab?.count ?? d.roots.reduce((s, n) => s + n.allNew, 0),
         courses: d.courses.map((n) => ({ code: n.course.code, name: n.course.name, href: n.href, newCount: n.allNew, semester: n.course.semester,
@@ -451,6 +462,12 @@
       // Only InSIS's own "mark as read" form (with its list) stays visible, in place; its rows are styled, not moved.
       ipx.ui.keepOnly(page, data.form);
       labelCells(data.form.querySelector('table:has(input[name="oznacene"])') || data.form.querySelector('table'));
+      // A course chip on each row of a course's document (a data attribute; CSS draws it before InSIS's folder link).
+      const folders = ipx.state.docserver?.folders || {};
+      for (const x of data.docs) {
+        const code = (x.folder?.id && folders[x.folder.id]) || x.folder?.name.match(CODE_RE)?.[1];
+        if (code && x.cell) x.cell.setAttribute('data-ipx-course', code);
+      }
       document.documentElement.classList.add('ipx-ds');
       styleSlotted('pages/docserver.css');
     }

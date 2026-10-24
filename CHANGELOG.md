@@ -6,6 +6,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+- First-frame skeleton (`boot.js`): an InSIS+ skeleton instead of the original page while InSIS's server responds.
+- In-place navigation between Home and the InSIS+ pages on its address (no server round trip); a session cache for
+  course syllabi (shown at once, refreshed in the background); skeleton placeholders instead of "Loading…".
+- Materials redesign (`docs/ia/04-materials.md`, reviewed): a course's files live in the course (New in this course,
+  folders flattened with readable names such as "Lecture · Fri 14:00 · RB 212"); InSIS's folder page of a course
+  folder is drawn as that course page; Courses › Materials has By course (newest course documents, one row per
+  course), New (course chips, InSIS's list in place), All folders (drill-down with a path and Jump to folder, no
+  expandable lists) and Search; Settings (E-mail and display, Your folders) replaces "DS settings" and "All my folders".
+- One header per section on every page of the section (kit.section).
+
+### Changed
+- Red counts (bell, course cards, New tab, Home) count documents in the student's courses only; faculty and
+  university documents no longer raise them.
+
+### Fixed / safety
+- A copied link ending in "#ipx:…" could pass the URL rule; pages whose reading might change InSIS state
+  (`verify_effect`: folder pages, a document's details, the lectures sheet) are never fetched; background reads
+  discard redirects to pages the rule does not allow; the session cache is wiped with the personal data everywhere.
+
 ## [0.9.0] - 2026-10-24
 
 ### Added

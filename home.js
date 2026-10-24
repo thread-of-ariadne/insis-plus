@@ -200,6 +200,8 @@
 
     const shownNotices = notices.filter((n) => !todo.some((it) => it.id === 'datacheck' && /kontrol|check/i.test(n.text)));
     const news = (ds.courses || []).filter((c) => c.newCount > 0).sort((a, b) => b.newCount - a.newCount).slice(0, 6);
+    const treeNewer = (ds.updated || 0) > (ds.newUpdated || 0);
+    const freshDocs = (ds.fresh || []).filter((d) => d.code && (!treeNewer || (ds.courses || []).find((x) => x.code === d.code)?.newCount > 0)).slice(0, 5);
     // What To do watches, in words, and when that data was last read (one time: the oldest of them).
     const read = checked.filter((s) => s.checked);
     const oldest = read.length ? new Date(Math.min(...read.map((s) => s.checked.getTime()))) : null;
@@ -240,7 +242,14 @@
         h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, nav.label('newfiles')),
             anchor({ href: ipx.nav.composedUrl('courses.files') }, { class: 'more' }, T.allFiles)),
-          news.length
+          // The newest documents of the student's courses by name (from the New list they last opened), else the
+          // courses with new files (from the tree). Both open the course's Materials, never InSIS's folder directly.
+          freshDocs.length
+            ? h('ul', { class: 'recent' }, freshDocs.map((d) => h('li', {},
+                anchor({ href: d.folderId && ipx.nav.safe(new URL(`/auth/dok_server/slozka.pl?id=${d.folderId}`, document.baseURI).href, 'link')
+                  ? `${new URL(`/auth/dok_server/slozka.pl?id=${d.folderId}`, document.baseURI).href}#ipx-file=${d.id}` : ipx.nav.composedUrl('course.files', d.code) }, { class: 'row' },
+                  h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(d.code))[1]}` }, d.code), ' ', d.name)))))
+          : news.length
             ? h('ul', { class: 'recent' }, news.map((c) => h('li', {},
                 anchor({ href: ipx.nav.composedUrl('course.files', c.code) }, { class: 'row' },
                   h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(c.code))[1]}` }, c.code), ' ', c.name),
