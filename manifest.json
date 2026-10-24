@@ -4,8 +4,15 @@
   "version": "0.6.0",
   "description": "Faster, friendlier InSIS (insis.vse.cz): a task-based menu, Ctrl+K search, a dashboard and redesigned study pages. Everything stays in your browser.",
   "permissions": [
-    "storage"
+    "storage",
+    "alarms"
   ],
+  "background": {
+    "service_worker": "bg.js",
+    "scripts": [
+      "bg.js"
+    ]
+  },
   "content_scripts": [
     {
       "matches": [
@@ -16,6 +23,7 @@
         "nav-data.js",
         "nav.js",
         "ui.js",
+        "todo.js",
         "composed.js",
         "home.js",
         "syllabus.js",

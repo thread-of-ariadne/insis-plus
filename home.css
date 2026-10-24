@@ -27,3 +27,25 @@
 @media (max-width: 900px) {
   .dash-main, .rail { padding: 16px; }
 }
+
+/* To do (K vyřízení) */
+.todo-block { display: flex; flex-direction: column; gap: 10px; }
+.todo-list { display: flex; flex-direction: column; padding: 6px 8px; }
+.todo-row { display: flex; align-items: center; gap: 12px; padding: 11px 10px; border-radius: 12px; }
+.todo-row + .todo-row { border-top: 1px solid var(--line); }
+.todo-row:hover { background: var(--hover); }
+.todo-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.todo-text strong { font-size: 15px; }
+.todo-text small { overflow: hidden; color: var(--muted); font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
+.todo-row .delta { flex: none; }
+.empty-todo p { margin: 0; padding: 12px 10px; color: var(--muted); font-size: 14px; }
+.checked { margin: 0; color: var(--faint); font-size: 12.5px; }
+
+/* One-time question: shared computer? */
+.ask { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; }
+.ask strong { font-size: 15px; }
+.ask p { margin: 4px 0 0; max-width: 62ch; font-size: 13.5px; }
+.ask-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink, #fff); font: 700 14px var(--font); cursor: pointer; }
+.btn.ghost { background: var(--chip); color: var(--fg); }
+.btn:hover { filter: brightness(1.06); }

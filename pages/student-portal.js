@@ -8,7 +8,7 @@
 // Stored for the dashboard, the sidebar and the background sync (plain data, no HTML):
 // ipx.state.portal = {
 //   updated, source,
-//   study: { faculty, name, detail, progress } | null,
+//   study: { faculty, name, detail, progress, restriction } | null,
 //   links: { exams, enrol, timetable, record, submissions, plan: { href, text } | undefined },
 //   paths: { '/auth/student/…pl': { href, text } }   (every portal link, by path)
 // }
@@ -129,7 +129,7 @@
     ipx.state.portal = {
       updated: Date.now(),
       source: location.href,
-      study: s && { faculty: s.faculty, name: s.name[0] || '', detail: s.name.slice(1).join(', '), progress: s.progress },
+      study: s && { faculty: s.faculty, name: s.name[0] || '', detail: s.name.slice(1).join(', '), progress: s.progress, restriction: s.restriction || '' },
       links: d.links,
       // Every portal link by page path, copied verbatim: the new navigation (nav.js) reaches InSIS pages through
       // the student's own links, which carry the right study and period.
