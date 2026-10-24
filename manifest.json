@@ -58,6 +58,7 @@
         "pages/noticeboard.js",
         "pages/requests.js",
         "pages/exams.js",
+        "pages/folder.js",
         "generic.js",
         "sync.js"
       ],

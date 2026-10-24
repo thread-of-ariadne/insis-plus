@@ -1,0 +1,171 @@
+/* InSIS+ — a document server folder (pages/folder.js). Injected into the page itself: InSIS's own tables, links and
+   pager are styled in place (nothing is moved out of InSIS's forms). Scoped to html.ipx-generic.ipx-folder. */
+
+/* ---------- the blocks: subfolders first, then the files, then the folder's actions ---------- */
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] { display: flex; flex-direction: column; gap: 4px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] > br,
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] > p:empty,
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] > hr { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="admins"] { order: 0; max-width: 100%; margin: 0 0 10px; color: var(--muted); font-size: 12.5px;
+  line-height: 1.45; white-space: normal; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="admins"] * { white-space: normal !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders-empty"] { display: none !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="admins"] .uf-icon { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders-line"] { order: 1; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders"] { order: 2; margin-bottom: 18px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] { order: 3; margin-bottom: 18px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops-head"] { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] { order: 4; }
+
+/* InSIS's count lines ("The following table shows documents (1 - 10 of 109).") read as quiet captions */
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders-line"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > .small { margin: 0 0 6px; color: var(--faint); font-size: 12.5px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > br,
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > p:empty,
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders"] > br,
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="folders"] > p:empty { display: none; }
+
+/* ---------- a list (both tables): a card of rows, no header row ---------- */
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] { display: block; width: 100%; margin: 0; border: 0; border-radius: 16px; background: var(--surface);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list]::before { content: attr(data-ipx-title); display: block; padding: 14px 16px 6px; color: var(--fg);
+  font: 700 15px var(--font, "Figtree", sans-serif); }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > thead { display: none; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > tbody { display: block; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > tbody > tr { position: relative; display: grid; align-items: center; column-gap: 12px; padding: 10px 16px;
+  border: 0; border-top: 1px solid var(--line); background: none !important; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > tbody > tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent) !important; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] td { display: block; min-width: 0; padding: 0 !important; border: 0 !important; background: none !important;
+  color: var(--fg-2); text-align: left !important; white-space: normal !important; }
+
+/* ---------- documents: [type] name / comment · author · date [new] [details] ---------- */
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list="docs"] > tbody > tr {
+  grid-template-columns: 44px minmax(0, 1fr) auto 32px;
+  grid-template-areas: "type name date info" "type comment author info";
+}
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="state"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="modified"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="modify"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="stats"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="change"] { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="name"] { grid-area: name; color: var(--fg); font-size: 14.5px; font-weight: 650; overflow-wrap: anywhere; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="name"][data-ipx-new]::after { content: attr(data-ipx-new); margin-left: 8px; padding: 1px 7px;
+  border-radius: 6px; background: var(--bad, #c62828); color: #fff; font-size: 11px; font-weight: 800; vertical-align: 2px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="comment"] { grid-area: comment; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="comment"]:empty { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="author"] { grid-area: author; justify-self: end; font-size: 12.5px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="author"] a { position: relative; z-index: 2; color: var(--muted); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="date"] { grid-area: date; justify-self: end; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+/* The file type badge is InSIS's own download link; stretched over the whole row, so the row opens the file. */
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] { grid-area: type; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px;
+  background: var(--chip); color: var(--fg-2); text-decoration: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a .uf-icon { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a::before { content: attr(data-ipx-mime); font-size: 11px; font-weight: 800; letter-spacing: .02em; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] tr:hover td[data-ipx-col="file"] a { background: var(--accent); color: var(--accent-ink, #fff); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="PDF"] { background: #fde7e7; color: #b42318; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="DOCX"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="DOC"] { background: #e3ecfd; color: #1d4ed8; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="PPTX"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="PPT"] { background: #fdeee3; color: #c2410c; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="XLSX"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="file"] a[data-ipx-mime="XLS"] { background: #e3f6ea; color: #15803d; }
+/* "View information": a small round button above the stretched link */
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="info"] { grid-area: info; justify-self: end; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="info"] a { position: relative; z-index: 2; display: grid; place-items: center; width: 30px; height: 30px;
+  border-radius: 50%; color: var(--faint); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="info"] a:hover { background: var(--chip); color: var(--accent); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="info"] .uf-icon svg { width: 16px; height: 16px; }
+/* A row without a file (a note only): no badge */
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] tr:not([data-ipx-has-file]) td[data-ipx-col="file"]::before { content: "—"; color: var(--faint); }
+/* The document asked for from New / Home */
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] tr[data-ipx-hl] { background: color-mix(in srgb, var(--accent) 10%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--accent); }
+
+/* ---------- subfolders: [folder] name / last change, the whole row opens it ---------- */
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list="folders"] > tbody > tr { grid-template-columns: auto 36px minmax(0, 1fr) auto 18px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="english"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="modify"],
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="select"][data-ipx-empty] { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="select"] { position: relative; z-index: 2; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="name"] { grid-column: 3; color: var(--fg); font-size: 14.5px; font-weight: 650; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="name"]::before { content: ""; position: absolute; left: 16px; top: 50%; width: 36px; height: 36px;
+  margin-top: -18px; border-radius: 9px; background: color-mix(in srgb, var(--accent) 12%, transparent)
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%232f45d1' stroke-width='1.8' viewBox='0 0 24 24'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'/%3E%3C/svg%3E") center no-repeat; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="changed"] { grid-column: 4; color: var(--muted); font-size: 12.5px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="enter"] { grid-column: 5; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="enter"] a { color: var(--faint); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="enter"] a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="enter"] .uf-icon svg { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="enter"] .uf-icon::before { content: "›"; font-size: 20px; line-height: 1; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] tr:hover td[data-ipx-col="enter"] a { color: var(--accent); }
+
+/* ---------- inside the documents form: count, sort, list, pager (a grid: InSIS's controls stay where they are) ---------- */
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] { display: grid; grid-template-columns: max-content max-content minmax(0, 1fr); align-items: center;
+  column-gap: 8px; row-gap: 8px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > * { grid-column: 1 / -1; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > br, html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > a[name] { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-part="sort-help"], html.ipx-generic.ipx-folder #str1 [data-ipx-part="pager-top"] { display: none !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-part="count"] { grid-row: 1; margin: 0; color: var(--faint); font-size: 12.5px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-part="sort"] { grid-row: 2; grid-column: 1; height: 34px; max-width: 340px; margin: 0; font-size: 13px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-part="sort-go"] { grid-row: 2; grid-column: 2; height: 34px; padding: 0 12px; font-size: 13px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > table[data-ipx-list] { grid-row: 3; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > ul[data-ipx-pager]:not([data-ipx-part]) { grid-row: 4; }
+
+/* ---------- InSIS's pager as buttons ---------- */
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] > li { padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 10px 0; padding: 0; list-style: none; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] > li { margin: 0; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a, html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] div {
+  display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 9px; background: var(--chip); color: var(--fg-2);
+  font-size: 13px; font-weight: 600; text-decoration: none; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] div { background: none; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a:hover { color: var(--accent); }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a[data-selected="true"] { background: var(--accent); color: var(--accent-ink, #fff); }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a[data-active="false"]:has(.uf-icon) { opacity: .4; pointer-events: none; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon svg { display: none; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon[data-sysid="tree-vlevo-zarazka"]::before { content: "«"; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon[data-sysid="tree-vlevo"]::before { content: "‹"; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon[data-sysid="tree-vpravo"]::before { content: "›"; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon[data-sysid="tree-vpravo-zarazka"]::before { content: "»"; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] .uf-icon::before { font-size: 16px; line-height: 1; }
+
+/* ---------- the folder's actions: quiet buttons ---------- */
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .rada-ikon { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .rada-ikon::before { content: attr(data-ipx-title) ":"; margin-right: 4px; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona { display: inline-flex; align-items: center; gap: 6px; width: auto !important; min-height: 32px; padding: 0 12px;
+  border-radius: 9px; background: var(--chip); color: var(--fg-2); font-size: 13px; font-weight: 600; text-decoration: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona:hover { color: var(--accent); }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona .uf-icon { display: none; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona-text { margin: 0 !important; font: inherit !important; }
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-folder #str1 table[data-ipx-list="docs"] > tbody > tr {
+    grid-template-columns: 44px minmax(0, 1fr) 32px;
+    grid-template-areas: "type name info" "type comment info" "type meta info";
+  }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="date"],
+  html.ipx-generic.ipx-folder #str1 [data-ipx-list="docs"] td[data-ipx-col="author"] { grid-area: auto; grid-column: 2; justify-self: start; }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-list="folders"] td[data-ipx-col="changed"] { display: none; }
+}
+
+/* InSIS fixes the width of its .small lines (800 px) and leaves empty tab-row wrappers: neither in this layout */
+html.ipx-generic.ipx-folder #str1 .small { width: auto !important; max-width: 100%; box-sizing: border-box; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] > .portal_menu_wrapper,
+html.ipx-generic.ipx-folder #str1 [data-ipx-folder] > p.portal_menu_sep { display: none !important; }
+/* Pager labels and action buttons keep their text on one line */
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] > li { flex: none; width: auto !important; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a { white-space: nowrap; width: auto !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .rada-ikon { display: flex !important; grid-template-columns: none !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona, html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona-text { white-space: nowrap; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a { display: inline-flex !important; align-items: center; justify-content: center; width: max-content !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .app-ikona { flex: none !important; width: max-content !important; max-width: none !important; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] > li { display: block !important; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a { box-sizing: border-box !important; width: auto !important; min-width: 34px !important; }
+html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] a, html.ipx-generic.ipx-folder #str1 ul[data-ipx-pager] div { margin: 0 !important; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"], html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"] .rada-ikon { width: 100% !important; max-width: 100% !important; align-self: stretch; }
+
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] td[data-ipx-col="num"] { display: none !important; }
+html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > tbody > tr > td:not([data-ipx-col]) { display: none !important; }
