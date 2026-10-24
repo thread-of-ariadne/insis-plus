@@ -1,47 +1,32 @@
-// InSIS+ — dashboard replacing the InSIS main page.
-// Built from the links found on the page itself, so it adapts when InSIS renames or adds items.
-// The service menu, name and counters are stored so every other redesigned page can show them.
-// If the page doesn't look like the main page, nothing is changed.
+// InSIS+ — Home (Přehled), drawn over the InSIS main page (docs/ia/02-redesign.md §3).
+// The main page's own menu, name, counters and notices are read here when the student opens it (never in the
+// background) and stored for the session. If the page doesn't look like the main page, nothing is changed.
+// InSIS+ pages (#ipx:…) also live on this address and are handed to composed.js.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
   const { clean, norm, lang } = ipx;
-  const { h, anchor, takeover, onPinsChange, kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip,
-    nextClasses, hoursChart, classDays, deadlineList, facultyColors, facultyFor, quickActions } = ipx.ui;
+  const { h, anchor, takeover, onPinsChange, sectionHead, emptyState, notice, courseCard, weekStrip,
+    nextClasses, hoursChart, classDays, facultyColors, facultyFor } = ipx.ui;
+  const nav = ipx.nav;
 
   const T = {
     cs: { morning: 'Dobré ráno', day: 'Dobrý den', evening: 'Dobrý večer', welcome: 'Vítejte zpět',
-      docs: 'Dokumenty', tasks: 'Úkoly', pinned: 'Připnuté', fresh: 'nové', allDone: '✓ hotovo', waiting: (n) => `${n} čeká`,
-      courses: 'Moje předměty', termTab: 'Zapsané', allTab: 'Nedávno zobrazené', catalogue: 'Katalog →',
-      coursesHint: 'Předměty, jejichž sylabus jste otevřeli.', fromTimetable: 'Podle vašeho rozvrhu.',
-      coursesEmpty: 'Zatím žádné. Otevřete sylabus předmětu, třeba z katalogu, a objeví se tady.',
-      enrolledEmpty: 'Zapsané předměty se zatím nenačetly. Najdete je ve Výsledcích v portálu studenta.',
-      loading: 'Načítám data z InSIS…', portal: 'Portál studenta', allPortal: 'Celý portál →',
-      portalEmpty: 'Zkoušky, zápis předmětů, rozvrh, výsledky a odevzdávárny najdete v portálu studenta.',
-      openPortal: 'Otevřít portál studenta', passed: 'splněno', failed: 'nesplněno',
-      semester: 'Semestr', schedule: 'Rozvrh', fullSchedule: 'Celý rozvrh →',
-      scheduleEmpty: 'Váš rozvrh se zatím nenačetl. Otevřete ho v portálu studenta.',
-      scheduleDone: 'V tomto rozvrhu už žádné další hodiny nejsou.',
-      deadlines: 'Termíny odevzdání', allDeadlines: 'Odevzdávárny →', noDeadlines: 'Žádná otevřená odevzdávárna nečeká.',
-      newDocs: 'Nové dokumenty', allDocs: 'Dokumentový server →', newN: (n) => `${n} nové`,
-      recent: 'Naposledy otevřené', recentEmpty: 'Tady se objeví stránky, které otevřete.',
-      today: 'dnes', yesterday: 'včera' },
+      loading: 'Načítám data z InSIS…', passed: 'splněno', failed: 'nesplněno', fullSchedule: 'Celý rozvrh →',
+      scheduleEmpty: 'Váš rozvrh se zatím nenačetl.', scheduleDone: 'V tomto rozvrhu už žádné další hodiny nejsou.',
+      allFiles: 'Všechny →', newN: (n) => `${n} nové`, noNewFiles: 'Žádné nové materiály.', filesNotRead: 'Materiály se zatím nenačetly.',
+      allCourses: 'Všechny →', coursesEmpty: 'Zapsané předměty se zatím nenačetly.', nothingTodo: 'Nic nečeká. ✓',
+      checked: 'Zkontrolováno:', notChecked: 'zatím nekontrolováno', next: 'příště', due: 'odevzdat', newFiles: (n) => `${n} nových materiálů`,
+      sharedQ: 'Je to sdílený počítač?', sharedText: 'Na sdíleném počítači InSIS+ mezi návštěvami nic neukládá (připnuté stránky ani nastavení). Data z InSIS se vždy mažou po odhlášení a po 10 minutách nečinnosti.',
+      sharedNo: 'Ne, můj počítač', sharedYes: 'Ano, nic neukládat' },
     en: { morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', welcome: 'Welcome back',
-      docs: 'Documents', tasks: 'Tasks', pinned: 'Pinned', fresh: 'new', allDone: '✓ done', waiting: (n) => `${n} waiting`,
-      courses: 'My courses', termTab: 'Enrolled', allTab: 'Recently viewed', catalogue: 'Catalogue →',
-      coursesHint: 'Courses whose syllabus you have opened.', fromTimetable: 'From your timetable.',
-      coursesEmpty: 'None yet. Open a course syllabus, for example from the catalogue, and it shows up here.',
-      enrolledEmpty: "Your enrolled courses have not loaded yet. They are in Study record in the Student's portal.",
-      loading: 'Loading your data from InSIS…', portal: "Student's portal", allPortal: 'Whole portal →',
-      portalEmpty: "Exams, course registration, your timetable, results and submissions are in the Student's portal.",
-      openPortal: "Open the Student's portal", passed: 'passed', failed: 'not passed',
-      semester: 'Semester', schedule: 'Timetable', fullSchedule: 'Full timetable →',
-      scheduleEmpty: "Your timetable has not loaded yet. Open it from the Student's portal.",
-      scheduleDone: 'No more classes in this timetable.',
-      deadlines: 'Deadlines', allDeadlines: 'Submissions →', noDeadlines: 'No open submission box is waiting.',
-      newDocs: 'New documents', allDocs: 'Document server →', newN: (n) => `${n} new`,
-      recent: 'Recently opened', recentEmpty: 'Pages you open will show up here.',
-      today: 'today', yesterday: 'yesterday' },
+      loading: 'Loading your data from InSIS…', passed: 'passed', failed: 'not passed', fullSchedule: 'Full timetable →',
+      scheduleEmpty: 'Your timetable has not loaded yet.', scheduleDone: 'No more classes in this timetable.',
+      allFiles: 'All →', newN: (n) => `${n} new`, noNewFiles: 'No new materials.', filesNotRead: 'Materials have not loaded yet.',
+      allCourses: 'All →', coursesEmpty: 'Your enrolled courses have not loaded yet.', nothingTodo: 'Nothing to do. ✓',
+      checked: 'Checked:', notChecked: 'not checked yet', next: 'next', due: 'due', newFiles: (n) => `${n} new materials`,
+      sharedQ: 'Is this a shared computer?', sharedText: 'On a shared computer InSIS+ keeps nothing between visits (no pins, no settings). Data from InSIS is always wiped on logout and after 10 minutes without activity.',
+      sharedNo: 'No, my computer', sharedYes: 'Yes, keep nothing' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -149,15 +134,6 @@
 
   // ---------- dashboard ----------
 
-  function when(ts) {
-    const d = new Date(ts);
-    const days = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(ts).setHours(0, 0, 0, 0)) / 864e5);
-    const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-    if (days === 0) return `${T.today} ${time}`;
-    if (days === 1) return `${T.yesterday} ${time}`;
-    return d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
-  }
-
   // Winter semester runs Sep–Jan, summer Feb–Aug; InSIS writes them ZS/WS and LS/SS plus "2026/2027".
   function isThisTerm(semester) {
     const now = new Date();
@@ -199,84 +175,86 @@
     return { fromTimetable: true, list: [...seen.values()].map((c) => card({ code: c.code, name: c.name, href, tags: [...c.types] })) };
   }
 
-  function buildPage({ header, notices, quick }, state) {
-    const pins = ipx.state.fav.filter((url) => ipx.state.links[url]);
-    const here = location.href.split('#')[0];
-    const recent = Object.entries(ipx.state.links)
-      .filter(([url, l]) => l.v > 0 && url !== here)
-      .sort((a, b) => b[1].s - a[1].s)
-      // One page often has several addresses (different parameters): list each title once.
-      .filter(([, l], i, all) => all.findIndex(([, m]) => m.t === l.t) === i)
-      .slice(0, 5)
-      .map(([url, l]) => ({ href: url, text: l.t, s: l.s }));
-
-    const viewed = Object.values(ipx.state.courses || {}).sort((a, b) => b.s - a.s);
-    const mine = enrolled(viewed);
-    const tab = state.tab || (mine.list.length || !viewed.length ? 'term' : 'all');
-    const shown = tab === 'term' ? mine.list.slice(0, 8) : viewed.slice(0, 4).map((c) => ({ ...c, tags: [c.completion, c.language] }));
+  // Home (docs/ia/02-redesign.md §3): To do, My courses and InSIS notices; the rail with the week, the timetable,
+  // new materials by course and teaching hours.
+  function buildPage({ notices }, state) {
+    const now = new Date();
     const syncing = ipx.state.sync?.running;
-
-    const { docs, tasks } = header;
-    // The personal timetable module stores its classes; the menu's "Timetables" is only the public search.
-    // The student's own timetable: never the menu's "Timetables", which is the public search.
     const tt = ipx.state.timetable;
-    const portal = ipx.state.portal;
-    const portalLink = portal?.source ? { href: portal.source } : quick.find((q) => q.icon === 'cap')?.link;
-    const timetable = portal?.links?.timetable || (tt?.source && { href: tt.source });
-    const upcoming = tt && nextClasses(tt.events, timetable?.href);
-    // Stored by pages/submissions.js and pages/docserver.js when those pages were opened.
-    const sub = ipx.state.submissions;
     const ds = ipx.state.docserver || {};
-    const news = (ds.courses || []).filter((c) => c.newCount > 0).sort((a, b) => b.newCount - a.newCount).slice(0, 5);
-    const catalogue = new URL('/katalog/', document.baseURI).href;
+    const viewed = Object.values(ipx.state.courses || {});
+    const mine = enrolled(viewed).list;
+    const todo = ipx.todo ? ipx.todo.items({}, now) : [];
+    const checked = ipx.todo ? ipx.todo.status() : [];
+
+    const sharedQuestion = !ipx.state.sharedAsked && ipx.user && h('section', { class: 'card ask' },
+      h('div', {}, h('strong', {}, T.sharedQ), h('p', { class: 'muted' }, T.sharedText)),
+      h('div', { class: 'ask-actions' },
+        h('button', { type: 'button', class: 'btn', onclick: () => ipx.setShared(false).then(state.render) }, T.sharedNo),
+        h('button', { type: 'button', class: 'btn ghost', onclick: () => ipx.setShared(true).then(state.render) }, T.sharedYes)));
+
+    // Per course: next class, nearest deadline, new files (only data matched by exact course code).
+    const nextOf = (code) => (tt?.events || []).filter((e) => e.code === code && e.date && new Date(`${e.date}T${e.end || '23:59'}`) > now)
+      .sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`))[0];
+    const dueOf = (code) => todo.find((it) => it.code === code && it.due);
+    const filesOf = (code) => (ds.courses || []).find((c) => c.code === code)?.newCount || 0;
+    const card = (c) => {
+      const n = nextOf(c.code);
+      const due = dueOf(c.code);
+      const files = filesOf(c.code);
+      return courseCard({
+        ...c,
+        href: ipx.nav.composedUrl('course.overview', c.code),
+        aims: null,
+        tags: [
+          n && `${T.next} ${new Date(`${n.date}T${n.start}`).toLocaleDateString(locale, { weekday: 'short' })} ${n.start}`,
+          due && `${T.due} ${due.when}`,
+          files > 0 && T.newFiles(files),
+        ],
+      });
+    };
+
+    const shownNotices = notices.filter((n) => !todo.some((it) => it.id === 'datacheck' && /kontrol|check/i.test(n.text)));
+    const news = (ds.courses || []).filter((c) => c.newCount > 0).sort((a, b) => b.newCount - a.newCount).slice(0, 6);
+    const lastChecked = checked.map((s) => (s.checked ? `${s.label} ${s.checked.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}` : `${s.label} — ${T.notChecked}`)).join(' · ');
 
     return h('div', { class: 'dash' },
       h('div', { class: 'dash-main' },
-        notices.map(notice),
+        sharedQuestion,
 
-        h('div', { class: 'kpis' },
-          docs && kpi({ label: T.docs, value: docs.count ?? '—', href: docs.href,
-            status: docs.count > 0 && { tone: 'bad', text: T.fresh } }),
-          tasks && kpi({ label: T.tasks, value: tasks.count ?? '—', href: tasks.href,
-            status: tasks.count > 0 ? { tone: 'warn', text: T.waiting(tasks.count) } : { tone: 'ok', text: T.allDone } }),
-          kpi({ label: T.pinned, value: pins.length })),
+        h('section', { class: 'todo-block' },
+          sectionHead(nav.label('todo')),
+          todo.length
+            ? h('div', { class: 'card todo-list' }, todo.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
+                h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
+                it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
+            : h('div', { class: 'card todo-list empty-todo' }, h('p', {}, syncing ? T.loading : T.nothingTodo)),
+          h('p', { class: 'checked' }, T.checked, ' ', lastChecked)),
 
-        sectionHead(T.portal, portalLink && { href: portalLink.href, text: T.allPortal }),
-        quickActions(portal?.links) || (syncing
-          ? emptyState(T.loading)
-          : emptyState(T.portalEmpty, portalLink && { href: portalLink.href, text: T.openPortal })),
+        h('section', {},
+          sectionHead(nav.label('mycourses'), { href: ipx.nav.composedUrl('courses.mine'), text: T.allCourses }),
+          mine.length
+            ? h('div', { class: 'course-list' }, mine.map(card))
+            : emptyState(syncing ? T.loading : T.coursesEmpty)),
 
-        sectionHead(T.courses, { href: catalogue, text: T.catalogue },
-          tabs([{ id: 'term', label: T.termTab }, { id: 'all', label: T.allTab }], tab, state.setTab)),
-        tab === 'term' && mine.fromTimetable && shown.length > 0 && h('p', { class: 'muted hint' }, T.fromTimetable),
-        tab === 'all' && shown.length > 0 && h('p', { class: 'muted hint' }, T.coursesHint),
-        shown.length
-          ? h('div', { class: 'course-list' }, shown.map(courseCard))
-          : tab === 'term'
-            ? emptyState(syncing ? T.loading : T.enrolledEmpty, !syncing && portalLink ? { href: portalLink.href, text: T.openPortal } : undefined)
-            : emptyState(T.coursesEmpty)),
+        shownNotices.length > 0 && h('section', {}, sectionHead(nav.label('notices')), shownNotices.map(notice))),
 
       h('aside', { class: 'rail' },
-        weekStrip(new Date(), classDays(tt?.events)),
+        weekStrip(now, classDays(tt?.events)),
         h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.schedule), timetable && anchor(timetable, { class: 'more' }, T.fullSchedule)),
-          upcoming || h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : syncing ? T.loading : T.scheduleEmpty)),
-        sub && h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.deadlines), anchor(portal?.links?.submissions || { href: sub.source }, { class: 'more' }, T.allDeadlines)),
-          deadlineList(sub.boxes) || h('p', { class: 'muted rail-empty' }, T.noDeadlines)),
-        news.length > 0 && h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.newDocs), ds.source && anchor({ href: ds.source }, { class: 'more' }, T.allDocs)),
-          h('ul', { class: 'recent' }, news.map((c) => h('li', {},
-            anchor({ href: c.href || ds.source }, { class: 'row' },
-              h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(c.code))[1]}` }, c.code), ' ', c.name),
-              h('span', { class: 'delta bad' }, T.newN(c.newCount))))))),
-        tt && hoursChart(tt.events),
+          h('div', { class: 'card-head' }, h('h2', {}, nav.label('timetable')),
+            ipx.nav.target('schedule.week') && anchor({ href: ipx.nav.target('schedule.week') }, { class: 'more' }, T.fullSchedule)),
+          (tt && nextClasses(tt.events, ipx.nav.target('schedule.week'))) || h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : syncing ? T.loading : T.scheduleEmpty)),
         h('section', {},
-          h('div', { class: 'card-head' }, h('h2', {}, T.recent)),
-          recent.length
-            ? h('ul', { class: 'recent' }, recent.map((r) => h('li', {},
-                anchor(r, { class: 'row' }, h('strong', {}, r.text), h('small', {}, when(r.s))))))
-            : h('p', { class: 'muted rail-empty' }, T.recentEmpty))));
+          h('div', { class: 'card-head' }, h('h2', {}, nav.label('newfiles')),
+            anchor({ href: ipx.nav.composedUrl('courses.files') }, { class: 'more' }, T.allFiles)),
+          news.length
+            ? h('ul', { class: 'recent' }, news.map((c) => h('li', {},
+                anchor({ href: ipx.nav.safe(c.href, 'link', { copied: true }) || ipx.nav.composedUrl('courses.files') }, { class: 'row' },
+                  h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(c.code))[1]}` }, c.code), ' ', c.name),
+                  h('span', { class: 'delta bad' }, T.newN(c.newCount))))))
+            : h('p', { class: 'muted rail-empty' }, ds.updated ? T.noNewFiles : syncing ? T.loading : T.filesNotRead)),
+        tt && hoursChart(tt.events)));
   }
 
   ipx.ready.then(() => {
@@ -287,6 +265,7 @@
 
     ipx.state.menu = data.services.map((g) => ({ title: g.title, links: g.links.map(({ href, text, target }) => ({ href, text, target })) }));
     ipx.state.profile = { name, docs: data.header.docs || null, tasks: data.header.tasks || null };
+    ipx.state.notices = { updated: Date.now(), items: data.notices.map(({ href, text }) => ({ href, text })) };
     ipx.state.homeUrl = location.href.split('#')[0];
     ipx.save();
 
@@ -307,13 +286,12 @@
       title: name ? `${greet}, ${name.split(' ')[0]}` : T.welcome,
       subtitle: date.charAt(0).toUpperCase() + date.slice(1),
       build: () => {
-        // Re-rendered when the course tab changes or pins change in the sidebar.
+        // Re-rendered when data arrives from the background sync, pins change, or the shared-computer answer is given.
         const wrap = h('div', {});
-        const state = { tab: null, setTab: (t) => { state.tab = t; render(); } };
+        const state = { render: () => render() };
         const render = () => wrap.replaceChildren(buildPage(data, state));
         render();
         onPinsChange(render);
-        // The background sync (sync.js) brings the portal links, timetable, record, deadlines and documents.
         ipx.onData(render);
         return wrap;
       },

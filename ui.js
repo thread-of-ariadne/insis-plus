@@ -215,7 +215,7 @@
   // A small menu that opens under its button (Help, avatar). Closes on Escape or a click outside.
   function popMenu(button, label, items) {
     const panel = h('div', { class: 'pop', role: 'menu', hidden: true }, items.filter(Boolean).map((it) =>
-      it.href ? anchor(it, { class: 'pop-item' + (it.phone ? ' phone-only' : ''), role: 'menuitem' }, it.icon && icon(it.icon), h('span', {}, it.text))
+      it.href ? anchor(it, { class: 'pop-item' + (it.phone ? ' phone-only' : ''), role: 'menuitem', onclick: it.onclick }, it.icon && icon(it.icon), h('span', {}, it.text))
         : h('p', { class: 'pop-note' }, it.text)));
     const wrap = h('div', { class: 'pop-wrap' }, button, panel);
     button.setAttribute('aria-haspopup', 'menu');
@@ -276,7 +276,8 @@
           nav().safe(at('/auth/system/zmena_hesla.pl')) && { href: at('/auth/system/zmena_hesla.pl'), text: nav().label('password'), icon: 'shield' },
           { href: nav().composedUrl('plus.settings'), text: nav().label('plus'), icon: 'layout' },
           ...langLinks().map((l) => ({ ...l, icon: 'globe', phone: true })),
-          { href: logout, text: nav().label('logout'), icon: 'back' },
+          // Personal data goes before InSIS logs out (principle 8).
+          { href: logout, text: nav().label('logout'), icon: 'back', onclick: () => ipx.wipe() },
         ])));
   }
 

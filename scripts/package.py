@@ -24,6 +24,10 @@ def files_from_manifest(manifest):
                 names.update(str(p.relative_to(ROOT)).replace("\\", "/") for p in ROOT.glob(res) if p.is_file())
             else:
                 names.add(res)
+    background = manifest.get("background", {})
+    names.update(background.get("scripts", []))
+    if background.get("service_worker"):
+        names.add(background["service_worker"])
     for icon in (manifest.get("icons") or {}).values():
         names.add(icon)
     return sorted(n for n in names if not n.endswith("README.md"))

@@ -15,7 +15,7 @@ import re
 import sys
 
 SERVER = "http://localhost:8765/"
-SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "composed.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
+SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
 
 SHIM = """<script>
 window.chrome = {
@@ -23,6 +23,7 @@ window.chrome = {
   storage: { local: {
     get: async (k) => { try { return { [k]: JSON.parse(localStorage.getItem(k)) || undefined }; } catch { return {}; } },
     set: async (o) => { try { for (const k in o) localStorage.setItem(k, JSON.stringify(o[k])); } catch {} },
+    remove: async (k) => { try { for (const key of [].concat(k)) localStorage.removeItem(key); } catch {} },
   },
   // Writes from other test pages (the sync frame) arrive as "storage" events.
   onChanged: { addListener: (fn) => addEventListener('storage', (e) => {
