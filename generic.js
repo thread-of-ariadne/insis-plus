@@ -34,14 +34,18 @@
     const inSection = ipx.kit?.sectionFor();
     if (inSection) {
       const { section, view } = inSection;
-      ipx.ui.hideInSlot([...page.querySelectorAll('table.portal_menu, nav[aria-label="breadcrumb"], #titulek')]);
+      const place = section.node?.();
+      if (place) ipx.ui.placeOverride = { node: place, dest: ipx.nav.destOf(place) };
+      // InSIS's tab rows go (the header has the views), unless the section keeps a row InSIS+ cannot link itself.
+      const rows = [...page.querySelectorAll('table.portal_menu')].filter((t) => !section.keepRow?.(t));
+      ipx.ui.hideInSlot([...rows, ...page.querySelectorAll('nav[aria-label="breadcrumb"], #titulek')]);
       styleSlotted();
       takeover({
-        key: 'generic', css: ['kit.css'], title: section.title(), subtitle: section.subtitle?.(), extra: section.actions?.(view),
+        key: 'generic', css: ['kit.css', ...[].concat(section.css || [])], title: section.title(), subtitle: section.subtitle?.(), extra: section.actions?.(view),
         slotted: [page],
         build: () => ipx.ui.h('div', { class: 'kit-page' },
           ipx.kit.sectionTabs(section, view),
-          view == null && insisName !== section.title() && ipx.ui.h('h2', { class: 'section-title' }, insisName),
+          section.lead?.() || (view == null && insisName !== section.title() && ipx.ui.h('h2', { class: 'section-title' }, insisName)),
           ipx.ui.h('slot')),
       });
       return;

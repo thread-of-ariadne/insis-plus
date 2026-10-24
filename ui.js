@@ -141,6 +141,8 @@
   function here() {
     if (!nav()) return { node: null, dest: null };
     const r = nav().route(document.baseURI.split('#')[0] + location.hash);
+    // A page that belongs elsewhere than its page type says (kit.section node(), e.g. a course's folder page).
+    if (ipx.ui.placeOverride) return { ...r, ...ipx.ui.placeOverride };
     // A page the mapping does not know (e.g. the page after a form was sent) keeps the place of the page before it.
     if (!r.node) {
       try {

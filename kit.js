@@ -164,7 +164,10 @@
   // content (generic.js). Otherwise the header jumps as the student moves between the tabs. Modules register their
   // section at load time; generic.js and the modules draw the header from here.
   //   section({ id, title: () => text, subtitle: () => text, pages: { '/auth/…': view | null | (route) => view },
-  //             views: () => [{ id, text, href, count? }], actions: (view) => [nodes] })
+  //             views: () => [{ id, text, href, count? }], actions: (view) => [nodes],
+  //             lead: () => node (a path or note above the content), node: () => node id (where the sidebar marks the page),
+  //             css: extra stylesheets for the header parts, keepRow: (table) => true to keep one of InSIS's tab rows })
+  // A page function returning undefined declines the page, so another section can claim it.
   // A page mapped to null belongs to the section but is none of its views (a step below it): no tab is marked.
   const sections = [];
   function section(def) { sections.push(def); return def; }
@@ -173,7 +176,10 @@
     for (const s of sections) {
       if (!r.path || !(r.path in s.pages)) continue;
       const v = s.pages[r.path];
-      return { section: s, view: typeof v === 'function' ? v(r) : v, route: r };
+      const view = typeof v === 'function' ? v(r) : v;
+      // A page function returning undefined declines the page (another section claims it).
+      if (view === undefined) continue;
+      return { section: s, view, route: r };
     }
     return null;
   }

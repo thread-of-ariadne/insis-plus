@@ -27,7 +27,7 @@
       lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
       coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
-      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky',
+      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky', courseFiles: 'Soubory předmětu', newInCourse: 'Nové v tomto předmětu', newInCourses: 'Nové ve vašich předmětech', fromList: (t) => `Podle seznamu Nové z ${t}`, openNew: 'Otevřít Nové', emptyFolders: (n) => `${n} ${ipx.kit.plural(n, 'prázdná složka', 'prázdné složky', 'prázdných složek')}`, noFiles: 'K tomuto předmětu zatím na dokumentovém serveru nejsou žádné soubory.', foldersTitle: 'Složky', openFolderHint: 'Složka se otevře v InSIS, v rámci tohoto předmětu.', earlier: 'Dřívější období', filesShort: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`, newShort: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`, noNewYet: 'Nové dokumenty se ukážou, když otevřete Nové.', materials: 'Materiály', allFoldersTab: 'Všechny složky', displaySettings: 'E-mail a zobrazení', yourFolders: 'Vaše složky', settingsNote: 'InSIS+ čte strom dokumentů: když ho v nastavení necháte začínat níž, můžou se tu vaše předměty přestat ukazovat.',
       library: 'E-knihovna', libraryText: 'Veřejné studijní materiály, které zveřejňují katedry.',
       untilAt: (d) => `do ${d}`, closedOn: (d) => `uzavřeno ${d}`, confirmed: 'potvrzeno', submitted: 'odevzdáno', nothingIn: 'nic neodevzdáno', notOpen: (d) => `otevře se ${d}`,
       noResult: 'Výsledek zatím není zapsaný.', entered: (d) => `zapsáno ${d}`, attemptN: (n) => `${n}. pokus`, allAttempts: 'Všechny pokusy ve Výsledcích',
@@ -47,7 +47,7 @@
       lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
       coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
-      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders',
+      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders', courseFiles: 'Course files', newInCourse: 'New in this course', newInCourses: 'New in your courses', fromList: (t) => `From the New list at ${t}`, openNew: 'Open New', emptyFolders: (n) => `${n} empty ${n === 1 ? 'folder' : 'folders'}`, noFiles: 'There are no files on the document server for this course yet.', foldersTitle: 'Folders', openFolderHint: 'A folder opens in InSIS, inside this course.', earlier: 'Earlier periods', filesShort: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, newShort: (n) => `${n} new`, noNewYet: 'New documents show here once you open New.', materials: 'Materials', allFoldersTab: 'All folders', displaySettings: 'E-mail and display', yourFolders: 'Your folders', settingsNote: 'InSIS+ reads the document tree: starting it lower in these settings can hide your courses here.',
       library: 'e-Library', libraryText: 'Public study materials published by departments.',
       untilAt: (d) => `until ${d}`, closedOn: (d) => `closed ${d}`, confirmed: 'confirmed', submitted: 'submitted', nothingIn: 'nothing submitted', notOpen: (d) => `opens ${d}`,
       noResult: 'No result has been entered yet.', entered: (d) => `entered ${d}`, attemptN: (n) => `attempt ${n}`, allAttempts: 'All attempts in Results',
@@ -77,6 +77,14 @@
   }
   const courseOf = (code) => courses().find((c) => c.code === code) || null;
   const eventsOf = (code) => (ipx.state.timetable?.events || []).filter((e) => e.code === code);
+  // New documents in the student's courses (red badges count these only; faculty and university folders do not).
+  function courseNewCount() {
+    const ds = ipx.state.docserver;
+    if (!ds?.courses) return null;
+    const mine = new Set(courses().map((c) => c.code));
+    return ds.courses.filter((c) => !mine.size || mine.has(c.code)).reduce((sum, c) => sum + (c.newCount || 0), 0);
+  }
+  ipx.courseNewCount = courseNewCount;
   const folderOf = (code) => (ipx.state.docserver?.courses || []).find((c) => c.code === code) || null;
   const boxesOf = (code) => (ipx.state.submissions?.boxes || []).filter((b) => b.code === code);
 
@@ -139,19 +147,70 @@
 
   // ---------- the course page ----------
 
-  // One folder of the document server tree as a row (indented by depth), then its subfolders. The tree comes from the
-  // tree page (read in the background); the folders themselves open in InSIS on the student's click, because opening
-  // one may mark its files as read.
-  function folderRow(n, depth) {
-    const to = nav.safe(n.href, 'link', { copied: true });
+
+
+  // ---------- a course's folders, as students read them ----------
+
+  // InSIS names class folders by their timetable entry ("Lecture - since 25.09.2026 14:00-16:15, RB 212 (4x)",
+  // "Přednáška - od 25.09.2026 14:00-16:15, RB 212 (4x)"): the readable form keeps the kind, the weekday, the start and
+  // the room ("Lecture · Fri 14:00 · RB 212").
+  function folderLabel(name) {
+    const m = /^(.+?)\s+-\s+(?:since|od)\s+(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}:\d{2})(?:-\d{1,2}:\d{2})?(?:,\s*([^()]+?))?\s*(?:\(\d+x\))?$/i.exec(name || '');
+    if (!m) return name;
+    const day = new Date(+m[4], +m[3] - 1, +m[2]).toLocaleDateString(locale, { weekday: 'short' });
+    return [m[1], `${day} ${m[5]}`, m[6]?.trim()].filter(Boolean).join(' · ');
+  }
+  const folderIdOf = (href) => /[?;&]id=(\d+)/.exec(href || '')?.[1] || null;
+
+  // The folders of a course that hold files, as one flat list: the course folder itself ("Course files"), then every
+  // folder below it with files of its own, whatever its depth (InSIS's containers, "On-site classes" and "Teachers",
+  // hold none). Empty folders are only counted.
+  function flatFolders(f, c) {
+    const out = [];
+    let empty = 0;
+    if (f.files > 0) out.push({ name: T.courseFiles, href: f.href, files: f.files, fresh: f.fresh || 0 });
+    const walk = (nodes) => (nodes || []).forEach((n) => {
+      if (n.files > 0) out.push({ name: folderLabel(n.name), href: n.href, files: n.files, fresh: n.fresh || 0 });
+      else if (!n.children?.length) empty++;
+      walk(n.children);
+    });
+    walk(f.tree);
+    return { list: out, empty };
+  }
+
+  // The course's unread documents from the New list the student last opened (pages/docserver.js); each links to its
+  // folder page with the document highlighted (never to the download itself).
+  function freshOf(code) {
+    const ds = ipx.state.docserver;
+    // Course documents only (faculty and university folders are not "your courses"). When the tree was read after
+    // the list and a course has no new documents left there, the list's documents of that course are not new any more.
+    const treeNewer = (ds?.updated || 0) > (ds?.newUpdated || 0);
+    const stillNew = (c) => !treeNewer || (ds.courses || []).find((x) => x.code === c)?.newCount > 0;
+    return (ds?.fresh || []).filter((d) => d.code && (!code || d.code === code) && stillNew(d.code)).map((d) => ({
+      ...d, href: d.folderId && nav.safe(new URL(`/auth/dok_server/slozka.pl?id=${d.folderId}`, document.baseURI).href, 'link'),
+    }));
+  }
+  const docRow = (d, withCourse) => {
+    const when = d.date ? new Date(d.date).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
     const inner = [
-      h('span', { class: 'ds-ico' }, icon('folder')),
-      h('span', { class: 'glist-text' }, h('strong', {}, n.name), h('small', {}, T.filesN(n.allFiles))),
-      n.allNew > 0 && h('span', { class: 'delta bad' }, T.newN(n.allNew)),
-      to && h('span', { class: 'glist-go' }, icon('arrow')),
+      h('span', { class: 'doc-type' }, (d.type || '').slice(0, 4) || icon('file')),
+      h('span', { class: 'glist-text' }, h('strong', {}, d.name),
+        h('small', {}, [withCourse && d.code, d.code && d.folderName.startsWith(d.code) ? T.courseFiles : folderLabel(d.folderName), d.author, when].filter(Boolean).join(' · '))),
+      h('span', { class: 'delta bad' }, T.newShort(1).replace(/^1 /, '')),
     ];
-    const props = { class: 'folder-row' + (n.allFiles ? '' : ' is-empty'), style: `--depth: ${depth}` };
-    return [to ? anchor({ href: to }, props, ...inner) : h('span', props, ...inner), ...(n.children || []).flatMap((k) => folderRow(k, depth + 1))];
+    return d.href ? anchor({ href: `${d.href}#ipx-file=${d.id}` }, { class: 'doc-row' }, ...inner) : h('span', { class: 'doc-row' }, ...inner);
+  };
+  function freshBlock(code, limit, withCourse) {
+    const ds = ipx.state.docserver;
+    const list = freshOf(code).slice(0, limit);
+    const at = ds?.newUpdated && new Date(ds.newUpdated).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    const newTab = nav.safe(new URL('/auth/dok_server/nove_dok.pl', document.baseURI).href, 'link');
+    if (!list.length) return null;
+    return h('section', { class: 'card pad fresh-block' },
+      h('div', { class: 'card-head' }, h('h2', {}, withCourse ? T.newInCourses : T.newInCourse),
+        newTab && anchor({ href: newTab }, { class: 'more' }, T.openNew)),
+      h('div', { class: 'doc-list' }, list.map((d) => docRow(d, withCourse))),
+      at && h('p', { class: 'muted small' }, T.fromList(at)));
   }
 
   const TABS = nav.tabs.course;
@@ -236,24 +295,32 @@
       ];
     },
     'course.files': (c) => {
+      // The course's files live here (04-materials.md §4.1): new documents first, then the folders that hold files
+      // as one flat list with readable names; a folder opens InSIS's folder page, drawn as this course page.
       const f = folderOf(c.code);
-      const href = f && nav.safe(f.href, 'link', { copied: true });
-      if (!href) return [emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }), h('p', { class: 'muted' }, T.moodle)];
-      const tree = f.tree || [];
-      const row = folderRow;
+      if (!f || !nav.safe(f.href, 'link', { copied: true })) {
+        return [emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }), h('p', { class: 'muted' }, T.moodle)];
+      }
+      const { list, empty } = flatFolders(f, c);
+      const row = (n) => {
+        const to = nav.safe(n.href, 'link', { copied: true });
+        const inner = [
+          h('span', { class: 'ds-ico' }, icon('folder')),
+          h('span', { class: 'glist-text' }, h('strong', {}, n.name), h('small', {}, T.filesShort(n.files))),
+          n.fresh > 0 && h('span', { class: 'delta bad' }, T.newShort(n.fresh)),
+          to && h('span', { class: 'glist-go' }, icon('arrow')),
+        ];
+        return to ? anchor({ href: to }, { class: 'folder-row' }, ...inner) : h('span', { class: 'folder-row' }, ...inner);
+      };
       return [
+        freshBlock(c.code, 20, false),
         h('section', { class: 'card pad' },
-          h('div', { class: 'card-head' },
-            h('h2', {}, T.folder),
-            f.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)),
-            anchor({ href }, { class: 'more' }, T.openFolder)),
-          h('div', { class: 'folder-list' },
-            f.files > 0 && row({ name: f.name || c.name, href: f.href, allFiles: f.files, allNew: f.fresh || 0 }, 0),
-            tree.flatMap((n) => row(n, 0)),
-            !tree.length && !(f.files > 0) && (f.tree ? h('p', { class: 'muted' }, T.folderEmpty) : anchor({ href }, { class: 'folder-row' },
-              h('span', { class: 'ds-ico' }, icon('folder')), h('span', { class: 'glist-text' }, h('strong', {}, f.name || c.name)),
-              h('span', { class: 'glist-go' }, icon('arrow'))))),
-          h('p', { class: 'muted small' }, T.folderNote)),
+          h('div', { class: 'card-head' }, h('h2', {}, T.foldersTitle),
+            f.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount))),
+          list.length
+            ? h('div', { class: 'folder-list' }, list.map(row), empty > 0 && h('p', { class: 'muted small folder-empty' }, T.emptyFolders(empty)))
+            : h('p', { class: 'muted' }, T.noFiles),
+          list.length > 0 && h('p', { class: 'muted small' }, T.openFolderHint)),
         h('p', { class: 'muted' }, T.moodle),
       ];
     },
@@ -385,24 +452,84 @@
   // tab row of the InSIS page at hand: InSIS's rows differ from page to page, which made the header jump.
   // current: 'course' | 'tree' | 'new' | 'search' | 'settings' | 'folders' | null (a page below the section).
   const plainLink = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
+
+  // A course's folder page (InSIS's slozka.pl whose folder belongs to a course, by the folder map the tree read
+  // stored) is part of that course, one level down: the course's title and view tabs with Materials active, the
+  // sidebar on My courses, and the path "Materials › Lecture · Fri 14:00" (04-materials.md §4.1). Registered before
+  // Materials, which takes the folders outside courses.
+  const folderHere = () => {
+    const r = nav.route(document.baseURI.split('#')[0]);
+    const id = r.params?.get?.('id');
+    const code = id && ipx.state.docserver?.folders?.[id];
+    return code ? { id, code, course: courseOf(code) || { code, name: folderOf(code)?.name || code } } : null;
+  };
+  const folderName = (here) => {
+    const f = folderOf(here.code);
+    if (!f) return null;
+    if (folderIdOf(f.href) === here.id) return T.courseFiles;
+    let found = null;
+    const walk = (nodes) => (nodes || []).forEach((n) => { if (folderIdOf(n.href) === here.id) found = folderLabel(n.name); walk(n.children); });
+    walk(f.tree);
+    return found;
+  };
+  ipx.kit.section({
+    id: 'course-folder',
+    css: ['course.css'],
+    title: () => folderHere()?.course.name || nav.sectionLabel('courses.files'),
+    // The same header as the course page itself (title the course, eyebrow Courses).
+    subtitle: () => nav.label('courses'),
+    pages: { '/auth/dok_server/slozka.pl': (r) => (folderHere() ? 'course.files' : undefined) },
+    views: () => {
+      const here = folderHere();
+      return here ? TABS.map((node) => ({ id: node, href: nav.composedUrl(node, here.code), text: nav.label(node) })) : [];
+    },
+    node: () => 'course.files',
+    lead: () => {
+      const here = folderHere();
+      if (!here) return null;
+      return h('div', { class: 'course-folder-lead' },
+        courseOf(here.code) && header(here.course),
+        h('nav', { class: 'folder-path', 'aria-label': T.foldersTitle },
+          anchor({ href: nav.composedUrl('course.files', here.code) }, {}, T.materials), ' › ', h('strong', {}, folderName(here) || '…')));
+    },
+  });
+
+  // Materials settings: a page below the section (eyebrow Materials, title Settings) with its own view tabs, not the
+  // Materials row. Until InSIS's other "All my folders" views are verified: E-mail and display · Your folders.
+  ipx.kit.section({
+    id: 'materials-settings',
+    title: () => T.dsSettings,
+    subtitle: () => nav.sectionLabel('courses.files'),
+    pages: { '/auth/dok_server/nastaveni_stromu.pl': 'display', '/auth/dok_server/moje_dok.pl': 'folders' },
+    views: () => [
+      { id: 'display', href: plainLink('/auth/dok_server/nastaveni_stromu.pl'), text: T.displaySettings },
+      { id: 'folders', href: plainLink('/auth/dok_server/moje_dok.pl'), text: T.yourFolders },
+    ],
+    lead: () => h('p', { class: 'kit-note info' }, icon('info'), h('span', {}, T.settingsNote)),
+    // InSIS's own sub-views of Your folders (My documents, Copy folders, Ignored folders) stay reachable through
+    // InSIS's row until InSIS+ may link them (zobraz_dok values unverified); only the document server's main row goes.
+    keepRow: (table) => !table.querySelector('a[href*="nove_dok.pl"], a[href*="vyhledavani.pl"]'),
+  });
+
   const materials = ipx.kit.section({
     id: 'materials',
     title: () => nav.sectionLabel('courses.files'),
     subtitle: () => nav.label('courses'),
-    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search',
-      '/auth/dok_server/nastaveni_stromu.pl': 'settings', '/auth/dok_server/moje_dok.pl': 'folders', '/auth/dok_server/slozka.pl': null },
+    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search', '/auth/dok_server/slozka.pl': null },
     views: () => {
-      const fresh = ipx.state.docserver?.newCount;
+      const fresh = courseNewCount();
       return [
         { id: 'course', href: nav.composedUrl('courses.files'), text: T.byCourse },
-        ...[['tree', '/auth/dok_server/', T.tree], ['new', '/auth/dok_server/nove_dok.pl', T.newDocs], ['search', '/auth/dok_server/vyhledavani.pl', T.search]]
-          .map(([id, path, text]) => ({ id, href: plainLink(path), text, count: id === 'new' && fresh != null ? fresh : null })),
+        { id: 'new', href: plainLink('/auth/dok_server/nove_dok.pl'), text: T.newDocs, count: fresh },
+        { id: 'tree', href: plainLink('/auth/dok_server/'), text: T.allFoldersTab },
+        { id: 'search', href: plainLink('/auth/dok_server/vyhledavani.pl'), text: T.search },
       ];
     },
-    actions: (current) => [['settings', '/auth/dok_server/nastaveni_stromu.pl', T.dsSettings, 'gear'], ['folders', '/auth/dok_server/moje_dok.pl', T.myFolders, 'folder']]
-      .map(([id, path, label, ic]) => plainLink(path) && anchor({ href: plainLink(path) },
-        { class: 'btn ghost ds-action' + (current === id ? ' on' : ''), title: label, 'aria-label': label, 'aria-current': current === id ? 'page' : null },
-        icon(ic), h('span', { class: 'ds-action-label' }, label))).filter(Boolean),
+    actions: () => {
+      const to = plainLink('/auth/dok_server/nastaveni_stromu.pl');
+      return to ? [anchor({ href: to }, { class: 'btn ghost ds-action', title: T.dsSettings, 'aria-label': T.dsSettings },
+        icon('gear'), h('span', { class: 'ds-action-label' }, T.dsSettings))] : [];
+    },
   });
   ipx.materials = { tabs: (view) => ipx.kit.sectionTabs(materials, view), actions: materials.actions };
 
@@ -461,32 +588,32 @@
     subtitle: nav.label('courses'),
     actions: ipx.materials.actions(null),
     build: () => {
+      // By course (04-materials.md §4.2): the newest documents of the student's courses, then one compact row per
+      // course opening its Materials tab; courses of earlier periods folded. No folder lists here: a course's
+      // folders live in the course.
       const list = current();
-      const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
-      // The same header as every other Materials page (ipx.materials, pages/docserver.js).
       const views = ipx.materials.tabs('course');
-      const library = at('/auth/eknihovna/');
-      const section = (c) => {
+      const library = nav.safe(new URL('/auth/eknihovna/', document.baseURI).href, 'link');
+      const ds = ipx.state.docserver;
+      const mineCodes = new Set(list.map((c) => c.code));
+      const row = (c) => {
         const f = folderOf(c.code);
         const fac = facultyFor(c.code);
-        const own = f && nav.safe(f.href, 'link', { copied: true });
-        const top = (f?.tree || []).map((n) => ({ ...n, children: [] }));
-        return h('section', { class: 'card pad files-course' },
-          h('div', { class: 'card-head' },
-            h('span', { class: 'course-code', style: `color: ${facultyColors(fac)[1]}` }, c.code),
-            h('h2', {}, anchor({ href: nav.composedUrl('course.files', c.code) }, {}, c.name)),
-            f?.newCount > 0 && h('span', { class: 'delta bad' }, T.newN(f.newCount)),
-            own && anchor({ href: own }, { class: 'more' }, T.openFolder)),
-          !f ? h('p', { class: 'muted' }, T.noFolder)
-            : h('div', { class: 'folder-list' },
-                f.files > 0 && folderRow({ name: f.name || c.name, href: f.href, allFiles: f.files, allNew: f.fresh || 0 }, 0),
-                top.flatMap((n) => folderRow(n, 0)),
-                !top.length && !(f.files > 0) && h('p', { class: 'muted' }, T.folderEmpty)));
+        const files = f ? flatFolders(f, c).list.reduce((s, n) => s + n.files, 0) : 0;
+        return anchor({ href: nav.composedUrl('course.files', c.code) }, { class: 'files-row' },
+          h('span', { class: 'course-code', style: `color: ${facultyColors(fac)[1]}` }, c.code),
+          h('span', { class: 'glist-text' }, h('strong', {}, c.name), h('small', {}, f ? T.filesShort(files) : T.noFolder)),
+          f?.newCount > 0 && h('span', { class: 'delta bad' }, T.newShort(f.newCount)),
+          h('span', { class: 'glist-go' }, icon('arrow')));
       };
+      const earlier = (ds?.courses || []).filter((c) => !mineCodes.has(c.code));
       return h('div', { class: 'course-page' },
         views,
-        list.length ? list.map(section) : emptyState(T.coursesEmpty),
-        list.length > 0 && h('p', { class: 'muted small' }, T.folderNote),
+        freshBlock(null, 10, true) || (ds?.newUpdated ? null : h('p', { class: 'muted small' }, T.noNewYet)),
+        list.length ? h('section', { class: 'card pad' }, h('div', { class: 'files-rows' }, list.map(row))) : emptyState(T.coursesEmpty),
+        earlier.length > 0 && h('details', { class: 'card pad files-earlier' },
+          h('summary', {}, `${T.earlier} (${earlier.length})`),
+          h('div', { class: 'files-rows' }, earlier.map((c) => row({ code: c.code, name: c.name })))),
         // Decision 3 (03-pages.md §7): the e-library lives here as a link card, never as a tab.
         library && anchor({ href: library }, { class: 'card glist-item files-library' },
           h('span', { class: 'ds-ico' }, icon('book')),

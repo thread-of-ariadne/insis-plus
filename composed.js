@@ -17,7 +17,7 @@
       background: 'Číst data na pozadí', backgroundText: 'Rozvrh, výsledky, odevzdávárny a materiály se načítají samy, nejvýš jednou za 3 hodiny.',
       shared: 'Sdílený počítač', sharedText: 'Mezi návštěvami se neukládá nic (připnuté stránky, nastavení, co už jste viděli).',
       clear: 'Smazat uložená data', clearText: 'Smaže vše, co InSIS+ uložil, kromě volby sdíleného počítače.', clearButton: 'Smazat', cleared: 'Smazáno.',
-      newFiles: (n) => `${n} nových dokumentů`, result: (c, n) => `Výsledek: ${c} ${n}`, fresh: 'nové', noNotifications: 'Zatím nic nového.',
+      newFiles: (n) => `${n} ${ipx.kit.plural(n, 'nový dokument', 'nové dokumenty', 'nových dokumentů')} ve vašich předmětech`, result: (c, n) => `Výsledek: ${c} ${n}`, fresh: 'nové', noNotifications: 'Zatím nic nového.',
       notifHint: 'Upozornění ukazují, co se v InSIS změnilo. Zprávy v InSIS najdete pod ikonou obálky.',
       somethingElse: 'Něco jiného?', myStudy: 'Vaše studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
       studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
@@ -31,7 +31,7 @@
       background: 'Read data in the background', backgroundText: 'Timetable, results, submission boxes and materials load by themselves, at most every 3 hours.',
       shared: 'Shared computer', sharedText: 'Nothing is kept between visits (pins, settings, what you have seen).',
       clear: 'Clear stored data', clearText: 'Deletes everything InSIS+ stored, except the shared-computer choice.', clearButton: 'Clear', cleared: 'Cleared.',
-      newFiles: (n) => `${n} new documents`, result: (c, n) => `Result: ${c} ${n}`, fresh: 'new', noNotifications: 'Nothing new yet.',
+      newFiles: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in your courses`, result: (c, n) => `Result: ${c} ${n}`, fresh: 'new', noNotifications: 'Nothing new yet.',
       notifHint: 'Notifications show what changed in InSIS. InSIS messages are under the envelope icon.',
       somethingElse: 'Something else?', myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
       studyUnknown: 'Your study details have not loaded yet.', toHandle: 'To handle', nothingToHandle: 'Nothing waiting.',
@@ -226,11 +226,14 @@
     const seen = ipx.state.seen || {};
     const since = seen.lastVisit || 0;
     const out = [];
-    const files = ipx.state.profile?.docs;
-    if (files?.count > 0) {
-      out.push({ id: 'files', fresh: files.count !== seen.files, title: T.newFiles(files.count),
+    // New documents in the student's courses only (04-materials.md §4.4): the tree's per-course counts; InSIS's
+    // main-page counter (all folders, faculty minutes included) only before the tree was first read.
+    const courseNew = ipx.courseNewCount?.();
+    const count = courseNew ?? ipx.state.profile?.docs?.count ?? 0;
+    if (count > 0) {
+      out.push({ id: 'files', fresh: count !== seen.files, title: T.newFiles(count),
         sub: (ipx.state.docserver?.courses || []).filter((c) => c.newCount > 0).map((c) => `${c.code} ${c.newCount}`).join(' · '),
-        href: nav.safe(files.href, 'link', { copied: true }) || nav.composedUrl('courses.files') });
+        href: nav.composedUrl('courses.files') });
     }
     for (const c of ipx.state.studyRecord?.courses || []) {
       const at = parseDate(c.entered);
@@ -248,7 +251,7 @@
     build: () => {
       const list = notifications();
       // Opening the list marks everything as seen, in InSIS+ only.
-      ipx.state.seen = { lastVisit: Date.now(), files: ipx.state.profile?.docs?.count ?? null };
+      ipx.state.seen = { lastVisit: Date.now(), files: ipx.courseNewCount?.() ?? ipx.state.profile?.docs?.count ?? null };
       ipx.save();
       return h('div', { class: 'glist' },
         list.length

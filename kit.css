@@ -58,3 +58,8 @@
 .msg-change { color: var(--accent); font-weight: 600; white-space: nowrap; }
 .msg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .msg-foot a { color: var(--accent); }
+
+/* A folder's path above InSIS's folder page (course folders: "Materials › Lecture · Fri 14:00") */
+.folder-path { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+.folder-path a { color: var(--accent); font-weight: 600; }
+.folder-path strong { color: var(--fg); }

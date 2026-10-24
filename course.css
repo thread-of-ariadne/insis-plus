@@ -64,3 +64,25 @@ a.box-row:hover .glist-go { color: var(--accent); }
 .files-library .ds-ico svg { width: 18px; height: 18px; }
 
 /* Overview: the embedded syllabus's lecturers card is hidden (teachers have one place, the People tab). */
+
+/* Materials (04-materials.md): document rows, the course's flat folder list, By course rows, the folder path */
+.doc-list, .files-rows { display: flex; flex-direction: column; margin: 0 -10px; }
+.doc-row, .files-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; color: var(--fg); }
+a.doc-row:hover, a.files-row:hover { background: var(--hover); }
+.doc-row + .doc-row, .files-row + .files-row { border-top: 1px solid var(--line); }
+.doc-type { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 9px; background: var(--chip); color: var(--fg-2); font: 800 11px/1 var(--font); letter-spacing: .02em; text-transform: uppercase; }
+.doc-type svg { width: 18px; height: 18px; }
+.doc-row .glist-text, .files-row .glist-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.doc-row strong, .files-row strong { font-size: 14.5px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-row small, .files-row small { color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files-row .course-code { width: 64px; flex: none; font-size: 12.5px; font-weight: 800; }
+.files-row .glist-go { color: var(--faint); }
+.files-earlier summary { cursor: pointer; font-weight: 700; }
+.files-earlier .files-rows { margin-top: 10px; }
+.fresh-block .muted.small { margin: 10px 0 0; }
+.folder-empty { margin: 8px 10px 0; }
+@media (max-width: 640px) {
+  .doc-row strong, .files-row strong { white-space: normal; }
+  .doc-row, .files-row { min-height: 44px; }
+}
+.course-folder-lead { display: flex; flex-direction: column; gap: 10px; }
