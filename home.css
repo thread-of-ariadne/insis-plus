@@ -28,19 +28,6 @@
   .dash-main, .rail { padding: 16px; }
 }
 
-/* To do (K vyřízení) */
-.todo-block { display: flex; flex-direction: column; gap: 10px; }
-.todo-list { display: flex; flex-direction: column; padding: 6px 8px; }
-.todo-row { display: flex; align-items: center; gap: 12px; padding: 11px 10px; border-radius: 12px; }
-.todo-row + .todo-row { border-top: 1px solid var(--line); }
-.todo-row:hover { background: var(--hover); }
-.todo-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.todo-text strong { font-size: 15px; }
-.todo-text small { overflow: hidden; color: var(--muted); font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
-.todo-row .delta { flex: none; }
-.empty-todo p { margin: 0; padding: 12px 10px; color: var(--muted); font-size: 14px; }
-.checked { margin: 0; color: var(--faint); font-size: 12.5px; }
-
 /* One-time question: shared computer? */
 .ask { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; }
 .ask strong { font-size: 15px; }

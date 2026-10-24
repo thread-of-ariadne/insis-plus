@@ -15,7 +15,7 @@ import re
 import sys
 
 SERVER = "http://localhost:8765/"
-SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
+SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "course.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
 
 SHIM = """<script>
 window.chrome = {

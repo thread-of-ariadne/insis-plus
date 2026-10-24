@@ -1,0 +1,21 @@
+/* InSIS+ course page and the Courses pages (course.js). Components and tokens in shared.css. */
+
+.course-page { display: flex; flex-direction: column; gap: 16px; max-width: 1000px; }
+.course-head { display: flex; flex-direction: column; gap: 8px; }
+.course-head .course-code { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
+.course-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; color: var(--muted); font-size: 14px; }
+.course-facts .fact b { color: var(--fg); }
+.course-tabs { margin: 0; max-width: 100%; }
+.course-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.pad { padding: 16px 18px; }
+.card-title { margin: 0 0 10px; font-size: 15.5px; font-weight: 700; }
+.glist-item.big { padding: 18px 20px; }
+.glist-item.big strong { font-size: 16px; }
+.result-line { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 15px; }
+.plain { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.plain.cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 16px; }
+.plain a:hover { color: var(--accent); }
+.people-list .muted { margin: 0; }
+@media (max-width: 760px) {
+  .course-grid { grid-template-columns: minmax(0, 1fr); }
+}
