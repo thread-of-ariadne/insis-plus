@@ -239,12 +239,12 @@
     const levelFromHash = () => byId.get(decodeURIComponent((/#ipx-folder=([\w-]+)/.exec(location.hash) || [])[1] || '')) || null;
     const view = h('div', { class: 'ds-browser' });
 
+    // The browser stays the browser all the way down, course folders included: a folder with subfolders opens its
+    // level here, a folder without them opens InSIS's folder page in the same context (All folders, the tree's path).
     const folderLink = (n) => {
       const c = courseOfNode(n);
-      // A course's folders belong to the course page (its Materials tab), not to this browser.
-      if (c) return { href: nav.composedUrl('course.files', c.code), course: c };
-      if (n.children.length) return { level: n };
-      return { href: safe(n.href) };
+      if (n.children.length) return { level: n, course: c };
+      return { href: safe(n.href), course: c };
     };
     const go = (n) => {
       // Absolute, from the page's own address (a <base> must not change where the state points).
@@ -396,6 +396,8 @@
         courses: d.courses.map((n) => ({ code: n.course.code, name: n.course.name, href: n.href, newCount: n.allNew, semester: n.course.semester,
           files: n.files, fresh: n.fresh, allFiles: n.allFiles, tree: slim(n.children) })),
         folders: d.folders,
+        // Every folder's name and parent, for the path above InSIS's folder page (slim: a few kB).
+        index: (() => { const out = {}; walk(d.roots, (n) => { if (n.id) out[n.id] = [n.name, n.parent?.id || null]; }); return out; })(),
       };
     } else {
       // The New documents list (opened by the student; never read in the background). It has its own time: the tree
