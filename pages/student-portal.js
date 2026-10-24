@@ -26,7 +26,7 @@
   const { h, icon, anchor, takeover, viewTabs, PORTAL_ACTIONS, facultyColors } = ipx.ui;
 
   const T = {
-    cs: { title: 'Stav studia', status: 'Stav', history: 'Historie studia', views: 'Pohledy na studium',
+    cs: { studyOffice: 'Studijní oddělení', title: 'Stav studia', status: 'Stav', history: 'Historie studia', views: 'Pohledy na studium',
       noRestriction: 'Bez omezení', restriction: 'Omezení', period: 'Období',
       restrictionText: (f) => `Omezení může zablokovat zápis předmětů i přihlašování na zkoušky. Ukládá a ruší ho studijní oddělení${f ? ` fakulty ${f}` : ''}.`,
       inStudy: 'Pro toto studium', inStudyLead: 'Stránky InSIS, které patří k právě zvolenému studiu.',
@@ -35,7 +35,7 @@
       photo: 'Změnit fotografii', cardTypes: 'Typy průkazů', validity: 'Ověřit platnost průkazu',
       ask: 'Na koho se obrátit', askText: 'Se studiem, omezením i průkazem poradí studijní oddělení vaší fakulty.',
       requests: 'Formuláře kontaktního centra', noStudy: 'InSIS na této stránce neukazuje žádné studium.' },
-    en: { title: 'Study status', status: 'Status', history: 'History', views: 'Views of your study',
+    en: { studyOffice: 'Study department', title: 'Study status', status: 'Status', history: 'History', views: 'Views of your study',
       noRestriction: 'No restriction', restriction: 'Restriction', period: 'Period',
       restrictionText: (f) => `A restriction can block course registration and exam sign-up. The study department${f ? ` of ${f}` : ''} sets and lifts it.`,
       inStudy: 'For this study', inStudyLead: 'InSIS pages that belong to the study you are working in.',
@@ -178,9 +178,16 @@
       h('span', {}, T.restrictionText(s.faculty), ' ', office && anchor(office, { class: 'sp-note-link' }, ipx.nav.label('campus.office'))));
   }
 
-  // The links InSIS gives in the study's row (exam sign-up, registration, …), each named by InSIS's own label.
+  // The links InSIS gives in the study's row (exam sign-up, registration, …), each named by InSIS's own label —
+  // only those the sidebar does not already lead to (a page whose section opens another page, e.g. minor-track
+  // registration under Registration & enrolment); the rest would repeat the navigation (03-pages.md §2).
   function studyLinks(d) {
-    const list = (d.study.actions || []).map(safe).filter(Boolean);
+    const nav = ipx.nav;
+    const list = (d.study.actions || []).map(safe).filter(Boolean).filter((l) => {
+      const r = nav.route(l.href);
+      const t = r.node && nav.target(nav.sectionOf(r.node));
+      return !t || nav.route(t).path !== r.path;
+    });
     if (!list.length) return null;
     return h('section', { class: 'card sp-block' },
       h('div', { class: 'card-head' }, h('h2', {}, T.inStudy)),
@@ -228,7 +235,7 @@
         h('div', { class: 'card-head' }, h('h2', {}, T.ask)),
         h('p', { class: 'muted rail-empty' }, T.askText),
         h('div', { class: 'sp-contacts' },
-          office && linkRow({ ...office, text: ipx.nav.label('campus.office') }, 'people', d.study?.faculty),
+          office && linkRow({ ...office, text: T.studyOffice }, 'people', d.study?.faculty),
           requests && linkRow({ ...requests, text: ipx.nav.sectionLabel('studies.requests') }, 'mail', T.requests))));
   }
 

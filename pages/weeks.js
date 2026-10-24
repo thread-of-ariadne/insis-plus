@@ -56,7 +56,7 @@
       takeover({
         key: 'weeks', css: ['kit.css', 'pages/weeks.css'], title, subtitle, slotted: [page],
         build: () => h('div', { class: 'kit-page' },
-          viewTabs([keyLink && { href: keyLink, text: T.keyDates }, { href: here || '#', text: T.weeks, on: true }].filter(Boolean), T.views),
+          viewTabs([keyLink && { href: keyLink, text: T.keyDates }, { href: here || location.href.split('#')[0], text: T.weeks, on: true }].filter(Boolean), T.views),
           h('slot')),
       });
       return;

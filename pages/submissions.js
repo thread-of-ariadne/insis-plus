@@ -437,16 +437,20 @@
     ipx.save();
   }
 
+  // InSIS's list for one course (…;predmet=N) is a filtered list: it must not replace the stored boxes of all
+  // courses, which To do, Home and the course pages use (03-pages.md §2).
+  const oneCourse = (url) => /[?;&]predmet=/.test(url);
+
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
   (ipx.readers ||= {}).submissions = (fetched, url) => {
     doc = fetched; here = new URL(url);
-    try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
+    try { const data = parse(); if (data && !oneCourse(url)) remember(data); } finally { doc = document; here = location; }
   };
 
   ipx.ready.then(() => {
     const data = parse();
     if (!data) return;
-    remember(data);
+    if (!oneCourse(document.baseURI)) remember(data);
     // A one-course list: which course, and the whole list (where the sidebar's All submissions leads).
     if (/[?;&]predmet=/.test(document.baseURI)) {
       const codes = [...new Set(data.boxes.map((b) => b.code).filter(Boolean))];

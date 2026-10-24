@@ -6,6 +6,37 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-24
+
+### Added
+- Page-by-page design (`docs/ia/03-pages.md`, four teardowns in `docs/ia/teardowns/`), reviewed for UX and safety.
+- Page kit (`kit.js`, `kit.css`) for rebuilt InSIS pages: tables, facts, InSIS's own form in a card, notes, dates,
+  Czech plurals.
+- Rebuilt pages: What's left (the plan check), Online tests, Academic calendar, Study plans, e-Library, Course
+  evaluation, Payments & scholarships, People search, Noticeboard, Requests (the contact centre's forms), Library
+  loans; InSIS mail with a forwarding status line and folders as tabs.
+- Finished courses have their own group on Home and My courses (dimmed card, ✓ with the result).
+- Messages, Account and Help show their sections in the sidebar while you are there.
+
+### Changed
+- Navigation: each destination opens its sections as a submenu in the sidebar; the row of destination tabs is
+  gone. A page has at most one row of view tabs, only for views of one thing. InSIS's portal bar is hidden.
+- Sections: Export to calendar is part of My week (Export and print); the four exam-list views are one section,
+  Exam dates; Study plans moved to Grades & credits; Requests opens the contact centre's request forms.
+- Titles: a section's page is titled by the section, a page below it by its own name with the section above.
+- Results has four views (This period, Whole study, Statistics, Comparison); My week, Materials, All submissions,
+  Study status and the overviews no longer repeat the navigation.
+- To do says what it watches and when the data was updated.
+
+### Fixed
+- Background reads opened InSIS pages in a hidden frame, which ran InSIS's scripts, including the Google Analytics
+  InSIS embeds: each read sent a page view to Google. Pages are now fetched as text and parsed; nothing runs.
+- Only settings are kept on disk; everything read from InSIS is session data by default.
+- Pages with credentials or sensitive personal data are never read; the action-parameter deny list is wider.
+- InSIS's submissions page for one course replaced the stored boxes of all courses.
+- The course catalogue module took over the people search page.
+- Stray "0" in some cards; Czech plural forms.
+
 ## [0.8.0] - 2026-10-24
 
 ### Added
@@ -155,7 +186,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 - Ctrl+K search over InSIS pages, indexed as you browse; favourites and frequently used pages.
 
-[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.9.0...HEAD
 [0.5.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.2.0...v0.3.0

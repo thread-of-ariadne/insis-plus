@@ -18,7 +18,7 @@
   const T = {
     cs: { lead: 'Hledejte podle jména, příjmení nebo loginu (stačí tři písmena, bez diakritiky). InSIS hledá, až stisknete Hledat.',
       search: 'Hledat osobu', narrow: 'Upřesnit hledání', where: 'Kde', who: 'Koho', units: (a, b) => `${a} z ${b} součástí`,
-      nobody: 'nikoho', results: 'Výsledky', mine: 'Tvoji vyučující v tomto semestru', mineLead: 'Z tvého rozvrhu: bez hledání.' },
+      nobody: 'nikoho', results: 'Výsledky', mine: 'Vaši vyučující v tomto semestru', mineLead: 'Z vašeho rozvrhu: bez hledání.' },
     en: { lead: 'Search by first name, surname or login (three letters are enough, no accents needed). InSIS searches when you press Search.',
       search: 'Find a person', narrow: 'Narrow the search', where: 'Where', who: 'Who', units: (a, b) => `${a} of ${b} units`,
       nobody: 'nobody', results: 'Results', mine: 'Your teachers this semester', mineLead: 'From your timetable: no search needed.' },

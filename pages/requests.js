@@ -18,7 +18,7 @@
     cs: { lead: 'Formulář se otevře v InSIS: tam vyberete studium, vyplníte ho a odešlete tlačítkem InSIS.',
       filter: 'Hledat formulář', general: 'Obecný dotaz', noMatch: 'Žádný formulář neodpovídá hledání.', none: 'InSIS teď nenabízí žádné formuláře.',
       kb: 'Hledat v databázi znalostí', kbLead: 'Hledá v odpovědích InSIS na časté otázky; nikomu se nic neposílá.', faq: 'Časté dotazy',
-      ask: 'Nevíte, který formulář?', askText: 'Poradí studijní oddělení vaší fakulty.', forms: (n) => (n === 1 ? '1 formulář' : n < 5 ? `${n} formuláře` : `${n} formulářů`) },
+      ask: 'Nevíte, který formulář?', askText: 'Poradí studijní oddělení vaší fakulty.', forms: (n) => `${n} ${ipx.kit.plural(n, 'formulář', 'formuláře', 'formulářů')}` },
     en: { lead: 'A form opens in InSIS: you choose the study there, fill it in and send it with InSIS’s button.',
       filter: 'Find a form', general: 'General question', noMatch: 'No form matches.', none: 'InSIS offers no forms right now.',
       kb: 'Search the knowledge base', kbLead: 'Searches InSIS’s answers to common questions; nothing is sent to anyone.', faq: 'FAQ',

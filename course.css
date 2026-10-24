@@ -64,4 +64,3 @@ a.box-row:hover .glist-go { color: var(--accent); }
 .files-library .ds-ico svg { width: 18px; height: 18px; }
 
 /* Overview: the embedded syllabus's lecturers card is hidden (teachers have one place, the People tab). */
-.course-syllabus .rail > section.card:has(> .people) { display: none; }

@@ -21,12 +21,12 @@
   const T = {
     cs: { views: 'Testy', open: 'Otevřené testy', openFoot: 'můžete začít teď', submitted: 'Odevzdané testy',
       warn: 'Spuštění testu nejde vrátit: čas běží od chvíle, kdy stisknete tlačítko pro spuštění v InSIS.',
-      emptyTodo: 'Teď není otevřený žádný test.', emptyTodoNext: 'Vyučující otevírá testy v daný čas; jakmile se nějaký otevře, objeví se tady a v přehledu Úkoly na úvodní stránce.',
+      emptyTodo: 'Teď není otevřený žádný test.', emptyTodoNext: 'Vyučující otevírá testy v daný čas; jakmile se nějaký otevře, objeví se tady.',
       emptyDone: 'Zatím jste neodevzdali žádný test.', emptyDoneNext: 'Odevzdané testy a jejich výsledky (když je vyučující zveřejní) se ukážou tady.',
       contact: 'Máte teď psát test a nevidíte ho? Ozvěte se hned vyučujícímu.' },
     en: { views: 'Tests', open: 'Open tests', openFoot: 'you can start now', submitted: 'Submitted tests',
       warn: "Starting a test can't be undone: the timer starts when you press InSIS's start button.",
-      emptyTodo: 'No test is open right now.', emptyTodoNext: 'Teachers open tests at a set time; as soon as one opens it shows here and in To do on Home.',
+      emptyTodo: 'No test is open right now.', emptyTodoNext: 'Teachers open tests at a set time; as soon as one opens it shows here.',
       emptyDone: "You haven't submitted any test yet.", emptyDoneNext: 'Submitted tests and their results (once the teacher publishes them) show here.',
       contact: "Should you be taking a test now and can't see it? Contact the teacher straight away." },
   }[lang];

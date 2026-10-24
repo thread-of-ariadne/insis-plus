@@ -17,7 +17,7 @@
 
   const T = {
     cs: { fresh: (n) => (n === 1 ? '1 nový příspěvek' : n < 5 ? `${n} nové příspěvky` : `${n} nových příspěvků`), nothing: 'Na vývěsce není nic nového.',
-      inFolders: (list) => `Ve složkách: ${list}.`, folders: (n, c) => `${n} složek, celkem ${c} příspěvků.`, newBadge: (n) => `${n} nové`,
+      inFolders: (list) => `Ve složkách: ${list}.`, folders: (n, c) => `${n} ${ipx.kit.plural(n, 'složka', 'složky', 'složek')}, celkem ${c} ${ipx.kit.plural(c, 'příspěvek', 'příspěvky', 'příspěvků')}.`, newBadge: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`,
       settings: 'Nastavení vývěsky', views: 'Vývěska', lead: 'Složku otevřete v InSIS; čísla v závorkách jsou počty příspěvků.' },
     en: { fresh: (n) => (n === 1 ? '1 new contribution' : `${n} new contributions`), nothing: 'Nothing new on the noticeboard.',
       inFolders: (list) => `In: ${list}.`, folders: (n, c) => `${n} folders, ${c} contributions in total.`, newBadge: (n) => `${n} new`,
@@ -52,12 +52,15 @@
         count: count == null ? null : Number(count), fresh, root: container?.classList.contains('root') };
     }).filter((f) => !f.root && f.name);
 
+    // Views InSIS+ may not link (New and My contributions are insis-only until verified) are reachable only through
+    // InSIS's own tab row: then that row stays, styled in place, and InSIS+ draws no tabs or Settings action of its own.
+    const ownRow = tabs.some((t) => !t.href && t.sysid !== 'nastaveni');
     return {
-      page, tree, menu, folders,
-      views: tabs.filter((t) => t.href && t.sysid !== 'nastaveni'),
-      settings: settings?.href ? settings : null,
+      page, tree, menu, folders, ownRow,
+      views: ownRow ? [] : tabs.filter((t) => t.href && t.sysid !== 'nastaveni'),
+      settings: !ownRow && settings?.href ? settings : null,
       fresh: freshTab?.count ?? folders.reduce((s, f) => s + f.fresh, 0),
-      chrome: [page.querySelector('#titulek'), menu, ...page.querySelectorAll('nav[aria-label="breadcrumb"], div.small, .uisLegend'),
+      chrome: [page.querySelector('#titulek'), !ownRow && menu, ...page.querySelectorAll('nav[aria-label="breadcrumb"], div.small, .uisLegend'),
         ...page.querySelectorAll('input[type="button"][id$="_open_all"], input[type="button"][id$="_close_all"]'),
         // InSIS's spacing around the tree (empty paragraphs, line breaks): the page's own gaps replace it.
         ...[...tree.parentElement.children].filter((n) => n !== tree && (n.nodeName === 'BR' || (n.nodeName === 'P' && !n.textContent.trim())))].filter(Boolean),

@@ -12,30 +12,31 @@
    | Check | Expected |
    |---|---|
    | First visit | A question "Is this a shared computer?" (answer once; it can be changed in InSIS+ settings) |
-   | Sidebar | Přehled · Předměty · Rozvrh · Zkoušky · Známky a kredity · Studijní záležitosti · Kampus a lidé, and at the bottom All services and Classic view |
-   | K vyřízení | Things to do with deadlines (open submission boxes closing within 7 days, a study restriction, InSIS's personal data check), or "Nothing to do", and a line saying when each source was last checked |
-   | Moje předměty | This semester's courses; each card opens the course page |
-   | Right column | The week, Rozvrh with "Full timetable →" (opens your personal timetable), new materials by course (a row opens that course's folder), teaching hours |
+   | Sidebar | Přehled · Předměty · Rozvrh · Zkoušky · Známky a kredity · Studijní záležitosti · Kampus a lidé, and at the bottom All services and Classic view. The current destination opens its sections under it (a submenu); there is no row of tabs above the page |
+   | K vyřízení | Things to do with deadlines (submission boxes closing within 7 days, a study restriction, InSIS's personal data check), or "Nic nečeká", and one line saying what is watched and when it was updated |
+   | Moje předměty | This semester's courses; finished ones under "Dokončené" (grey cover, ✓ with the result); each card opens the course page |
+   | Right column | The week, Rozvrh with "Full timetable →", new materials by course (a row opens that course's Materials tab), teaching hours |
    | Top bar | Search, Messages (envelope), Notifications (bell), ?, CS/EN, avatar menu (Account, Change password, InSIS+ settings, Log out) |
 
-4. Go through the sections:
+4. Go through the sections (each opens from the sidebar submenu; the page title is the section, the line above it
+   the destination; a page has at most one row of tabs, only for views of one thing):
 
    | Open | What you should see |
    |---|---|
-   | Předměty | Tabs Moje předměty · Materiály · Všechny odevzdávárny · Registrace a zápis · Katalog · Anketa |
-   | A course card | The course page with Souhrn · Materiály · Odevzdávárny · Body · Lidé. Souhrn shows the syllabus (credits, completion, aims, content, assessment, literature) with next classes and teachers on the right; Lidé lists teachers and classmates |
-   | Course › Materiály | The course folder's subfolders with file counts and new files, right in the tab; a row opens that folder in InSIS |
-   | Předměty › Materiály | One card per course with its folders (no extra click), then InSIS's document server views. Moje předměty, Materiály and Přehled use the same course card |
-   | Dokumentový server (Celý strom) | The whole tree; its own views as a thin underlined row (no second tab bar) and a link to Materiály |
-   | Rozvrh | Your personal timetable (week view) with tabs Můj týden · Harmonogram · Hledání rozvrhů · Export |
-   | Zkoušky | InSIS's exam list with the tabs Moje termíny · Volné termíny · Proběhlé · Zatím bez termínu · Testy |
-   | Známky a kredity | The e-index (Výsledky) and Co mi chybí |
-   | Studijní záležitosti | Your study (programme, state, restriction) and K vyřízení on top, then the sections in compact columns; the sidebar opens the sections as a submenu |
-   | Kampus a lidé | Your teachers this semester (each opens their person page), then the sections; a submenu in the sidebar |
-   | All services | Grouped list; each row opens the InSIS page |
-   | Envelope (Messages) | InSIS's mail box with "Where do messages arrive?" and a button to Outlook |
+   | Předměty › Moje předměty | Course cards; finished courses in their own group |
+   | A course card | Tabs Souhrn · Materiály · Odevzdávárny · Body · Lidé, a status line (next class, deadline, new files, result). Souhrn: the syllabus with next classes and what is coming; Body: InSIS's result, the attempt, links to Results and Exam dates; Lidé: teachers and classmates |
+   | Předměty › Materiály | Tabs Podle předmětů · Strom dokumentů · Nové dokumenty · Hledat; one card per course with its folders; an e-Library card |
+   | Nové dokumenty | A summary, then InSIS's own list (its checkboxes and Mark as read stay InSIS's) |
+   | Předměty › Všechny odevzdávárny / Anketa | Deadlines ordered by date; course evaluation with how many questionnaires are open (Fill in is InSIS's own link) |
+   | Rozvrh › Můj týden | The week view; Export opens "Export and print" (Outlook transfer and InSIS's own print/PDF form) |
+   | Rozvrh › Harmonogram | Academic calendar (an explanation when InSIS lists no teaching weeks) |
+   | Zkoušky | Exam dates and Online tests (empty states explain what happens next) |
+   | Známky a kredity | Výsledky with tabs Toto období · Celé studium · Statistiky · Srovnání; Co mi chybí (credits, compulsory courses left, groups; electives open 50 at a time); Studijní plány |
+   | Studijní záležitosti | Your study and K vyřízení, Next degree in "Něco jiného?"; Stav studia a průkaz (study card, student card block); Platby a stipendia (tabs Poplatky · Stipendia · Bankovní účty); Žádosti (the contact centre's forms grouped, with a filter) |
+   | Kampus a lidé | Your teachers this semester and rooms this week; Lidé (InSIS's search form in a card); Knihovna (loans or "no loans") |
+   | Envelope (Messages) | InSIS mail: New message and University e-mail in the header, where mail is forwarded, folders as tabs; the sidebar shows InSIS mail · Noticeboard |
    | Bell (Notifications) | New documents and newly entered results; opening it clears the dot |
-   | Any other InSIS page | The shell around the original page, with the right section highlighted |
+   | Any other InSIS page | The InSIS+ header, InSIS's content without its portal bar, breadcrumbs or page heading, the right section highlighted |
 
 5. Log out with the avatar menu, log in again: Přehled loads the data again (nothing was kept from before).
 6. Switch InSIS to Czech or English (CS/EN): everything follows.
