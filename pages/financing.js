@@ -185,15 +185,27 @@
 
   const portalLink = (path) => kit.portalLink(path);
 
-  // The section's views: the portal's own links, else the plain address where the URL rule allows one.
-  function views() {
-    const link = (path) => portalLink(path) || nav.safe(new URL(path, document.baseURI).href, 'link');
-    return [
-      { href: location.href.split('#')[0], text: T.fees, on: true },
-      { href: link('/auth/student/vypl_stip_student.pl'), text: T.scholarships },
-      { href: link('/auth/student/bank_spojeni_clovek.pl'), text: T.accounts },
-    ].filter((t) => t.href);
-  }
+  // The section's views: the portal's own links, else the plain address where the URL rule allows one. One header
+  // for all three pages and the accommodation benefit form (kit.section; generic.js draws the pages this module
+  // does not rebuild).
+  const link = (path) => portalLink(path) || nav.safe(new URL(path, document.baseURI).href, 'link');
+  const benefitAction = () => {
+    const benefit = link('/auth/student/zadost_ubyt_stip.pl');
+    return benefit && anchor({ href: benefit }, { class: 'btn ghost', title: T.benefit }, icon('home'), h('span', {}, T.benefit));
+  };
+  const money = kit.section({
+    id: 'money',
+    title: () => nav.sectionLabel('studies.money'),
+    subtitle: () => nav.label('matters'),
+    pages: { '/auth/student/financovani.pl': 'fees', '/auth/student/vypl_stip_student.pl': 'scholarships',
+      '/auth/student/bank_spojeni_clovek.pl': 'accounts', '/auth/student/zadost_ubyt_stip.pl': null },
+    views: () => [
+      { id: 'fees', href: link('/auth/student/financovani.pl'), text: T.fees },
+      { id: 'scholarships', href: link('/auth/student/vypl_stip_student.pl'), text: T.scholarships },
+      { id: 'accounts', href: link('/auth/student/bank_spojeni_clovek.pl'), text: T.accounts },
+    ],
+    actions: () => [benefitAction()].filter(Boolean),
+  });
 
   ipx.ready.then(() => {
     if (nav.route(document.baseURI.split('#')[0]).path !== '/auth/student/financovani.pl') return;
@@ -201,15 +213,13 @@
     if (!page?.querySelector('form[action*="financovani"]')) return;
     const data = parse(page);
     if (!data) return;
-    const benefit = portalLink('/auth/student/zadost_ubyt_stip.pl');
-
     kit.page({
       key: 'financing',
       css: 'pages/financing.css',
       title: nav.sectionLabel('studies.money'),
       subtitle: nav.label('matters'),
-      tabs: views(),
-      actions: benefit && anchor({ href: benefit }, { class: 'btn ghost', title: T.benefit }, icon('home'), h('span', {}, T.benefit)),
+      tabs: kit.sectionTabs(money, 'fees'),
+      actions: money.actions(),
       build: () => [
         summary(data),
         data.messages.some((m) => m.tone === 'info') && kit.note({ tone: 'info', text: T.binding }),

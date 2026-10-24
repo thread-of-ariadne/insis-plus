@@ -25,6 +25,10 @@
   const { clean, lang } = ipx;
   const { h, icon, anchor, takeover, viewTabs, PORTAL_ACTIONS, facultyColors } = ipx.ui;
 
+  // One header for the section's pages (kit.section): Status (this page), History (studium.pl) and the student
+  // card pages below it, which generic.js draws around InSIS's content.
+  const statusLink = (path) => ipx.kit.portalLink(path) || ipx.nav.safe(new URL(path, document.baseURI).href, 'link');
+  let statusSection = null;
   const T = {
     cs: { studyOffice: 'Studijní oddělení', title: 'Stav studia', status: 'Stav', history: 'Historie studia', views: 'Pohledy na studium',
       noRestriction: 'Bez omezení', restriction: 'Omezení', period: 'Období',
@@ -239,14 +243,22 @@
           requests && linkRow({ ...requests, text: ipx.nav.sectionLabel('studies.requests') }, 'mail', T.requests))));
   }
 
+  statusSection = ipx.kit.section({
+    id: 'status',
+    title: () => ipx.nav.sectionLabel('studies.status'),
+    subtitle: () => ipx.nav.label('matters'),
+    pages: { '/auth/student/moje_studium.pl': 'status', '/auth/student/studium.pl': 'history', '/auth/karty/': null,
+      '/auth/karty/typy_karet.pl': null, '/auth/karty/platnost.pl': null, '/auth/personalizace/vkladani_fotky.pl': null },
+    views: () => [
+      { id: 'status', href: statusLink('/auth/student/moje_studium.pl'), text: T.status },
+      { id: 'history', href: statusLink('/auth/student/studium.pl'), text: T.history },
+    ],
+  });
+
   function buildPage(d) {
-    const tabs = [
-      { href: here.href.split('#')[0], text: T.status, on: true },
-      safe(d.history) && { href: safe(d.history).href, text: T.history },
-    ].filter(Boolean);
     return h('div', { class: 'sp' },
       h('div', { class: 'sp-main' },
-        viewTabs(tabs, T.views),
+        ipx.kit.sectionTabs(statusSection, 'status'),
         d.study ? [studyCard(d), restrictionNote(d), otherStudies(d), studyLinks(d)] : h('div', { class: 'empty' }, h('p', {}, T.noStudy)),
         idCard(d)),
       rail(d));

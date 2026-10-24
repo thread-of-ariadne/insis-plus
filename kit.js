@@ -16,6 +16,7 @@
 // ipx.kit.facts(pairs)            → <dl> of label / value
 // ipx.kit.formCard(page, form, { title, lead })  → a card whose body is InSIS's own form (slotted)
 // ipx.kit.page({ key, css, title, subtitle, actions, tabs, build, form })  → takeover with the anatomy of §2
+// ipx.kit.section(def) / sectionFor(url) / sectionTabs(section, view)  → one header for every page of a section
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui || !ipx.nav) return;
@@ -157,6 +158,34 @@
       h('slot'));
   }
 
+  // ---------- sections with views: one header on every page of the section ----------
+  // A section whose views live on several InSIS pages (Payments: fees, scholarships, bank accounts) must show the
+  // same title, view tabs and page actions on each of them, whether InSIS+ redraws the page or only frames InSIS's
+  // content (generic.js). Otherwise the header jumps as the student moves between the tabs. Modules register their
+  // section at load time; generic.js and the modules draw the header from here.
+  //   section({ id, title: () => text, subtitle: () => text, pages: { '/auth/…': view | null | (route) => view },
+  //             views: () => [{ id, text, href, count? }], actions: (view) => [nodes] })
+  // A page mapped to null belongs to the section but is none of its views (a step below it): no tab is marked.
+  const sections = [];
+  function section(def) { sections.push(def); return def; }
+  function sectionFor(url = document.baseURI.split('#')[0]) {
+    const r = nav.route(url);
+    for (const s of sections) {
+      if (!r.path || !(r.path in s.pages)) continue;
+      const v = s.pages[r.path];
+      return { section: s, view: typeof v === 'function' ? v(r) : v, route: r };
+    }
+    return null;
+  }
+  // The current view always has a tab: when its link is not known yet (nothing read from the portal so far), this
+  // page's own address stands in, so the header never loses a tab on the page the student is on.
+  const sectionTabs = (s, view) => {
+    const here = nav.safe(document.baseURI.split('#')[0], 'link', { copied: true });
+    return viewTabs((s.views() || []).filter(Boolean)
+      .map((v) => ({ ...v, href: v.href || (v.id === view ? here : null), on: v.id === view }))
+      .filter((v) => v.href), s.title());
+  };
+
   // A rebuilt InSIS page with the anatomy of 03-pages.md §2. `form` (optional): InSIS's form element that holds the
   // page's action; build() places it with formCard(). Without a form the original content is not slotted at all.
   function page({ key, css, title, subtitle, actions, tabs, build, form }) {
@@ -166,11 +195,11 @@
     if (slotted) styleSlotted();
     return takeover({
       key, css: ['kit.css', ...[].concat(css || [])], title, subtitle, extra: actions, slotted,
-      build: () => h('div', { class: 'kit-page' }, tabs && viewTabs(tabs, title), build({ formCard: (opts) => formCard(original, form, opts) })),
+      build: () => h('div', { class: 'kit-page' }, tabs && (tabs instanceof Node ? tabs : viewTabs(tabs, title)), build({ formCard: (opts) => formCard(original, form, opts) })),
     });
   }
 
     const note = ({ tone, text }) => h('p', { class: `kit-note ${tone}` }, ipx.ui.icon(tone === 'bad' || tone === 'warn' ? 'alert' : 'info'), h('span', {}, text));
 
-  ipx.kit = { plural, portalLink, FACULTY_BY_LOGO, FACULTY_BY_CODE, readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
+  ipx.kit = { section, sectionFor, sectionTabs, plural, portalLink, FACULTY_BY_LOGO, FACULTY_BY_CODE, readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
 })();

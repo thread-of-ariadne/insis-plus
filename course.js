@@ -27,7 +27,7 @@
       lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
       coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
-      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály',
+      byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky',
       library: 'E-knihovna', libraryText: 'Veřejné studijní materiály, které zveřejňují katedry.',
       untilAt: (d) => `do ${d}`, closedOn: (d) => `uzavřeno ${d}`, confirmed: 'potvrzeno', submitted: 'odevzdáno', nothingIn: 'nic neodevzdáno', notOpen: (d) => `otevře se ${d}`,
       noResult: 'Výsledek zatím není zapsaný.', entered: (d) => `zapsáno ${d}`, attemptN: (n) => `${n}. pokus`, allAttempts: 'Všechny pokusy ve Výsledcích',
@@ -47,7 +47,7 @@
       lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
       coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
-      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials',
+      byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders',
       library: 'e-Library', libraryText: 'Public study materials published by departments.',
       untilAt: (d) => `until ${d}`, closedOn: (d) => `closed ${d}`, confirmed: 'confirmed', submitted: 'submitted', nothingIn: 'nothing submitted', notOpen: (d) => `opens ${d}`,
       noResult: 'No result has been entered yet.', entered: (d) => `entered ${d}`, attemptN: (n) => `attempt ${n}`, allAttempts: 'All attempts in Results',
@@ -367,6 +367,33 @@
     });
   }
 
+  // ---------- one header for every Materials page ----------
+  // The same title, view tabs and page actions on every page of the section (By course here; the tree, New documents,
+  // Search, a folder, DS settings and My folders in pages/docserver.js), built from fixed addresses, never from the
+  // tab row of the InSIS page at hand: InSIS's rows differ from page to page, which made the header jump.
+  // current: 'course' | 'tree' | 'new' | 'search' | 'settings' | 'folders' | null (a page below the section).
+  const plainLink = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
+  const materials = ipx.kit.section({
+    id: 'materials',
+    title: () => nav.sectionLabel('courses.files'),
+    subtitle: () => nav.label('courses'),
+    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search',
+      '/auth/dok_server/nastaveni_stromu.pl': 'settings', '/auth/dok_server/moje_dok.pl': 'folders', '/auth/dok_server/slozka.pl': null },
+    views: () => {
+      const fresh = ipx.state.docserver?.newCount;
+      return [
+        { id: 'course', href: nav.composedUrl('courses.files'), text: T.byCourse },
+        ...[['tree', '/auth/dok_server/', T.tree], ['new', '/auth/dok_server/nove_dok.pl', T.newDocs], ['search', '/auth/dok_server/vyhledavani.pl', T.search]]
+          .map(([id, path, text]) => ({ id, href: plainLink(path), text, count: id === 'new' && fresh != null ? fresh : null })),
+      ];
+    },
+    actions: (current) => [['settings', '/auth/dok_server/nastaveni_stromu.pl', T.dsSettings, 'gear'], ['folders', '/auth/dok_server/moje_dok.pl', T.myFolders, 'folder']]
+      .map(([id, path, label, ic]) => plainLink(path) && anchor({ href: plainLink(path) },
+        { class: 'btn ghost ds-action' + (current === id ? ' on' : ''), title: label, 'aria-label': label, 'aria-current': current === id ? 'page' : null },
+        icon(ic), h('span', { class: 'ds-action-label' }, label))).filter(Boolean),
+  });
+  ipx.materials = { tabs: (view) => ipx.kit.sectionTabs(materials, view), actions: materials.actions };
+
   // ---------- Courses › My courses and Materials ----------
 
   // The one course card used everywhere (Home, My courses, Materials): same look, same facts — next class, nearest
@@ -417,20 +444,15 @@
   }));
 
   ipx.composed.register('courses.files', () => ({
-    css: 'course.css',
+    css: ['course.css', 'pages/docserver.css'],
     title: nav.sectionLabel('courses.files'),
     subtitle: nav.label('courses'),
+    actions: ipx.materials.actions(null),
     build: () => {
       const list = current();
       const at = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
-      // One row of view tabs for the whole section, the same as on the document server's pages (pages/docserver.js):
-      // this page (By course), then InSIS's views of the document server. The e-library is another tool: a link card.
-      const newCount = ipx.state.docserver?.newCount;
-      const views = [
-        { href: nav.composedUrl('courses.files'), text: T.byCourse, on: true },
-        ...[[T.tree, '/auth/dok_server/'], [T.newDocs, '/auth/dok_server/nove_dok.pl', newCount ?? null], [T.search, '/auth/dok_server/vyhledavani.pl']]
-          .map(([text, path, count]) => at(path) && { text, href: at(path), count }).filter(Boolean),
-      ];
+      // The same header as every other Materials page (ipx.materials, pages/docserver.js).
+      const views = ipx.materials.tabs('course');
       const library = at('/auth/eknihovna/');
       const section = (c) => {
         const f = folderOf(c.code);
@@ -450,7 +472,7 @@
                 !top.length && !(f.files > 0) && h('p', { class: 'muted' }, T.folderEmpty)));
       };
       return h('div', { class: 'course-page' },
-        ipx.ui.viewTabs(views, T.views),
+        views,
         list.length ? list.map(section) : emptyState(T.coursesEmpty),
         list.length > 0 && h('p', { class: 'muted small' }, T.folderNote),
         // Decision 3 (03-pages.md §7): the e-library lives here as a link card, never as a tab.

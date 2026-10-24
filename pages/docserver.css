@@ -119,3 +119,7 @@ html.ipx-takeover.ipx-ds #str1 [data-ipx-keep="node"] input[type="submit"] + inp
   html.ipx-takeover.ipx-ds #str1 [data-ipx-keep="node"] table:has(.zahlavi) td:empty { display: none; }
   html.ipx-takeover.ipx-ds #str1 [data-ipx-keep="node"] input[type="submit"] { display: block; width: calc(100% - 24px); margin: 8px 12px 0; }
 }
+
+/* Pages below the section (a folder, DS settings, My folders) and Search: the Materials header, InSIS's content */
+.ds-other-title { margin: 4px 0 0; }
+.ds-action.on { background: var(--surface); box-shadow: var(--shadow-raised); }
