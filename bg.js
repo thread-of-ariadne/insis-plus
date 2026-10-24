@@ -4,6 +4,7 @@
 // - Every minute: personal data with no InSIS activity for 10 minutes is wiped, even if no InSIS tab is open.
 const SESSION_KEY = 'insisPlusSession';
 const VOLATILE_KEY = 'insisPlusVolatile';
+const CACHE_KEY = 'insisPlusCache'; // pages read on open (content.js ipx.cache), wiped with the personal data
 const IDLE_MS = 10 * 60e3;
 
 function openSession() {
@@ -18,7 +19,7 @@ async function wipeIdle() {
     if (!area) continue;
     try {
       const v = (await area.get(key))[key];
-      if (v && now - (v.active || 0) > IDLE_MS) await area.remove(key);
+      if (v && now - (v.active || 0) > IDLE_MS) await area.remove([key, CACHE_KEY]);
     } catch {}
   }
 }
@@ -26,11 +27,11 @@ async function wipeIdle() {
 openSession();
 chrome.runtime.onInstalled.addListener(() => {
   openSession();
-  chrome.storage.local.remove(VOLATILE_KEY);
+  chrome.storage.local.remove([VOLATILE_KEY, CACHE_KEY]);
 });
 chrome.runtime.onStartup.addListener(() => {
   openSession();
-  chrome.storage.local.remove(VOLATILE_KEY);
+  chrome.storage.local.remove([VOLATILE_KEY, CACHE_KEY]);
 });
 chrome.alarms.create('insis-plus-idle', { periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener((alarm) => {

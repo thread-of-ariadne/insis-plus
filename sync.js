@@ -33,6 +33,10 @@
     try {
       const res = await fetch(resolve(allowed), { credentials: 'include', signal: ctrl.signal, redirect: 'follow' });
       if (!res.ok) return;
+      // InSIS sent us somewhere else (a login page, another page type): only read it if the rule allows that page.
+      if (res.redirected && !globalThis.__ipxFixtureFor && !ipx.nav.safe(res.url, 'fetch', { copied: true })) return;
+      if (!/text\/html/i.test(res.headers.get('content-type') || 'text/html')) return;
+      if (Number(res.headers.get('content-length') || 0) > 4e6) return;
       const fetched = new DOMParser().parseFromString(await res.text(), 'text/html');
       // Links in the fetched page resolve against its InSIS address, as they would on the page itself.
       fetched.head.prepend(Object.assign(fetched.createElement('base'), { href: allowed }));

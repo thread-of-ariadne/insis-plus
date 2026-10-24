@@ -18,8 +18,9 @@
 //
 // Stored for the dashboard, plain values only:
 // ipx.state.docserver = {
-//   updated: Date.now(), source: location.href,
+//   updated: Date.now(), source: location.href,     // the tree's read (the background read keys on this)
 //   newCount: number | null,                      // "New documents (N)" from the tab row (or the list length)
+//   newUpdated, fresh: [{ id, name, type, author, date, folderId, folderName, code }], freshPartial,   // the New list, when the student opened it
 //   courses: [{ code, name, href, newCount, semester, files, allFiles, tree }],   // course folders from the tree, href = the folder;
 //            tree = its subfolders [{ name, href, files, fresh, allFiles, allNew, children }]
 //   folders: { [folderId]: courseCode },          // every folder inside a course, to group new documents by course
@@ -48,7 +49,7 @@
       latest: 'Poslední', today: 'dnes', yesterday: 'včera', refresh: 'Aktualizovat',
       emptyNew: 'Nemáte žádné nové dokumenty.', inCourses: 'Ve složkách předmětů', ofCourses: (n) => `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')}`,
       perCourse: 'Podle předmětů', otherFolders: (n) => `${n} v ostatních složkách (fakulta, škola)`,
-      markLead: 'Seznam je původní seznam InSIS. Otevřený dokument se v něm už znovu neukáže. Více dokumentů najednou označíte jako přečtené zaškrtnutím a tlačítkem InSIS pod seznamem.',
+      markLead: 'Seznam je původní seznam InSIS. Otevřený dokument se v něm už nemusí znovu ukázat. Více dokumentů najednou označíte jako přečtené zaškrtnutím a tlačítkem InSIS pod seznamem.',
       treeTip: 'Předměty u nových dokumentů InSIS+ pozná, až jednou otevřete Strom dokumentů.' },
     en: { tag: 'new', fresh: 'New documents', newBadge: (n) => `${n} new`,
       inside: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in subfolders`,
@@ -61,7 +62,7 @@
       latest: 'Latest', today: 'today', yesterday: 'yesterday', refresh: 'Refresh',
       emptyNew: 'You have no new documents.', inCourses: 'In course folders', ofCourses: (n) => `${n} ${n === 1 ? 'course' : 'courses'}`,
       perCourse: 'By course', otherFolders: (n) => `${n} in other folders (faculty, university)`,
-      markLead: 'This is InSIS\'s own list. A document you open no longer shows up in it. To mark several as read at once, tick them and press InSIS\'s button under the list.',
+      markLead: 'This is InSIS\'s own list. A document you open may no longer show up in it. To mark several as read at once, tick them and press InSIS\'s button under the list.',
       treeTip: 'InSIS+ can tell the courses of new documents once you have opened the Document tree.' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -386,16 +387,38 @@
         folders: d.folders,
       };
     } else {
-      // The list is the truth for new documents: recount the known courses from it.
-      const per = {};
+      // The New documents list (opened by the student; never read in the background). It has its own time: the tree
+      // keeps `updated`, so visiting New does not stop the background read of the tree. When InSIS shows the list in
+      // pages (fewer rows than its count), per-course numbers are left to the tree.
+      const total = tab?.count ?? d.docs.length;
+      const partial = total > d.docs.length;
+      const codeOf = (doc) => (doc.folder?.id && prev.folders?.[doc.folder.id]) || doc.folder?.name.match(CODE_RE)?.[1] || null;
+      const perCourse = {};
+      const perFolder = {};
       for (const doc of d.docs) {
-        const code = (doc.folder?.id && prev.folders?.[doc.folder.id]) || doc.folder?.name.match(CODE_RE)?.[1];
-        if (code) per[code] = (per[code] || 0) + 1;
+        const code = codeOf(doc);
+        if (code) perCourse[code] = (perCourse[code] || 0) + 1;
+        if (doc.folder?.id) perFolder[doc.folder.id] = (perFolder[doc.folder.id] || 0) + 1;
       }
+      // The course folders' subfolder counts follow the list too (a folder's id is in its address).
+      const recount = (nodes) => (nodes || []).map((n) => {
+        const children = recount(n.children);
+        const fresh = perFolder[folderId(n.href)] || 0;
+        return { ...n, fresh, allNew: fresh + children.reduce((s, k) => s + k.allNew, 0), children };
+      });
       ipx.state.docserver = {
-        ...prev, updated: Date.now(), source: here.href,
-        newCount: d.docs.length || tab?.count || 0,
-        courses: (prev.courses || []).map((c) => ({ ...c, newCount: per[c.code] || 0 })),
+        ...prev,
+        newCount: total,
+        newUpdated: Date.now(),
+        // Slim rows for "New in your courses" (no download links: those stay on InSIS's pages).
+        fresh: d.docs.slice(0, 60).map((doc) => ({ id: doc.id, name: doc.name, type: doc.type || '', author: doc.author?.text || '',
+          date: doc.date ? doc.date.toISOString() : null, folderId: doc.folder?.id || null, folderName: doc.folder?.name || '', code: codeOf(doc) })),
+        freshPartial: partial,
+        courses: partial ? prev.courses || [] : (prev.courses || []).map((c) => {
+          const tree = recount(c.tree);
+          const fresh = perFolder[folderId(c.href)] || 0;
+          return { ...c, newCount: perCourse[c.code] || 0, fresh, tree };
+        }),
       };
     }
     ipx.save();

@@ -92,5 +92,6 @@
         ]
       }
     }
-  }
+  },
+  "minimum_chrome_version": "112"
 }

@@ -135,9 +135,11 @@ on top, slot the original below.
   (no HTML) with `updated` and `source`, document the shape at the top of your module, and say so in the report.
 - **Timetable events** are available to every module through `ipx.state.timetable.events` and the shared
   `nextClasses()`, `hoursChart()` and `classDays()` components.
-- **Background sync.** `sync.js` loads the portal, personal timetable, study record, submissions and document
-  server in a hidden frame; there `ipx.syncOnly` is true and `takeover()` does nothing, so your module must call
-  its `remember()` **before** `takeover()` and must not depend on layout (sizes, visibility). Pages that show
+- **Background sync.** `sync.js` fetches the portal, personal timetable, study record, submissions, document server
+  tree and mail box as text and parses them with DOMParser (no InSIS script runs). A module that owns such a page
+  registers a reader, `(ipx.readers ||= {}).key = (doc, url) => …`, which parses the given document and calls its
+  `remember()`; parsing reads from a module variable `doc` (normally `document`) and must not depend on layout
+  (sizes, visibility, `innerText` line breaks). Pages that show
   synced data redraw with `ipx.onData(render)`. The portal's links are in `ipx.state.portal.paths` (every portal
   link by page path); `nav.target()` uses them.
 - **Recognise your page by its own markers.** The mail box also has a folder tree; the document server module once
