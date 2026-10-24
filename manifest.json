@@ -13,7 +13,10 @@
       ],
       "js": [
         "content.js",
+        "nav-data.js",
+        "nav.js",
         "ui.js",
+        "composed.js",
         "home.js",
         "syllabus.js",
         "catalog.js",

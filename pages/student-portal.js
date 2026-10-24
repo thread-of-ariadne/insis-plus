@@ -10,6 +10,7 @@
 //   updated, source,
 //   study: { faculty, name, detail, progress } | null,
 //   links: { exams, enrol, timetable, record, submissions, plan: { href, text } | undefined },
+//   paths: { '/auth/student/…pl': { href, text } }   (every portal link, by path)
 // }
 (() => {
   const ipx = globalThis.insisPlus;
@@ -119,7 +120,7 @@
       items: rest.filter((l) => groupOf(l) === id),
     })).filter((g) => g.items.length);
 
-    return { head, study, others: studies.filter((s) => s !== study), links, contacts, groups,
+    return { head, study, others: studies.filter((s) => s !== study), links, contacts, groups, all,
       help: help && { href: help.href, target: '_blank' } };
   }
 
@@ -130,6 +131,9 @@
       source: location.href,
       study: s && { faculty: s.faculty, name: s.name[0] || '', detail: s.name.slice(1).join(', '), progress: s.progress },
       links: d.links,
+      // Every portal link by page path, copied verbatim: the new navigation (nav.js) reaches InSIS pages through
+      // the student's own links, which carry the right study and period.
+      paths: Object.fromEntries(d.all.map((l) => [new URL(l.href).pathname.replace(/\/index\.pl$/, '/'), { href: l.href, text: l.text }])),
     };
     ipx.save();
   }

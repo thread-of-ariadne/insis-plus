@@ -39,6 +39,18 @@ for group, entries in structure.items():
     if group.startswith("_"):
         continue
     for key, label in entries.items():
+        if key.startswith("_"):
+            continue
+        if group == "entry":
+            errors += [f"structure entry.{key}: {path} is not a page of that node" for path in label
+                       if path not in pages or (pages[path]["node"] != key and key not in pages[path].get("variants", {}).values())]
+            continue
+        if group == "tabs":
+            members = [n for lst in label.values() for n in lst] if isinstance(label, dict) else label
+            errors += [f"structure tabs.{key}: unknown node {n}" for n in members if n not in nodes]
+            continue
+        if group == "glosses" and key not in nodes:
+            errors.append(f"structure glosses.{key}: unknown node")
         if not (isinstance(label, list) and len(label) == 2 and all(label)):
             errors.append(f"structure {group}.{key}: needs [en, cs]")
 

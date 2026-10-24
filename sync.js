@@ -30,7 +30,11 @@
   const resolve = (url) => globalThis.__ipxFixtureFor?.(url) || url;
   const stale = (key, age = MAX_AGE) => !ipx.state[key]?.updated || Date.now() - ipx.state[key].updated > age;
 
+  // Every background read obeys the URL rule of the mapping (nav.js): only pages marked readable, only with an
+  // allowed parameter set. A page that does not pass is skipped, never "fixed up".
   function load(url) {
+    const allowed = ipx.nav ? ipx.nav.safe(url, 'fetch', { copied: true }) : null;
+    if (!allowed) return Promise.resolve();
     return new Promise((resolveLoad) => {
       const frame = document.createElement('iframe');
       frame.name = FRAME;
@@ -52,7 +56,7 @@
       // A page no module recognises (an error page, the login page) never answers: give up after a while.
       const timer = setTimeout(finish, TIMEOUT);
       addEventListener('message', onMessage);
-      frame.src = resolve(url);
+      frame.src = resolve(allowed);
       document.documentElement.append(frame);
     });
   }

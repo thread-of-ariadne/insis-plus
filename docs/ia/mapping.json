@@ -177,6 +177,323 @@
         "All services",
         "Všechny služby"
       ]
+    },
+    "tabs": {
+      "_comment": "Order of the tabs (or grouped sections) of each destination; node ids from nodes.",
+      "courses": [
+        "courses.mine",
+        "courses.files",
+        "courses.submissions",
+        "courses.registration",
+        "courses.catalogue",
+        "courses.evaluation"
+      ],
+      "course": [
+        "course.overview",
+        "course.files",
+        "course.submissions",
+        "course.points",
+        "course.people",
+        "course.syllabus"
+      ],
+      "schedule": [
+        "schedule.week",
+        "schedule.calendar",
+        "schedule.search",
+        "schedule.export"
+      ],
+      "exams": [
+        "exams.mine",
+        "exams.signup",
+        "exams.past",
+        "exams.unscheduled",
+        "exams.tests"
+      ],
+      "grades": [
+        "grades.results",
+        "grades.plan"
+      ],
+      "matters": {
+        "matters.paperwork": [
+          "studies.papers",
+          "studies.excuses",
+          "studies.status",
+          "studies.requests"
+        ],
+        "matters.money": [
+          "studies.money"
+        ],
+        "matters.future": [
+          "studies.thesis",
+          "studies.abroad",
+          "studies.internships",
+          "studies.nextdegree"
+        ]
+      },
+      "campus": {
+        "campus.contacts": [
+          "campus.office",
+          "campus.people",
+          "campus.departments"
+        ],
+        "campus.campus": [
+          "campus.rooms",
+          "campus.library"
+        ],
+        "campus.info": [
+          "campus.plans",
+          "campus.theses",
+          "campus.about"
+        ]
+      },
+      "all": [
+        "all.discussions",
+        "all.tasks",
+        "all.news",
+        "all.public-courses",
+        "all.surveys",
+        "all.research",
+        "all.stats",
+        "all.search",
+        "all.system",
+        "all.games"
+      ],
+      "messages": [
+        "messages.mail",
+        "messages.noticeboard"
+      ],
+      "help": [
+        "campus.office",
+        "help",
+        "help.ask"
+      ],
+      "account": [
+        "account.profile",
+        "account.security",
+        "account.devices",
+        "account.email",
+        "account.access",
+        "account.custom"
+      ]
+    },
+    "glosses": {
+      "_comment": "One-line explanations shown in grouped lists (en, cs).",
+      "all.discussions": [
+        "Course and interest forums",
+        "Diskusní fóra předmětů a zájmů"
+      ],
+      "all.tasks": [
+        "Task lists some departments use",
+        "Seznamy úkolů, které používají některá pracoviště"
+      ],
+      "all.news": [
+        "E-mail news from InSIS by topic",
+        "Novinky z InSIS e-mailem podle témat"
+      ],
+      "all.public-courses": [
+        "Public courses; University of the Third Age for seniors",
+        "Kurzy pro veřejnost; Univerzita třetího věku"
+      ],
+      "all.surveys": [
+        "University surveys, academic senate elections",
+        "Univerzitní průzkumy, volby do akademického senátu"
+      ],
+      "all.research": [
+        "Publications, biographical data, CVs, projects",
+        "Publikace, životopisné údaje, CV, projekty"
+      ],
+      "all.stats": [
+        "Enrollment and InSIS usage statistics",
+        "Statistiky zápisu a využití InSIS"
+      ],
+      "all.search": [
+        "Search InSIS by topic",
+        "Vyhledávání v InSIS podle témat"
+      ],
+      "all.system": [
+        "Licence, system integrators, development",
+        "Licence, systémoví integrátoři, rozvoj"
+      ],
+      "all.games": [
+        "InSIS games",
+        "Hry v InSIS"
+      ],
+      "studies.papers": [
+        "Confirmation of study (CZ/EN), decisions delivered to you",
+        "Potvrzení o studiu (CZ/EN), doručená rozhodnutí"
+      ],
+      "studies.excuses": [
+        "Excuse yourself from classes",
+        "Omluvení z výuky"
+      ],
+      "studies.status": [
+        "Status, restrictions, ID card",
+        "Stav, omezení, průkaz"
+      ],
+      "studies.requests": [
+        "Interruption, recognition of courses: where to ask",
+        "Přerušení, uznání předmětů: kam se obrátit"
+      ],
+      "studies.money": [
+        "Fees, scholarships, bank account",
+        "Poplatky, stipendia, bankovní účet"
+      ],
+      "studies.thesis": [
+        "Topics, supervisor, state exam",
+        "Témata, vedoucí, SZZ"
+      ],
+      "studies.abroad": [
+        "Exchange application, partner universities",
+        "Přihláška na výjezd, partnerské školy"
+      ],
+      "studies.internships": [
+        "Jobs portal, my internships",
+        "Portál pracovních příležitostí, moje praxe"
+      ],
+      "studies.nextdegree": [
+        "Applications to follow-up study",
+        "Přihlášky na navazující studium"
+      ],
+      "campus.office": [
+        "Contacts by faculty and topic",
+        "Kontakty podle fakulty a tématu"
+      ],
+      "campus.people": [
+        "Search staff and students",
+        "Hledání zaměstnanců a studentů"
+      ],
+      "campus.departments": [
+        "Structure, staff, phone directory",
+        "Struktura, zaměstnanci, telefonní seznam"
+      ],
+      "campus.rooms": [
+        "Buildings, rooms, room timetables",
+        "Budovy, místnosti, rozvrhy místností"
+      ],
+      "campus.library": [
+        "My loans and due dates",
+        "Moje výpůjčky a termíny"
+      ],
+      "campus.plans": [
+        "Study plans of all programmes",
+        "Studijní plány všech programů"
+      ],
+      "campus.theses": [
+        "Final theses defended at VŠE",
+        "Obhájené závěrečné práce"
+      ],
+      "campus.about": [
+        "Basic information, graduates",
+        "Základní informace, absolventi"
+      ]
+    },
+    "entry": {
+      "_comment": "Entry page of a node with several InSIS pages, in order of preference (the first reachable one is used).",
+      "account.access": [
+        "/auth/ps/"
+      ],
+      "account.custom": [
+        "/auth/personalizace/pref.pl"
+      ],
+      "account.devices": [
+        "/auth/system/mobilni_zarizeni.pl"
+      ],
+      "account.email": [
+        "/auth/sit/univ_posta.pl"
+      ],
+      "account.profile": [
+        "/auth/kontrola/"
+      ],
+      "account.security": [
+        "/auth/system/zmena_hesla.pl"
+      ],
+      "all.games": [
+        "/auth/herna/"
+      ],
+      "all.public-courses": [
+        "/auth/kurzy/nabidka_kurzu.pl"
+      ],
+      "all.research": [
+        "/auth/vv/bio/",
+        "/auth/vv/publikace.pl"
+      ],
+      "all.surveys": [
+        "/auth/vv/epruzkumy/prehled_pruzkumu.pl",
+        "/auth/evolby/portal_volice.pl"
+      ],
+      "all.system": [
+        "/auth/about/"
+      ],
+      "campus.about": [
+        "/auth/verejne_informace.pl"
+      ],
+      "campus.departments": [
+        "/auth/pracoviste/pracoviste.pl"
+      ],
+      "campus.office": [
+        "/auth/pracoviste/stud_odd.pl"
+      ],
+      "campus.people": [
+        "/auth/lide/"
+      ],
+      "campus.theses": [
+        "/auth/zp/"
+      ],
+      "courses.catalogue": [
+        "/auth/katalog/"
+      ],
+      "courses.evaluation": [
+        "/auth/anketky/dotazniky.pl"
+      ],
+      "courses.registration": [
+        "/auth/student/registrace.pl"
+      ],
+      "courses.submissions": [
+        "/auth/student/odevzdavarny.pl"
+      ],
+      "grades.plan": [
+        "/auth/studijni/studijni_povinnosti.pl"
+      ],
+      "help": [
+        "/auth/dok/help.pl"
+      ],
+      "help.ask": [
+        "/auth/kc/kc.pl",
+        "/auth/kc/"
+      ],
+      "messages.mail": [
+        "/auth/posta/slozka.pl"
+      ],
+      "messages.noticeboard": [
+        "/auth/vyveska/"
+      ],
+      "schedule.calendar": [
+        "/auth/student/harmonogram.pl",
+        "/auth/ca/prehled_tydnu.pl"
+      ],
+      "schedule.week": [
+        "/auth/katalog/rozvrhy_view.pl"
+      ],
+      "studies.abroad": [
+        "/auth/int/podani_prihlasky.pl",
+        "/auth/katalog/dohody.pl"
+      ],
+      "studies.money": [
+        "/auth/student/financovani.pl"
+      ],
+      "studies.papers": [
+        "/auth/student/tisk_dokumentu.pl",
+        "/auth/uloziste/"
+      ],
+      "studies.status": [
+        "/auth/student/studium.pl"
+      ],
+      "studies.excuses": [
+        "/auth/student/moje_omluvenky.pl"
+      ],
+      "grades.results": [
+        "/auth/student/pruchod_studiem.pl"
+      ]
     }
   },
   "nodes": {
@@ -467,6 +784,9 @@
     "_m": {
       "rule": "tolerated on copied links (menu item id); exempt from the _* deny pattern",
       "verify": "confirm with an un-normalised snapshot that _m has no side effect (menu or favourites state)"
+    },
+    "zpet_student": {
+      "rule": "same as zpet (a back-link to the portal, relative to the page)"
     }
   },
   "external": {
@@ -1030,7 +1350,8 @@
         ]
       },
       "fetch": [
-        "format,rozvrh_student,rozvrh_student_obec,studium,zobraz"
+        "format,rozvrh_student,rozvrh_student_obec,studium,zobraz",
+        "format,rozvrh_student,rozvrh_student_obec,zobraz"
       ],
       "links": [
         "",
@@ -1040,7 +1361,8 @@
         "k,konf,rozvrh,z",
         "k,konf,z",
         "konf",
-        "konf,vse"
+        "konf,vse",
+        "format,rozvrh_student,rozvrh_student_obec,zobraz"
       ]
     },
     "/auth/katalog/syllabus.pl": {
@@ -1507,19 +1829,14 @@
         "",
         "fakulta",
         "fakulta,id",
-        "fakulta,studium,zpet_student"
+        "fakulta,studium"
       ],
       "links": [
         "",
         "fakulta",
         "fakulta,id",
-        "fakulta,studium,zpet_student"
-      ],
-      "values": {
-        "zpet_student": [
-          "moje_studium.pl"
-        ]
-      }
+        "fakulta,studium"
+      ]
     },
     "/auth/pracoviste/telsez.pl": {
       "node": "campus.departments",
@@ -1707,21 +2024,16 @@
         "",
         "fakulta",
         "fakulta,obdobi",
-        "fakulta,obdobi,studium,zpet_student",
+        "fakulta,obdobi,studium",
         "vyber_fakulty"
       ],
       "links": [
         "",
         "fakulta",
         "fakulta,obdobi",
-        "fakulta,obdobi,studium,zpet_student",
+        "fakulta,obdobi,studium",
         "vyber_fakulty"
-      ],
-      "values": {
-        "zpet_student": [
-          "moje_studium.pl"
-        ]
-      }
+      ]
     },
     "/auth/student/hodnoceni.pl": {
       "node": "courses.catalogue",
