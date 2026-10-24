@@ -232,6 +232,9 @@
       if (!key) continue;
       const title = clean(a.textContent) || clean(a.title) || clean(a.querySelector('img')?.alt);
       if (title.length < 2 || title.length > 100 || UNSAFE.test(key) || UNSAFE.test(title)) continue;
+      // Search offers only links the mapping allows InSIS+ to show (nav.js): no action links, no menu switches.
+      const nav = globalThis.insisPlus?.nav;
+      if (nav && !nav.allowed(a.href, 'link', { copied: true })) continue;
 
       const link = state.links[key];
       if (link) {

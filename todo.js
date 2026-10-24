@@ -41,7 +41,7 @@
     id: 'portal', label: T.portal, key: 'portal',
     items(state) {
       const r = state.portal?.study?.restriction;
-      return r ? [{ id: 'restriction', title: T.restriction, sub: `${r} · ${T.restrictionSub}`, tone: 'bad', href: ipx.nav.target('studies.status') }] : [];
+      return r && !/^[-–—\s]*$/.test(r) ? [{ id: 'restriction', title: T.restriction, sub: `${r} · ${T.restrictionSub}`, tone: 'bad', href: ipx.nav.target('studies.status') }] : [];
     },
   });
 

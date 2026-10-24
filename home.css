@@ -33,6 +33,3 @@
 .ask strong { font-size: 15px; }
 .ask p { margin: 4px 0 0; max-width: 62ch; font-size: 13.5px; }
 .ask-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink, #fff); font: 700 14px var(--font); cursor: pointer; }
-.btn.ghost { background: var(--chip); color: var(--fg); }
-.btn:hover { filter: brightness(1.06); }

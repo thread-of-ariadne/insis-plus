@@ -34,6 +34,7 @@
         "pages/submissions.js",
         "pages/study-record.js",
         "pages/docserver.js",
+        "pages/messages.js",
         "generic.js",
         "sync.js"
       ],

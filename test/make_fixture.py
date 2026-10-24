@@ -15,7 +15,7 @@ import re
 import sys
 
 SERVER = "http://localhost:8765/"
-SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "course.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "generic.js", "sync.js"]
+SCRIPTS = ["content.js", "nav-data.js", "nav.js", "ui.js", "todo.js", "composed.js", "course.js", "home.js", "syllabus.js", "catalog.js", "pages/timetable.js", "pages/student-portal.js", "pages/submissions.js", "pages/study-record.js", "pages/docserver.js", "pages/messages.js", "generic.js", "sync.js"]
 
 SHIM = """<script>
 window.chrome = {
@@ -38,7 +38,8 @@ window.__ipxFixtureFor = (url) => {
   const cs = /-cs[.-]/.test(location.pathname);
   // Most specific first: other addresses carry a link back to the portal (zpet=…moje_studium.pl).
   const map = [[/rozvrh_student/, 'timetable-personal'], [/moje_studium/, 'student-portal'],
-    [/pruchod_studiem/, 'study-record'], [/odevzdavarny/, 'submissions', 'submissions-cs-real'], [/dok_server\/$/, 'docserver']];
+    [/pruchod_studiem/, 'study-record'], [/odevzdavarny/, 'submissions', 'submissions-cs-real'], [/dok_server\/$/, 'docserver'],
+    [/posta\/slozka/, 'mailbox', 'mailbox']];
   const hit = map.find(([re]) => re.test(url));
   return hit && new URL((cs ? hit[2] || hit[1] + '-cs' : hit[1]) + '.built.html', location.href).href;
 };

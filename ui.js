@@ -244,7 +244,7 @@
     const logout = pageLink(/logout\.pl/)?.href || at('/auth/system/logout.pl');
     const help = pageLink(/help\.pl/);
     const unread = ipx.state.messages?.unread;
-    const newFiles = p.docs?.count;
+    const fresh = ipx.notifications?.unseen() || 0;
 
     const helpBtn = h('button', { class: 'chip-btn', type: 'button' }, h('b', { class: 'q' }, '?'));
     const avatarBtn = h('button', { class: 'avatar', type: 'button', title: p.name || T.account }, p.name ? initials(p.name) : icon('people'));
@@ -261,8 +261,8 @@
         mail && h('a', { class: 'chip-btn', href: mail, title: nav().label('messages'), 'aria-label': unread ? `${nav().label('messages')}: ${unread}` : nav().label('messages') },
           icon('mail'), unread > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
         h('a', { class: 'chip-btn', href: nav().composedUrl('notifications'), title: nav().label('notifications'),
-          'aria-label': newFiles ? `${nav().label('notifications')}: ${newFiles}` : nav().label('notifications') },
-          icon('bell'), newFiles > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
+          'aria-label': fresh ? `${nav().label('notifications')}: ${fresh}` : nav().label('notifications') },
+          icon('bell'), fresh > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
         popMenu(helpBtn, nav().label('help'), [
           { href: nav().target('campus.office'), text: nav().label('campus.office'), icon: 'people' },
           { href: nav().target('help.ask'), text: nav().label('help.ask'), icon: 'mail' },

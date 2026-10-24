@@ -772,3 +772,21 @@ button.avatar { border: 0; cursor: pointer; }
 .empty-todo p { margin: 0; padding: 12px 10px; color: var(--muted); font-size: 14px; }
 .checked { margin: 0; color: var(--faint); font-size: 12.5px; }
 .todo-mini { display: flex; flex-direction: column; }
+
+/* InSIS+ settings and notifications (composed.js) */
+.setting { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; }
+.switch-input { flex: none; width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+.notif-list .todo-row.fresh strong { color: var(--fg); }
+.notif-list .todo-row:not(.fresh) strong { font-weight: 600; color: var(--fg-2); }
+
+/* Messages: where do messages arrive? (pages/messages.js) */
+.msg-where { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; padding: 16px 18px; }
+.msg-text { display: flex; flex-direction: column; gap: 4px; max-width: 64ch; }
+.msg-text p { margin: 0; font-size: 14px; }
+.msg-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.msg-actions .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; line-height: 40px; }
+
+/* Buttons (InSIS+ controls only; InSIS's own buttons keep generic.css) */
+.btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink, #fff); font: 700 14px var(--font); cursor: pointer; }
+.btn.ghost { background: var(--chip); color: var(--fg); }
+.btn:hover { filter: brightness(1.06); }

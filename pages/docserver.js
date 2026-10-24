@@ -127,7 +127,8 @@
     if (!ul) return null;
     const roots = readNodes(ul, null);
     let count = 0;
-    walk(roots, (n) => { if (/slozka\.pl/.test(n.href)) count++; });
+    // Document-server folders only: the mail box has a folder tree of its own (posta/slozka.pl).
+    walk(roots, (n) => { if (/dok_server\/slozka\.pl/.test(n.href)) count++; });
     if (!count) return null;
 
     const courses = [];
