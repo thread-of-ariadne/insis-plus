@@ -183,11 +183,7 @@
           requests && anchor({ href: requests }, { class: 'fin-link' }, icon('mail'), h('span', {}, nav.sectionLabel('studies.requests'))))));
   }
 
-  // A link the portal gave the student for this page (it carries the study and period), through the URL rule.
-  const portalLink = (path) => {
-    const href = ipx.state.portal?.paths?.[path]?.href;
-    return href ? nav.safe(href, 'link', { copied: true }) : null;
-  };
+  const portalLink = (path) => kit.portalLink(path);
 
   // The section's views: the portal's own links, else the plain address where the URL rule allows one.
   function views() {

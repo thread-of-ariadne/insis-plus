@@ -23,7 +23,8 @@
 //   credits: { earned: number | null, registered: number | null },   // from the statistics table, else row sums
 //   average: number | null,                                          // as InSIS states it, else mean of row grades
 //   courses: [{ code, name, href (syllabus), ects: number | null (credits), completion, result, grade: 1–4 | null,
-//               semester, passed: true | false | null (null = no result yet), entered: 'd.m.yyyy' | '' }],
+//               semester, passed: true | false | null (null = no result yet), entered: 'd.m.yyyy' | '',
+//               attempt: '1' | '2' | … | null (as InSIS writes it) }],
 // }
 // Only a view that lists courses is stored: the statistics and comparison views would otherwise replace the
 // stored courses with none.
@@ -48,7 +49,7 @@
       attempt: (n) => `${n}. pokus`, attemptTitle: 'Předchozí termíny zkoušek', credits: 'kr.',
       creditsCard: 'Kredity v období', notEarned: 'Nezískáno', lost: 'Ztraceno', stats: 'Statistika období',
       ectsKey: 'Stupnice ECTS', study: 'Studium', views: 'Přehledy',
-      courses: (n) => `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'}`,
+      courses: (n) => `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')}`,
       semCredits: (a, b) => (b != null ? `${a} / ${b} kr.` : `${a} kr.`),
       empty: 'V tomto přehledu nejsou žádné předměty.', more: 'Další údaje z InSIS',
       grade: 'Známka', ectsGrade: 'ECTS', entered: 'Zapsáno', by: 'Zapsal',
@@ -385,8 +386,8 @@
       h('div', { class: 'sr-side' },
         r.credits != null && h('span', { class: 'sr-credits' }, fmt(r.credits), h('small', {}, T.credits)),
         r.ectsGrade && h('span', { class: 'sr-ects', title: T.ectsGrade + (r.ectsEstimate ? ' (≈)' : '') }, r.ectsGrade),
-        r.attempt && (r.attemptHref
-          ? h('a', { class: 'sr-attempt', href: r.attemptHref, title: T.attemptTitle }, T.attempt(r.attempt))
+        r.attempt && (r.attemptHref && ipx.nav.safe(r.attemptHref, 'link', { copied: true })
+          ? h('a', { class: 'sr-attempt', href: ipx.nav.safe(r.attemptHref, 'link', { copied: true }), title: T.attemptTitle }, T.attempt(r.attempt))
           : h('span', { class: 'sr-attempt' }, T.attempt(r.attempt)))));
   }
 
@@ -459,7 +460,8 @@
         d.study && h('p', { class: 'sr-study-name' }, d.study),
         d.period && h('p', { class: 'muted' }, d.period)),
       creditsCard(d, t),
-      leftHref && anchor({ href: leftHref }, { class: 'card glist-item sr-left' },
+      // Only with a live fact (the plan check read this session): otherwise it would just repeat the sidebar.
+      leftHref && plan?.required != null && plan.earned != null && anchor({ href: leftHref }, { class: 'card glist-item sr-left' },
         h('span', { class: 'glist-text' }, h('strong', {}, nav.sectionLabel('grades.plan')),
           h('small', {}, plan?.required != null && plan.earned != null ? T.leftOf(fmt(plan.earned), fmt(plan.required), fmt(plan.missing ?? Math.max(0, plan.required - plan.earned))) : T.leftText)),
         h('span', { class: 'glist-go' }, icon('arrow'))),
@@ -482,15 +484,15 @@
       credits: { earned: t.earned, registered: t.registered },
       average: t.average,
       courses: t.rows.map((r) => ({ code: r.code, name: r.name, href: r.href, ects: r.credits, completion: r.completion,
-        result: r.result, grade: r.grade, semester: r.semester, passed: r.passed, entered: r.date })),
+        result: r.result, grade: r.grade, semester: r.semester, passed: r.passed, entered: r.date, attempt: r.attempt || null })),
     };
     ipx.save();
   }
 
   // ---------- course attainment evaluation: the faculty picker ----------
 
-  const LOGO_FAC = { ffu: 'FFU', fmv: 'FMV', fph: 'FPH', fis: 'FIS', fnh: 'NF', fmh: 'FM' };
-  const CODE_FAC = { 10: 'FFU', 20: 'FMV', 30: 'FPH', 40: 'FIS', 50: 'NF', 60: 'FM' };
+  const LOGO_FAC = ipx.kit.FACULTY_BY_LOGO;
+  const CODE_FAC = ipx.kit.FACULTY_BY_CODE;
 
   function parseAttainment() {
     const page = doc.getElementById('str1');

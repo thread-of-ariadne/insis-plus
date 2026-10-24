@@ -3,6 +3,8 @@
 // components. Links keep InSIS's own addresses and pass the URL rule (nav.js); anything else becomes text.
 // InSIS's forms are never copied or submitted: formCard() shows the form element itself (slotted) inside a card.
 //
+// ipx.kit.portalLink(path, add)  → the student's own link to an InSIS page (from the portal), through the URL rule
+// ipx.kit.plural(n, one, few, many)  → the Czech plural form for n (0 and 5+ take "many")
 // ipx.kit.readTable(table)        → { head: [text], rows: [{ cells: [{ text, links, el }], el }] }
 // ipx.kit.findTables(root)        → InSIS data tables (with a header row) in reading order
 // ipx.kit.keyValues(root)         → [{ label, value, links }] from two-column label/value tables
@@ -105,6 +107,22 @@
     return m ? new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)) : null;
   }
 
+  // A link to one of the student's own InSIS pages, as the Student's portal gave it (it carries the study and the
+  // period), with optional parameters added, through the URL rule.
+  function portalLink(path, add) {
+    const base = ipx.state.portal?.paths?.[path]?.href;
+    if (!base) return null;
+    const extra = Object.entries(add || {}).map(([k, v]) => `${k}=${v}`).join(';');
+    return nav.safe(extra ? `${base}${base.includes('?') ? ';' : '?'}${extra}` : base, 'link', { copied: true });
+  }
+
+  // VŠE faculties by InSIS's logo file name (img/loga/vse/fis.png) and by the leading digits of a unit code.
+  const FACULTY_BY_LOGO = { ffu: 'FFU', fmv: 'FMV', fph: 'FPH', fis: 'FIS', fnh: 'NF', fmh: 'FM' };
+  const FACULTY_BY_CODE = { 10: 'FFU', 20: 'FMV', 30: 'FPH', 40: 'FIS', 50: 'NF', 60: 'FM' };
+
+  // Czech plural forms: 1 → one, 2–4 → few, everything else (0, 5+) → many. ("1 složka, 3 složky, 0 / 5 složek")
+  const plural = (n, one, few, many) => (n === 1 ? one : n >= 2 && n <= 4 ? few : many);
+
   // ---------- drawing ----------
 
   const cellNode = (v) => {
@@ -154,5 +172,5 @@
 
     const note = ({ tone, text }) => h('p', { class: `kit-note ${tone}` }, ipx.ui.icon(tone === 'bad' || tone === 'warn' ? 'alert' : 'info'), h('span', {}, text));
 
-  ipx.kit = { readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
+  ipx.kit = { plural, portalLink, FACULTY_BY_LOGO, FACULTY_BY_CODE, readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
 })();

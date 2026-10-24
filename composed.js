@@ -19,10 +19,10 @@
       clear: 'Smazat uložená data', clearText: 'Smaže vše, co InSIS+ uložil, kromě volby sdíleného počítače.', clearButton: 'Smazat', cleared: 'Smazáno.',
       newFiles: (n) => `${n} nových dokumentů`, result: (c, n) => `Výsledek: ${c} ${n}`, fresh: 'nové', noNotifications: 'Zatím nic nového.',
       notifHint: 'Upozornění ukazují, co se v InSIS změnilo. Zprávy v InSIS najdete pod ikonou obálky.',
-      somethingElse: 'Něco jiného?', myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
+      somethingElse: 'Něco jiného?', myStudy: 'Vaše studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
       studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
-      myTeachers: 'Tvoji vyučující v tomto semestru', myRooms: 'Tvoje místnosti tento týden',
-      checkedAt: (t) => `Načteno z InSIS v ${t}`, nextClass: (w, r) => `příště ${w}${r ? ` · ${r}` : ''}`, findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
+      myTeachers: 'Vaši vyučující v tomto semestru', myRooms: 'Vaše místnosti tento týden',
+      checkedAt: (t) => `Načteno z InSIS v ${t}`, nextClass: (w, r) => `příště ${w}${r ? ` · ${r}` : ''}`, findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte váš rozvrh.',
       nextDegree: 'Přihlášky ke studiu (např. na navazující magisterské studium) se podávají elektronickou přihláškou VŠE; InSIS+ ji neotevírá. S postupem poradí studijní oddělení.' },
     en: { soon: 'This InSIS+ page is still being built.', open: 'Open in InSIS', settingsLead: 'Settings of the InSIS+ extension.',
       classic: 'Classic InSIS look', classicText: 'Switch the InSIS+ look off on any page with Classic view at the bottom of the sidebar.',
@@ -70,14 +70,6 @@
     h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
     it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))));
   const clock = (ms) => new Date(ms).toLocaleTimeString(ipx.ui.locale, { hour: '2-digit', minute: '2-digit' });
-  // A link to another place as one compact card: icon, the place's label and its one-line explanation.
-  const linkCard = (node, iconName) => {
-    const href = nav.target(node);
-    return href && anchor({ href }, { class: 'card glist-item' }, icon(iconName),
-      h('span', { class: 'glist-text' }, h('strong', {}, nav.label(node)), nav.gloss(node) && h('small', {}, nav.gloss(node))),
-      h('span', { class: 'glist-go' }, icon('arrow')));
-  };
-
   register('dest.matters', () => ({
     title: nav.label('matters'),
     build: () => {
@@ -174,8 +166,7 @@
           list.length ? teacherGrid(list) : h('p', { class: 'muted' }, T.teachersUnknown)),
         rooms.length > 0 && h('section', { class: 'card pad' },
           h('h2', { class: 'card-title' }, T.myRooms),
-          h('p', { class: 'study-facts' }, rooms.map((r) => linkOrText(r.href, { class: 'chip', title: [...r.codes].join(', ') || null }, r.text)))),
-        h('div', { class: 'glist-items' }, linkCard('campus.office', 'people')));
+          h('p', { class: 'study-facts' }, rooms.map((r) => linkOrText(r.href, { class: 'chip', title: [...r.codes].join(', ') || null }, r.text)))));
     },
   }));
 

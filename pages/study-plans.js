@@ -25,8 +25,8 @@
   }[lang];
 
   // Faculty from InSIS's logo file name (fis-ang.png …); the faculty id in the address as a fallback.
-  const LOGO_FAC = { ffu: 'FFU', fmv: 'FMV', fph: 'FPH', fis: 'FIS', fnh: 'NF', fmh: 'FM' };
-  const CODE_FAC = { 10: 'FFU', 20: 'FMV', 30: 'FPH', 40: 'FIS', 50: 'NF', 60: 'FM' };
+  const LOGO_FAC = ipx.kit.FACULTY_BY_LOGO;
+  const CODE_FAC = ipx.kit.FACULTY_BY_CODE;
 
   function parse(page) {
     const links = [...page.querySelectorAll('.vyber-fakult a.fakulta[href]')];

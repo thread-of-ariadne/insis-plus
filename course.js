@@ -18,7 +18,7 @@
       next: 'Příští hodiny', noClasses: 'V rozvrhu nejsou žádné další hodiny tohoto předmětu.', waiting: 'Co tě čeká', nothing: 'Nic nečeká.',
       folder: 'Složka předmětu na dokumentovém serveru', newN: (n) => `${n} ${n === 1 ? 'nový' : n >= 2 && n <= 4 ? 'nové' : 'nových'}`, openFolder: 'Otevřít v InSIS',
       filesN: (n) => `${n} ${n === 1 ? 'soubor' : n >= 2 && n <= 4 ? 'soubory' : 'souborů'}`, folderEmpty: 'Složka je zatím prázdná.',
-      folderNote: 'Složky se otevírají v InSIS až na tvé kliknutí: otevření může označit soubory jako přečtené.', noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
+      folderNote: 'Složky se otevírají v InSIS až na vaše kliknutí: otevření může označit soubory jako přečtené.', noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
       allFolders: 'Všechny složky', moodle: 'Někteří vyučující dávají materiály do Moodlu.', noBoxes: 'Pro tento předmět nejsou žádné odevzdávárny.',
       topics: 'Přihlašování na témata', result: 'Výsledek', points: 'Průběžné body',
       pointsText: 'Body z průběžného hodnocení ukazuje InSIS v listu předmětu.', examDates: 'Termíny zkoušek', tests: 'Online testy a kvízy',
@@ -80,13 +80,7 @@
   const folderOf = (code) => (ipx.state.docserver?.courses || []).find((c) => c.code === code) || null;
   const boxesOf = (code) => (ipx.state.submissions?.boxes || []).filter((b) => b.code === code);
 
-  // A link to an InSIS page of the student's (from the portal), with one parameter added, through the URL rule.
-  function portalLink(path, add) {
-    const base = ipx.state.portal?.paths?.[path]?.href;
-    if (!base) return null;
-    const extra = Object.entries(add || {}).map(([k, v]) => `${k}=${v}`).join(';');
-    return nav.safe(extra ? `${base}${base.includes('?') ? ';' : '?'}${extra}` : base, 'link', { copied: true });
-  }
+  const portalLink = ipx.kit.portalLink;
 
   function statusOf(c) {
     if (c.passed === true) return { tone: 'ok', text: T.passed };
@@ -217,7 +211,8 @@
         }
         // Teachers have one place, the People tab: the syllabus's lecturers card is hidden here by course.css
         // (.course-syllabus … :has(> .people)). Dropping the fact instead would make syllabus.js print a stray "0".
-        box.replaceChildren(sanitizeLinks(ipx.syllabus.build(d, { embedded: true, rail: own })));
+        // Teachers live on the People tab only: the syllabus is drawn here without its lecturers block.
+        box.replaceChildren(sanitizeLinks(ipx.syllabus.build({ ...d, facts: d.facts.filter((f) => f.key !== 'lecturers') }, { embedded: true, rail: own })));
       });
       const full = c.href && nav.safe(c.href, 'link', { copied: true });
       const sheet = c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });

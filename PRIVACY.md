@@ -13,6 +13,8 @@ deleted:
 - when a different InSIS user logs in in the same browser;
 - after 10 minutes without activity in InSIS, even if no InSIS tab is open.
 
+Everything InSIS+ reads from InSIS is session data by default; only the settings below are ever kept on disk.
+
 **Your settings**, per InSIS user (identified by a one-way hash of the name InSIS shows as logged in, never the name
 itself), in the extension's local storage:
 
@@ -29,15 +31,18 @@ between sessions, no settings, no pins, no record.
 ## What it reads, and when
 
 - **In the background**, at most every 3 hours, only while an InSIS tab is open and you were active in the last
-  10 minutes, InSIS+ opens these InSIS pages in a hidden frame with your existing session: the Student's portal,
-  your personal timetable, your study record, coursework submissions, the document server's folder tree and your
-  InSIS mail box (only the unread count it shows). These are ordinary page loads from `insis.vse.cz`, the same as
-  clicking the links; nothing is clicked, submitted or changed. They may appear in InSIS's own log of your
+  10 minutes, InSIS+ reads these InSIS pages with your existing session: the Student's portal, your personal
+  timetable, your study record, coursework submissions, the document server's folder tree and your InSIS mail box
+  (only the unread count it shows). Each page is fetched as text from `insis.vse.cz` and read by InSIS+ without
+  running it: no InSIS script runs (so neither does the analytics InSIS embeds in its pages), no image or
+  stylesheet is loaded, nothing is clicked, submitted or changed. The reads may appear in InSIS's own log of your
   operations ("My operations").
 - **When you open a page that needs it**: the list of classmates on a course's People tab, and InSIS's mail
   forwarding page when the mail box does not say where mail is forwarded. Not stored.
 - **Never**: pages or links that do something (sign up, sign off, mark as read, generate a document, delete,
-  change settings), opening a stored document, questionnaires, messages. Every address InSIS+ reads or links to
+  change settings), opening a stored document, questionnaires, messages; and pages with credentials or sensitive
+  personal data (the mobile-app pairing code, the personal data check, bank accounts, card passes, the log of your
+  operations). When you open one of those yourself, InSIS+ only draws its frame around InSIS's page. Every address InSIS+ reads or links to
   is checked against a reviewed list (`docs/ia/mapping.json`).
 
 ## What it sends

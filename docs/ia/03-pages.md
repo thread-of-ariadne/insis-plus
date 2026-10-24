@@ -24,7 +24,9 @@ second look at what each row does:
 Rules that follow:
 
 1. **One row of tabs per page, at most**, and only for views of one thing (NN/g, "Tabs, used right"; Material 3
-   tabs). Places are never tabs.
+   tabs). Places are never tabs. One exception, on baseline (B) pages only: where InSIS itself has a second row of
+   sub-views inside a view (Settings › Personal page › three sub-views), that row is drawn as a small segmented
+   choice under the tabs, because InSIS's links cannot be merged into one row without moving them.
 2. **Sections are places** and live in the sidebar. A destination with groups (Study matters, Campus & people)
    shows its sections in the submenu in group order; its landing page is an overview with live data, not a page
    of links.

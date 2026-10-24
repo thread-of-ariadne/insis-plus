@@ -16,8 +16,8 @@
 
   const T = {
     cs: { title: 'E-knihovna', folders: 'Složky', search: 'Hledat',
-      summary: (f, o) => `${f} ${f === 1 ? 'složka' : f < 5 ? 'složky' : 'složek'} · ${o} ${o === 1 ? 'studijní materiál' : o < 5 ? 'studijní materiály' : 'studijních materiálů'}`,
-      objects: (n) => `${n} ${n === 1 ? 'materiál' : n < 5 ? 'materiály' : 'materiálů'}`,
+      summary: (f, o) => `${f} ${ipx.kit.plural(f, 'složka', 'složky', 'složek')} · ${o} ${ipx.kit.plural(o, 'studijní materiál', 'studijní materiály', 'studijních materiálů')}`,
+      objects: (n) => `${n} ${ipx.kit.plural(n, 'materiál', 'materiály', 'materiálů')}`,
       lead: 'Veřejné studijní materiály, které zveřejňují katedry. Složka se otevře v InSIS.',
       filter: 'Hledat složku…', noMatch: 'Žádná složka neodpovídá.', none: 'E-knihovna teď nemá žádné složky.' },
     en: { title: 'e-Library', folders: 'Folders', search: 'Search',

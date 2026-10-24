@@ -4,7 +4,7 @@
 /* ---------- layout: main column + rail ---------- */
 
 :host .content:has(> .pp) { padding: 0; }
-.pp { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 100%; }
+.pp { display: grid; grid-template-columns: minmax(0, 1100px); min-height: 100%; }
 .pp-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px 32px 48px; }
 .pp-rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
 .pp-main .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }

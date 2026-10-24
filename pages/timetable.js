@@ -26,7 +26,7 @@
     cs: { days: ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'],
       classesWeek: 'Výuka tento týden', classesShown: 'Výuka v týdnu', hoursWeek: 'Hodin tento týden', hoursShown: 'Hodin v týdnu',
       next: 'Další hodina', nextList: 'Nejbližší hodiny', none: 'Žádná', noneLeft: 'V tomto rozvrhu už žádná další hodina není.',
-      courses: 'Předměty', sessions: (n) => `${n} ${n === 1 ? 'termín' : n < 5 ? 'termíny' : 'termínů'}`,
+      courses: 'Předměty', sessions: (n) => `${n} ${ipx.kit.plural(n, 'termín', 'termíny', 'termínů')}`,
       today: 'dnes', tomorrow: 'zítra', inDays: (n) => `za ${n} ${n < 5 ? 'dny' : 'dní'}`, now: 'právě teď',
       nearest: 'nejbližší', week: 'Týden', prev: 'Předchozí týden', next7: 'Další týden', back: 'Tento týden',
       backNearest: 'Nejbližší výuka', template: 'Týdenní přehled',
@@ -539,7 +539,7 @@
       to: d.to ? iso(d.to) : null,
       events: d.events.map((e) => ({
         date: e.date, weekday: e.weekday, start: e.start, end: e.end, code: e.code, name: e.name,
-        type: e.type, room: e.room, teacher: e.teacher, note: e.note, people: e.people,
+        type: e.type, room: e.room, roomHref: e.roomHref, teacher: e.teacher, note: e.note, people: e.people,
       })),
     };
     ipx.save();

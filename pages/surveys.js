@@ -31,10 +31,7 @@
   }[lang];
 
   // "06/10/2026 00:00", "6. 10. 2026 0:00" → Date; InSIS's words ("date of result entry") → null.
-  function dateOf(text) {
-    const m = /(\d{1,2})\s*[./]\s*(\d{1,2})\s*[./]\s*(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(text || '');
-    return m ? new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)) : null;
-  }
+  const dateOf = ipx.kit.dateOf;
   const stamp = (d) => {
     const w = wallTime(d);
     return `${w.day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })} ${w.time}`;
@@ -120,7 +117,8 @@
         h('ul', { class: 'sv-list' }, open.map((r) => h('li', {},
           h('span', { class: 'sv-body' }, h('small', {}, [r.code, r.part].filter(Boolean).join(' · ')), h('strong', {}, courseOf(r))),
           r.closes && h('span', { class: 'sv-when' }, T.until(stamp(r.closes))),
-          r.closes && h('span', { class: `delta ${deadlineTone(r.closes, false, d.now)}` }, countdown(r.closes, d.now)))))),
+          // InSIS may still list a questionnaire as open after its closing time: no countdown then.
+          r.closes && r.closes > d.now && h('span', { class: `delta ${deadlineTone(r.closes, false, d.now)}` }, countdown(r.closes, d.now)))))),
     ];
   }
 

@@ -313,11 +313,11 @@
 
   // The destination's tabs under the top bar (links, the current one marked); none on pages without tabs.
   // One row of view tabs: views of one thing (a course, one InSIS tool, one list cut different ways).
-  // links: [{ href, text, on, count }]
+  // links: [{ href, text, on, count, hot }]  (a count is red when > 0, unless hot: false says it is not news)
   function viewTabs(links, label) {
     if (!links || links.length < 2) return null;
     return h('nav', { class: 'view-tabs', 'aria-label': label || null }, links.map((l) => h('a', { href: l.href, class: l.on ? 'on' : null,
-      'aria-current': l.on ? 'page' : null }, l.text, l.count != null && h('b', { class: 'view-tab-count' + (l.count > 0 ? ' hot' : '') }, String(l.count)))));
+      'aria-current': l.on ? 'page' : null }, l.text, l.count != null && h('b', { class: 'view-tab-count' + ((l.hot ?? l.count > 0) ? ' hot' : '') }, String(l.count)))));
   }
 
   // ---------- page takeover ----------
@@ -586,12 +586,6 @@
       .filter((i) => i >= 0 && i < 7))];
   }
 
-  // Tabs that are links (InSIS's portal_menu rows): items [{ href, text, on, count }]. Same look as tabs().
-  const linkTabs = (items, label) =>
-    h('nav', { class: 'tabs link-tabs', 'aria-label': label || null }, items.map((t) =>
-      anchor(t, { class: 'tab' + (t.on ? ' on' : ''), 'aria-current': t.on ? 'page' : null },
-        t.text, t.count != null && h('b', { class: 'tab-count' }, String(t.count)))));
-
   // ---------- deadlines ----------
 
   const pad2 = (n) => String(n).padStart(2, '0');
@@ -713,7 +707,7 @@
   ipx.ui = {
     PORTAL_ACTIONS, quickActions, here, nodeLinks, viewTabs, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
-    facultyFromCode, facultyFor, linkTabs, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
+    facultyFromCode, facultyFor, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
     kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,
     T, MAIN, locale,
   };

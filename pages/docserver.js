@@ -37,16 +37,16 @@
   const nav = ipx.nav;
 
   const T = {
-    cs: { tag: 'nové', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${n === 1 ? 'nový' : n < 5 ? 'nové' : 'nových'}`,
-      inside: (n) => `${n} ${n === 1 ? 'nový dokument' : n < 5 ? 'nové dokumenty' : 'nových dokumentů'} v podsložkách`,
-      files: (n) => `${n} ${n === 1 ? 'soubor' : n < 5 ? 'soubory' : 'souborů'}`,
+    cs: { tag: 'nové', fresh: 'Nové dokumenty', newBadge: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`,
+      inside: (n) => `${n} ${ipx.kit.plural(n, 'nový dokument', 'nové dokumenty', 'nových dokumentů')} v podsložkách`,
+      files: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`,
       byCourseTab: 'Podle předmětů', treeTab: 'Strom dokumentů', searchTab: 'Hledat', views: 'Pohledy na materiály', settings: 'Nastavení', myFolders: 'Moje složky',
       byCourse: 'Novinky ve vašich předmětech', byCourseNews: (c) => `Nové soubory v: ${c}. Podle předmětů je máte pohromadě.`,
       allHint: 'Všechny složky, které vám InSIS ukazuje. Složky s novými dokumenty jsou rozbalené.',
       expand: 'Rozbalit vše', collapse: 'Sbalit vše', filter: 'Hledat složku…', noMatch: 'Žádná složka neodpovídá.',
       storage: 'Vaše úložiště', open: 'Rozbalit',
       latest: 'Poslední', today: 'dnes', yesterday: 'včera', refresh: 'Aktualizovat',
-      emptyNew: 'Nemáte žádné nové dokumenty.', inCourses: 'Ve složkách předmětů', ofCourses: (n) => `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'}`,
+      emptyNew: 'Nemáte žádné nové dokumenty.', inCourses: 'Ve složkách předmětů', ofCourses: (n) => `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')}`,
       perCourse: 'Podle předmětů', otherFolders: (n) => `${n} v ostatních složkách (fakulta, škola)`,
       markLead: 'Seznam je původní seznam InSIS. Otevřený dokument se v něm už znovu neukáže. Více dokumentů najednou označíte jako přečtené zaškrtnutím a tlačítkem InSIS pod seznamem.',
       treeTip: 'Předměty u nových dokumentů InSIS+ pozná, až jednou otevřete Strom dokumentů.' },
@@ -158,10 +158,7 @@
     return { kind: 'tree', roots, courses, folders, tabs, quota: quota(), count };
   }
 
-  const parseDate = (s) => {
-    const m = (s || '').match(/(\d{1,2})\s*[./]\s*(\d{1,2})\s*[./]\s*(\d{4})/);
-    return m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null;
-  };
+  const parseDate = (s) => ipx.kit.dateOf(s);
 
   function parseNew() {
     const tabs = tabRow();

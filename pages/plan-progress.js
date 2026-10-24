@@ -33,23 +33,23 @@
 
   const T = {
     cs: {
-      credits: 'Kredity', of: (a, b) => `${a} z ${b}`, missing: (n) => `chybí ${n}`, needed: (n) => `ještě ${n} ${n === 1 ? 'kredit' : n < 5 ? 'kredity' : 'kreditů'}`,
-      complete: 'splněno', compulsoryLeft: 'Povinné předměty', leftFoot: (n) => (n ? `nesplněno v povinných skupinách · ${n} zapsáno teď` : 'nesplněno v povinných skupinách'),
+      credits: 'Kredity', of: (a, b) => `${a} z ${b}`, missing: (n) => `chybí ${n}`, needed: (n) => `ještě ${n} ${ipx.kit.plural(n, 'kredit', 'kredity', 'kreditů')}`,
+      complete: 'splněno', compulsoryLeft: 'Povinné předměty', leftFoot: (n) => (n ? `nesplněno v povinných skupinách · z toho zapsané teď: ${n}` : 'nesplněno v povinných skupinách'),
       groupsDone: 'Splněné skupiny', groupsFoot: (n) => `z ${n} ${n === 1 ? 'skupiny' : 'skupin'} s požadavkem`,
-      enrolledNow: 'Zapsáno teď', enrolledFoot: (n) => `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'} probíhá`,
+      enrolledNow: 'Zapsáno teď', enrolledFoot: (n) => `${n} ${ipx.kit.plural(n, 'předmět právě probíhá', 'předměty právě probíhají', 'předmětů právě probíhá')}`,
       progress: (a, b) => `${a} z ${b} kreditů`,
       yours: 'Vaše předměty', yoursNone: 'V plánu zatím nemáte žádný zapsaný ani splněný předmět.',
       groups: 'Skupiny předmětů', kinds: { compulsory: 'povinné', elective: 'povinně volitelné', exam: 'státní zkouška', optional: 'volitelné' },
       done: 'Splněno', groupMissing: (n) => `chybí ${n} kr.`, minOf: (a, b) => `${a} z min. ${b} kr.`, earnedN: (a) => `${a} kr. získáno`,
-      taken: (n) => (n ? `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'} z této skupiny` : 'zatím žádný předmět'),
+      taken: (n) => (n ? `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')} z této skupiny` : 'zatím žádný předmět'),
       stDone: 'Splněno', stEnrolled: 'Zapsáno', stNot: 'Nezapsáno', stRecognised: 'Uznáno',
       notTaken: 'Ještě nesplněno', inGroup: 'Vaše předměty ve skupině', noneInGroup: 'Z této skupiny zatím nemáte žádný předmět.',
       choose: (n) => `Vybrat z ${n} ${n === 1 ? 'předmětu' : 'předmětů'}`, all: 'Všechny předměty skupiny', more: (n) => `Zobrazit dalších ${n}`,
       filter: 'Hledat podle kódu nebo názvu', noMatch: 'Žádný předmět neodpovídá hledání.', shown: (a, b) => `Zobrazeno ${a} z ${b}`,
       cr: 'kr.', times: (n) => `zapsáno ${n}×`,
       failed: 'Stránku kontroly plánu se nepodařilo přečíst. Původní stránku InSIS ukáže Klasické zobrazení v postranním panelu.',
-      thesis: nav.label('studies.thesis'), results: nav.sectionLabel('grades.results'),
-      since: 'od', resultsLink: 'Známky a kredity v jednotlivých obdobích',
+      thesis: nav.label('studies.thesis'),
+      since: 'od',
     },
     en: {
       credits: 'Credits', of: (a, b) => `${a} of ${b}`, missing: (n) => `${n} missing`, needed: (n) => `${n} more ${n === 1 ? 'credit' : 'credits'} needed`,
@@ -67,8 +67,8 @@
       filter: 'Search by code or title', noMatch: 'No course matches the search.', shown: (a, b) => `Showing ${a} of ${b}`,
       cr: 'cr.', times: (n) => `enrolled ${n}×`,
       failed: "InSIS+ could not read this plan check. Classic view in the sidebar shows InSIS's own page.",
-      thesis: nav.label('studies.thesis'), results: nav.sectionLabel('grades.results'),
-      since: 'from', resultsLink: 'Grades and credits period by period',
+      thesis: nav.label('studies.thesis'),
+      since: 'from',
     },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -243,8 +243,12 @@
       h('span', { class: `delta ${tone}` }, key ? T[key] : c.raw, c.date && ` ${c.date}`));
   }
 
-  const bar = (value, max, tone) => h('div', { class: 'pp-bar', role: 'img', 'aria-label': `${Math.round(Math.min(100, (value / max) * 100))} %` },
-    h('span', { class: tone ? `t-${tone}` : null, style: `width: ${Math.min(100, (value / max) * 100)}%` }));
+  // A progress bar; a requirement of 0 counts as met (100 %), never "NaN %".
+  const bar = (value, max, tone) => {
+    const pct = max > 0 ? Math.min(100, ((value || 0) / max) * 100) : 100;
+    return h('div', { class: 'pp-bar', role: 'img', 'aria-label': `${Math.round(pct)} %` },
+      h('span', { class: tone ? `t-${tone}` : null, style: `width: ${pct}%` }));
+  };
 
   // A long list drawn on demand, PAGE_SIZE rows at a time, with a filter when it is longer than one page.
   function lazyList(courses) {
@@ -335,10 +339,8 @@
         x.mine.length ? h('ul', { class: 'card pp-list pp-mine' }, x.mine.map((c) => courseRow(c, true))) : emptyState(T.yoursNone),
         sectionHead(T.groups),
         h('div', { class: 'pp-groups' }, d.groups.map(groupCard))),
-      nav.target('grades.results') && h('aside', { class: 'pp-rail' },
-        anchor({ href: nav.target('grades.results') }, { class: 'card glist-item' },
-          h('span', { class: 'glist-text' }, h('strong', {}, T.results), h('small', {}, T.resultsLink)),
-          h('span', { class: 'glist-go' }, icon('arrow')))));
+      // (Results is a sidebar section next to this one: no card repeating it here.)
+    );
   }
 
   function remember(d, x) {

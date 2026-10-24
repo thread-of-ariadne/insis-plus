@@ -43,7 +43,8 @@
       const a = label.querySelector('a[href]');
       const name = clean((a || label.querySelector('b'))?.textContent);
       const count = /\((\d+)\)/.exec(label.textContent)?.[1];
-      return name && { text: name, href: a ? link(a) : here.href.split('#')[0], on: !a, count: count == null ? null : Number(count) };
+      // InSIS does not say whether a folder's number is unread or all messages: shown, never as a red badge.
+      return name && { text: name, href: a ? link(a) : here.href.split('#')[0], on: !a, count: count == null ? null : Number(count), hot: false };
     }).filter((f) => f && f.href);
     const notice = form.querySelector('.uis_msg');
     const fwd = /@/.test(notice?.textContent || '') ? clean(notice.querySelector('a')?.textContent || '') : null;
