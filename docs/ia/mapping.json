@@ -195,7 +195,7 @@
       ]
     },
     "tabs": {
-      "_comment": "Sections of each destination (the sidebar submenu), in order; grouped where the destination has groups. Node ids from nodes. Nodes left out on purpose: schedule.export (an action of My week), studies.requests and studies.nextdegree (no InSIS page: a card on the Study matters overview).",
+      "_comment": "Sections of each destination (the sidebar submenu), in order; grouped where the destination has groups. Node ids from nodes. Nodes left out on purpose: schedule.export (an action of My week), studies.nextdegree (never read: a card on the Study matters overview).",
       "courses": [
         "courses.mine",
         "courses.files",
@@ -229,7 +229,8 @@
         "matters.paperwork": [
           "studies.papers",
           "studies.excuses",
-          "studies.status"
+          "studies.status",
+          "studies.requests"
         ],
         "matters.money": [
           "studies.money"
@@ -272,9 +273,7 @@
         "messages.noticeboard"
       ],
       "help": [
-        "campus.office",
-        "help",
-        "help.ask"
+        "help"
       ],
       "account": [
         "account.profile",
@@ -340,8 +339,8 @@
         "Stav, omezení, průkaz"
       ],
       "studies.requests": [
-        "Interruption, recognition of courses: where to ask",
-        "Přerušení, uznání předmětů: kam se obrátit"
+        "Interruption, recognition of courses, transfers, scholarships: the request forms",
+        "Přerušení, uznání předmětů, přestupy, stipendia: formuláře žádostí"
       ],
       "studies.money": [
         "Fees, scholarships, bank account",
@@ -466,10 +465,6 @@
       "help": [
         "/auth/dok/help.pl"
       ],
-      "help.ask": [
-        "/auth/kc/kc.pl",
-        "/auth/kc/"
-      ],
       "messages.mail": [
         "/auth/posta/slozka.pl"
       ],
@@ -502,6 +497,10 @@
       ],
       "grades.results": [
         "/auth/student/pruchod_studiem.pl"
+      ],
+      "studies.requests": [
+        "/auth/kc/kc.pl",
+        "/auth/kc/"
       ]
     }
   },
@@ -685,10 +684,6 @@
     "help": {
       "en": "Help",
       "cs": "Nápověda"
-    },
-    "help.ask": {
-      "en": "Ask a question",
-      "cs": "Zeptat se"
     },
     "account.profile": {
       "en": "Profile & privacy",
@@ -1015,11 +1010,8 @@
     "/auth/dok_server/nastaveni_stromu.pl": {
       "node": "courses.files",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
       ]
@@ -1265,11 +1257,8 @@
     "/auth/karty/platnost.pl": {
       "node": "studies.status",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
       ]
@@ -1405,10 +1394,10 @@
       }
     },
     "/auth/kc/": {
-      "node": "help.ask",
+      "node": "studies.requests",
       "form": true,
       "also": [
-        "campus.office"
+        "help"
       ],
       "read": "on-open",
       "link": "shell",
@@ -1422,33 +1411,30 @@
       ]
     },
     "/auth/kc/kc.pl": {
-      "node": "help.ask",
+      "node": "studies.requests",
       "form": true,
       "also": [
-        "campus.office"
+        "help"
       ],
       "read": "on-open",
       "link": "shell",
       "fetch": [
         "",
-        "formular,zalozka",
         "obdobi,studium"
       ],
       "links": [
         "",
         "formular,zalozka",
         "obdobi,studium"
-      ]
+      ],
+      "note": "form pages (formular,zalozka) are linked, never fetched: opening one may start a draft request"
     },
     "/auth/kontrola/": {
       "node": "account.profile",
       "form": true,
-      "read": "on-open",
-      "note": "the To do item comes from the notices on InSIS main page, not from this form page",
+      "read": "never",
+      "note": "the To do item comes from the notices on InSIS main page, not from this form page; never read by InSIS+: government ID numbers and personal data (safety review 2026-10-24)",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
       ]
@@ -1657,11 +1643,8 @@
     "/auth/posta/hz_ng_sprava_mlistu.pl": {
       "node": "messages.mail",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
       ]
@@ -1674,11 +1657,8 @@
     "/auth/posta/nastaveni.pl": {
       "node": "messages.mail",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         "",
         "zalozka"
@@ -1729,11 +1709,8 @@
     "/auth/posta/slozky.pl": {
       "node": "messages.mail",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
       ]
@@ -1913,14 +1890,12 @@
     },
     "/auth/ps/moje_pruchody.pl": {
       "node": "account.access",
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
-      ]
+      ],
+      "note": "never read by InSIS+: card passes (a location history) (safety review 2026-10-24)"
     },
     "/auth/ps/povolene_body.pl": {
       "node": "account.access",
@@ -1992,14 +1967,12 @@
     "/auth/student/bank_spojeni_clovek.pl": {
       "node": "studies.money",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
-      ]
+      ],
+      "note": "never read by InSIS+: bank account numbers (safety review 2026-10-24)"
     },
     "/auth/student/financovani.pl": {
       "node": "studies.money",
@@ -2387,11 +2360,8 @@
     "/auth/student/zadost_ubyt_stip.pl": {
       "node": "studies.money",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        "obdobi,studium"
-      ],
       "links": [
         "obdobi,studium"
       ]
@@ -2415,8 +2385,8 @@
       ]
     },
     "/auth/studijni/": {
-      "node": "campus.office",
-      "note": "Study Department landing",
+      "node": "courses.catalogue",
+      "note": "An InSIS menu hub (catalogue, enrolment statistics), not the study office; never linked by InSIS+",
       "read": "on-open",
       "link": "shell",
       "fetch": [
@@ -2509,14 +2479,12 @@
     "/auth/system/mobilni_zarizeni.pl": {
       "node": "account.devices",
       "form": true,
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        ""
-      ],
       "links": [
         ""
-      ]
+      ],
+      "note": "never read by InSIS+: pairing QR code (a credential) (safety review 2026-10-24)"
     },
     "/auth/system/nastaveni_delegatu.pl": {
       "node": "account.security",
@@ -2598,14 +2566,12 @@
     },
     "/auth/system/zobraz_wlog.pl": {
       "node": "account.security",
-      "read": "on-open",
+      "read": "never",
       "link": "shell",
-      "fetch": [
-        "current"
-      ],
       "links": [
         "current"
-      ]
+      ],
+      "note": "never read by InSIS+: operations log (safety review 2026-10-24)"
     },
     "/auth/tisk/evidence_tisku.pl": {
       "node": "studies.papers",
@@ -2633,10 +2599,7 @@
     },
     "/auth/uloziste/": {
       "node": "studies.papers",
-      "also": [
-        "home"
-      ],
-      "read": "background",
+      "read": "on-open",
       "link": "shell",
       "fetch": [
         "obdobi,rezim,studium",
@@ -2648,7 +2611,8 @@
         "rezim",
         "rezim,slozka",
         "rezim,slozka,studium"
-      ]
+      ],
+      "note": "on-open until a snapshot shows that viewing the list does not set Delivered/Displayed (safety review 2026-10-24)"
     },
     "/auth/uloziste/zobrazeni.pl": {
       "node": "studies.papers",

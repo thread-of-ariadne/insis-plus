@@ -7,6 +7,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { clean, norm, lang } = ipx;
   const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, weekStrip, styleSlotted, facultyColors, facultyFor,
     keepOnly } = ipx.ui;
@@ -96,7 +101,7 @@
   }
 
   function findGrid() {
-    for (const table of document.querySelectorAll('table')) {
+    for (const table of doc.querySelectorAll('table')) {
       const head = table.querySelector('tr');
       if (!head) continue;
       const cols = slotColumns(head);
@@ -108,7 +113,7 @@
   // "(1)" → "Pouze pro studenty …", from the notes table under the grid.
   function footnotes(grid) {
     const out = {};
-    for (const tr of document.querySelectorAll('tr')) {
+    for (const tr of doc.querySelectorAll('tr')) {
       if (grid.contains(tr)) continue;
       const tds = tr.querySelectorAll(':scope > td');
       const key = tds.length === 2 && clean(tds[0].textContent).match(/^\((\d+)\)$/)?.[1];
@@ -120,7 +125,7 @@
   // Type labels from the key under the grid ("lecture", "seminar"), so they follow the page language.
   function typeLabels(grid) {
     const out = { ...TYPE_FALLBACK };
-    for (const td of document.querySelectorAll('td[class*="rozvrh-"]')) {
+    for (const td of doc.querySelectorAll('td[class*="rozvrh-"]')) {
       if (grid.contains(td)) continue;
       const key = td.className.match(/\brozvrh-([a-z]+)/)?.[1];
       const text = clean(td.textContent);
@@ -167,7 +172,7 @@
   }
 
   function parse() {
-    const personal = /rozvrh_student=/.test(location.href) || document.querySelector('input[name="rozvrh_student"]');
+    const personal = /rozvrh_student=/.test(here.href) || doc.querySelector('input[name="rozvrh_student"]');
     const found = findGrid();
     if (!personal || !found) return null;
     const { table, head, cols } = found;
@@ -214,13 +219,13 @@
     }
     events.sort((a, b) => (a.date || '').localeCompare(b.date || '') || a.weekday - b.weekday || a.start.localeCompare(b.start));
 
-    const val = (name) => clean(document.querySelector(`input[name="${name}"]`)?.value);
+    const val = (name) => clean(doc.querySelector(`input[name="${name}"]`)?.value);
     const from = parseDate(val('konani_od'));
     const to = parseDate(val('konani_do'));
-    const crumbs = [...document.querySelectorAll('.breadcrumb-item a[href]')];
+    const crumbs = [...doc.querySelectorAll('.breadcrumb-item a[href]')];
     const criteria = crumbs.find((a) => /rozvrhy_view\.pl$/.test(a.getAttribute('href') || ''));
-    const form = document.querySelector('form input[name="rozvrh_student"]')?.form || null;
-    const changed = document.body.innerText.match(/(?:Last change|Poslední změna)\s*:\s*([0-9./: ]+)/i)?.[1]?.trim() || '';
+    const form = doc.querySelector('form input[name="rozvrh_student"]')?.form || null;
+    const changed = doc.body.innerText.match(/(?:Last change|Poslední změna)\s*:\s*([0-9./: ]+)/i)?.[1]?.trim() || '';
 
     return {
       events,
@@ -506,7 +511,7 @@
   function remember(d) {
     ipx.state.timetable = {
       updated: Date.now(),
-      source: location.href,
+      source: here.href,
       from: d.from ? iso(d.from) : null,
       to: d.to ? iso(d.to) : null,
       events: d.events.map((e) => ({
@@ -517,12 +522,18 @@
     ipx.save();
   }
 
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).timetable = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
+  };
+
   ipx.ready.then(() => {
     const data = parse();
     if (!data) return;
     remember(data);
 
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     const slotted = page && data.form && page.contains(data.form) ? [page] : null;
     if (slotted) {
       // Only the display-mode form of the original stays visible under the new view.

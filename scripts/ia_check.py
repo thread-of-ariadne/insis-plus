@@ -61,7 +61,11 @@ for group, entries in structure.items():
 # (_m, a menu id, is handled as a transient parameter, not as an allowed-set name.)
 DENY = re.compile(r"^(\w*tisk\w*|potvrz\w*|\w*_on|\w*_off|email\w*|notif\w*|odber\w*|add\w*|del\w*|remove\w*|_.*|akce|"
                   r"operace|smaz\w*|zrus\w*|odhlas\w*|prihlas\w*|odesl\w*|uloz\w*|form|on|off|vybrano|zalozeni|stahnuti|"
-                  r"download|export\w*|zakaz\w*|blok\w*)$")
+                  r"download|export\w*|zakaz\w*|blok\w*|"
+                  # added after the safety review of 2026-10-24 (03-pages.md §7)
+                  r"potvr\w*|prid\w*|odeb\w*|vloz\w*|nahr\w*|upload\w*|oznac\w*|precten\w*|ignor\w*|kopir\w*|presun\w*|"
+                  r"prejmen\w*|rename|zalozit|zalozen\w*|hlas\w*|vote|spust\w*|vypln\w*|udel\w*|odvol\w*|generuj\w*|"
+                  r"\w*stahn\w*|popisek\w*|zprac\w*|filtr\w*)$", re.I)
 COMPOSED = {"home", "notifications", "exams.mine"}
 for path, m in pages.items():
     targets = [m["node"], *m.get("also", []), *m.get("variants", {}).values()]

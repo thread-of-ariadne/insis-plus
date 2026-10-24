@@ -19,6 +19,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { clean, norm, lang } = ipx;
   const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, weekStrip, facultyColors, facultyOf } = ipx.ui;
 
@@ -184,14 +189,14 @@
   }
 
   function parse() {
-    const url = /odevzdavarny\.pl/.test(location.pathname);
+    const url = /odevzdavarny\.pl/.test(here.pathname);
     const tables = [];
-    for (const table of document.querySelectorAll('table')) {
+    for (const table of doc.querySelectorAll('table')) {
       const cols = columns(table);
       // A submissions table has a course column, a deadline column and a files column.
       if ('course' in cols && 'until' in cols && ('files' in cols || 'insert' in cols || 'display' in cols)) tables.push({ table, cols });
     }
-    const decorated = document.querySelector('[data-sysid^="dekorace-terminy"]');
+    const decorated = doc.querySelector('[data-sysid^="dekorace-terminy"]');
     if (!tables.length || !(url || decorated)) return null;
 
     const boxes = [];
@@ -204,7 +209,7 @@
       }
     }
 
-    const studyLine = document.querySelector('#titulek div');
+    const studyLine = doc.querySelector('#titulek div');
     const period = clean(studyLine?.querySelectorAll('b')[1]?.textContent);
     return { boxes, period, tableCount: tables.length };
   }
@@ -323,7 +328,7 @@
     if (!list.length) return h('p', { class: 'muted sb-rail-empty' }, T.emptyOpen);
     return h('div', { class: 'sb-next' }, list.slice(0, 4).map((b, i) => {
       const w = wall(b.closes);
-      return h('a', { class: 'sb-next-row' + (i === 0 ? ' first' : ''), href: (b.insert || b.display)?.href || location.href, style: facStyle(b.code) },
+      return h('a', { class: 'sb-next-row' + (i === 0 ? ' first' : ''), href: (b.insert || b.display)?.href || here.href, style: facStyle(b.code) },
         h('span', { class: 'sb-next-day' }, h('b', {}, String(w.day.getDate())), h('small', {}, w.day.toLocaleDateString(locale, { weekday: 'short' }))),
         h('span', { class: 'sb-next-sep' }),
         h('span', { class: 'sb-next-body' }, h('strong', {}, b.title || b.name), h('small', {}, [b.code, w.time].filter(Boolean).join(' · '))),
@@ -409,16 +414,22 @@
   function remember(d) {
     ipx.state.submissions = {
       updated: Date.now(),
-      source: location.href,
+      source: here.href,
       boxes: d.boxes.map((b) => ({
         code: b.code, name: b.name, title: b.title,
         opens: isoMin(b.opens), closes: isoMin(b.closes),
         submitted: submittedOf(b), files: b.files, section: b.section,
-        href: (b.insert || b.display)?.href || location.href,
+        href: (b.insert || b.display)?.href || here.href,
       })),
     };
     ipx.save();
   }
+
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).submissions = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
+  };
 
   ipx.ready.then(() => {
     const data = parse();

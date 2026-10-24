@@ -5,6 +5,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui || !ipx.nav) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { lang, clean } = ipx;
   const { h, icon, anchor, takeover, styleSlotted } = ipx.ui;
   const nav = ipx.nav;
@@ -19,10 +24,10 @@
   }[lang];
 
   function parse() {
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     if (!page || !page.querySelector('form[action*="posta/slozka.pl"]') || !page.querySelector('table.portal_menu')) return null;
     const outlook = page.querySelector('table.portal_menu a[href*="outlook"]');
-    const forwarding = new URL('/auth/posta/forwardy.pl', document.baseURI).href;
+    const forwarding = new URL('/auth/posta/forwardy.pl', doc.baseURI).href;
     const text = clean(page.textContent);
     const fwd = /(?:forwarded to|přeposílány na|přesměrovány na)\s*:?\s*([^\s@]+@[^\s@]+\.[a-z]{2,})/i.exec(text)?.[1] || null;
     const unread = /(?:unread|nepřečten\w*)\s*:\s*(\d+)/i.exec(text)?.[1];
@@ -42,6 +47,12 @@
     }
   }
 
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).messages = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parse(); if (data?.unread != null) { ipx.state.messages = { updated: Date.now(), unread: data.unread }; ipx.save(); } } finally { doc = document; here = location; }
+  };
+
   ipx.ready.then(() => {
     const data = parse();
     if (!data) return;
@@ -49,7 +60,6 @@
       ipx.state.messages = { updated: Date.now(), unread: data.unread };
       ipx.save();
     }
-    if (ipx.syncOnly) return;
     const line = h('p', { class: 'msg-line' }, data.fwd ? T.forwarded(data.fwd) : '…');
     if (!data.fwd) forwardingStatus(data.forwarding, line);
     styleSlotted();

@@ -7,14 +7,14 @@
   const { lang, clean, norm } = ipx;
 
   const T = {
-    cs: { classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', search: 'Hledat v InSIS…',
+    cs: { ask: 'Zeptat se nebo podat žádost', classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', search: 'Hledat v InSIS…',
       menu: 'Menu', collapse: 'Sbalit panel',
       note: 'Neoficiální rozšíření. Data zůstávají ve vašem prohlížeči.', unpin: 'Odepnout',
       pinned: 'Připnuté', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
       inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', creditsOf: (a, b) => `${a} z ${b} kreditů`, creditsN: (a) => `${a} kreditů`, nothingDue: 'Nic nečeká na odevzdání', tomorrowAt: 'zítra',
       inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), navigation: 'Navigace', account: 'Účet',
       pageHelp: 'Nápověda k této stránce', allHelp: 'Veškerá nápověda' },
-    en: { classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
+    en: { ask: 'Ask or make a request', classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
       menu: 'Menu', collapse: 'Collapse sidebar',
       note: 'Unofficial extension. Your data stays in your browser.', unpin: 'Unpin',
       pinned: 'Pinned', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
@@ -192,8 +192,17 @@
         return [item, h('div', { class: 'nav-sub' }, subs.map((l) => anchor(l, { class: 'nav-item sub' + (current === l.node ? ' active' : ''),
           'aria-current': where.node === l.node ? 'page' : null, title: nav().sectionLabel(l.node) }, h('span', { class: 'label' }, nav().sectionLabel(l.node)))))];
       }).flat();
+      // Top-bar places (Messages, Account, Help) are not destinations; while you are in one, its sections show as a
+      // block above the destinations, so they stay reachable.
+      const place = ['messages', 'account', 'help'].includes(where.dest) && nav().tabs[where.dest];
+      const placeLinks = place ? nodeLinks(place) : [];
+      const placeBlock = placeLinks.length > 1 && h('div', { class: 'nav-place' },
+        h('p', { class: 'side-label' }, nav().label(where.dest)),
+        placeLinks.map((l) => anchor(l, { class: 'nav-item sub' + (l.node === where.node ? ' active' : ''), 'aria-current': l.node === where.node ? 'page' : null },
+          h('span', { class: 'label' }, l.text))));
       const pinned = ipx.state.fav.map((url) => ipx.state.links[url] && { href: url, text: ipx.state.links[url].t }).filter(Boolean);
       body.replaceChildren(...[
+        placeBlock,
         h('div', { class: 'dests' }, items),
         pinned.length > 0 && h('p', { class: 'side-label' }, T.pinned),
         pinned.map((l) => h('div', { class: 'nav-row' },
@@ -276,7 +285,7 @@
           icon('bell'), fresh > 0 && h('span', { class: 'dot', 'aria-hidden': 'true' })),
         popMenu(helpBtn, nav().label('help'), [
           { href: nav().target('campus.office'), text: nav().label('campus.office'), icon: 'people' },
-          { href: nav().target('help.ask'), text: nav().label('help.ask'), icon: 'mail' },
+          { href: nav().target('studies.requests'), text: T.ask, icon: 'mail' },
           help && { href: help.href, target: '_blank', text: T.pageHelp, icon: 'info' },
           { href: nav().composedUrl('dest.help'), text: T.allHelp, icon: 'book' },
         ].filter((x) => !x || x.href)),
@@ -320,8 +329,6 @@
   // Replaces the original page with the InSIS+ shell rendered in a closed shadow root.
   // `slotted` nodes stay in the light DOM (so InSIS's own scripts and forms keep working) and show in the content area.
   function takeover({ key, css, title, subtitle, extra, build, slotted }) {
-    // In the hidden background-sync frame, modules only store their data.
-    if (ipx.syncOnly) return null;
     if (!document.getElementById('insis-plus-takeover-style')) {
       const style = h('style', { id: 'insis-plus-takeover-style' });
       style.textContent = `
@@ -363,7 +370,12 @@
       h('div', { class: 'scrim', onclick: () => shellEl.classList.remove('drawer') }),
       h('div', { class: 'main' },
         topBar(title, subtitle, extra),
-        h('main', { class: 'content' }, build ? build() : null, slotted ? h('slot') : null)),
+        (() => {
+          // Slotted originals show where the page put its <slot> (a form card), else at the end of the content.
+          const body = build ? build() : null;
+          const placed = body instanceof Node && (body.matches?.('slot') || body.querySelector?.('slot'));
+          return h('main', { class: 'content' }, body, slotted && !placed ? h('slot') : null);
+        })()),
       bottomBar());
     const pill = h('button', { class: 'pill', type: 'button', onclick: () => setClassic(false) }, icon('layout'), T.back);
 
@@ -688,7 +700,6 @@
   // Original InSIS content that stays in the page (slotted into the shell) gets the shared look from generic.css,
   // plus an optional page stylesheet for what is specific to that page.
   function styleSlotted(pageCss) {
-    if (ipx.syncOnly) return;
     document.documentElement.classList.add('ipx-generic');
     for (const file of ['generic.css', pageCss].filter(Boolean)) {
       if (document.querySelector(`link[data-ipx="${file}"]`)) continue;

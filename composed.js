@@ -13,7 +13,6 @@
     cs: { soon: 'Tato stránka InSIS+ se teprve připravuje.', open: 'Otevřít v InSIS', settingsLead: 'Nastavení rozšíření InSIS+.',
       classic: 'Klasický vzhled InSIS', classicText: 'Vzhled InSIS+ můžete na každé stránce vypnout tlačítkem Klasické zobrazení dole v postranním panelu.',
       privacy: 'Soukromí', privacyText: 'InSIS+ běží jen ve vašem prohlížeči a nic nikam neposílá.',
-      requests: 'Žádosti na studijní oddělení (přerušení studia, uznání předmětů, prodloužení termínů) se podávají podle pokynů vaší fakulty. Zeptejte se na studijním oddělení nebo v kontaktním centru.',
       theme: 'Vzhled', themeText: 'Světlý, tmavý, nebo podle nastavení systému.', themeSystem: 'Podle systému', themeLight: 'Světlý', themeDark: 'Tmavý',
       background: 'Číst data na pozadí', backgroundText: 'Rozvrh, výsledky, odevzdávárny a materiály se načítají samy, nejvýš jednou za 3 hodiny.',
       shared: 'Sdílený počítač', sharedText: 'Mezi návštěvami se neukládá nic (připnuté stránky, nastavení, co už jste viděli).',
@@ -23,11 +22,10 @@
       somethingElse: 'Něco jiného?', myStudy: 'Tvoje studium', details: 'Stav studia', restricted: 'Omezení', noRestriction: 'Bez omezení',
       studyUnknown: 'Údaje o studiu se zatím nenačetly.', toHandle: 'K vyřízení', nothingToHandle: 'Nic nečeká.',
       myTeachers: 'Tvoji vyučující v tomto semestru', findPerson: 'Hledat osobu', teachersUnknown: 'Vyučující se ukážou, až se načte tvůj rozvrh.',
-      nextDegree: 'Přihlášky ke studiu jsou v InSIS pod položkou Přihláška ke studiu na hlavní stránce (v klasickém zobrazení). InSIS+ je zatím neotevírá. Pokud si nejste jistí postupem, zeptejte se na studijním oddělení.' },
+      nextDegree: 'Přihlášky ke studiu (např. na navazující magisterské studium) se podávají elektronickou přihláškou VŠE; InSIS+ ji neotevírá. S postupem poradí studijní oddělení.' },
     en: { soon: 'This InSIS+ page is still being built.', open: 'Open in InSIS', settingsLead: 'Settings of the InSIS+ extension.',
       classic: 'Classic InSIS look', classicText: 'Switch the InSIS+ look off on any page with Classic view at the bottom of the sidebar.',
       privacy: 'Privacy', privacyText: 'InSIS+ runs only in your browser and sends nothing anywhere.',
-      requests: 'Requests to the study department (interrupting studies, recognition of courses, deadline extensions) follow your faculty’s instructions. Ask the study department or the contact centre.',
       theme: 'Appearance', themeText: 'Light, dark, or as your system is set.', themeSystem: 'System', themeLight: 'Light', themeDark: 'Dark',
       background: 'Read data in the background', backgroundText: 'Timetable, results, submission boxes and materials load by themselves, at most every 3 hours.',
       shared: 'Shared computer', sharedText: 'Nothing is kept between visits (pins, settings, what you have seen).',
@@ -37,7 +35,7 @@
       somethingElse: 'Something else?', myStudy: 'Your study', details: 'Study status', restricted: 'Restriction', noRestriction: 'No restriction',
       studyUnknown: 'Your study details have not loaded yet.', toHandle: 'To handle', nothingToHandle: 'Nothing waiting.',
       myTeachers: 'Your teachers this semester', findPerson: 'Find a person', teachersUnknown: 'Your teachers appear once your timetable has loaded.',
-      nextDegree: 'Study applications are in InSIS under Study application form on the main page (in Classic view). InSIS+ does not open them yet. If you are unsure how to apply, ask the study department.' },
+      nextDegree: 'Applications for study (e.g. a master’s programme) are made with VŠE’s electronic application; InSIS+ does not open it. The study department can advise you.' },
   }[lang];
 
   const renderers = {};
@@ -110,7 +108,6 @@
         h('section', { class: 'card pad else-card' },
           h('h2', { class: 'card-title' }, T.somethingElse),
           h('dl', { class: 'else-list' },
-            h('dt', {}, nav.label('studies.requests')), h('dd', {}, T.requests),
             h('dt', {}, nav.label('studies.nextdegree')), h('dd', {}, T.nextDegree)),
           nav.target('campus.office') && anchor({ href: nav.target('campus.office') }, { class: 'btn ghost' }, nav.label('campus.office'))));
     },
@@ -143,18 +140,6 @@
         groupColumns('campus'));
     },
   }));
-
-  // Sections whose InSIS pages are not verified yet: say where to go and who to ask (docs/ia/02-redesign.md §3).
-  const signpost = (node, text) => register(node, () => ({
-    title: nav.label(node),
-    build: () => h('div', { class: 'glist' },
-      h('section', { class: 'card glist-note' }, h('p', {}, text)),
-      nodeLinks(['campus.office', 'help.ask']).map((l) => anchor(l, { class: 'card glist-item' },
-        h('span', { class: 'glist-text' }, h('strong', {}, l.text), l.gloss && h('small', {}, l.gloss)),
-        h('span', { class: 'glist-go' }, icon('arrow'))))),
-  }));
-  signpost('studies.requests', T.requests);
-  signpost('studies.nextdegree', T.nextDegree);
 
   // ---------- InSIS+ settings ----------
 

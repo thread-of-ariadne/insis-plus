@@ -15,7 +15,11 @@
   const ORIGIN = base().origin;
 
   // Parameter names that perform actions (docs/ia/01-current-map.md §4). Same list as scripts/ia_check.py.
-  const DENY = /^(\w*tisk\w*|potvrz\w*|\w*_on|\w*_off|email\w*|notif\w*|odber\w*|add\w*|del\w*|remove\w*|_.*|akce|operace|smaz\w*|zrus\w*|odhlas\w*|prihlas\w*|odesl\w*|uloz\w*|form|on|off|vybrano|zalozeni|stahnuti|download|export\w*|zakaz\w*|blok\w*)$/;
+  const DENY = new RegExp(`^(${[
+    String.raw`\w*tisk\w*|potvrz\w*|\w*_on|\w*_off|email\w*|notif\w*|odber\w*|add\w*|del\w*|remove\w*|_.*|akce|operace|smaz\w*|zrus\w*|odhlas\w*|prihlas\w*|odesl\w*|uloz\w*|form|on|off|vybrano|zalozeni|stahnuti|download|export\w*|zakaz\w*|blok\w*`,
+    // added after the safety review of 2026-10-24 (03-pages.md §7)
+    String.raw`potvr\w*|prid\w*|odeb\w*|vloz\w*|nahr\w*|upload\w*|oznac\w*|precten\w*|ignor\w*|kopir\w*|presun\w*|prejmen\w*|rename|zalozit|zalozen\w*|hlas\w*|vote|spust\w*|vypln\w*|udel\w*|odvol\w*|generuj\w*|\w*stahn\w*|popisek\w*|zprac\w*|filtr\w*`,
+  ].join('|')})$`, 'i');
   const TRANSIENT = new Set(D.transient);
 
   // InSIS writes parameters after "?" and ";" (and sometimes a second "?"). A back-link (zpet…) carries a whole
@@ -129,8 +133,7 @@
 
   // Nodes that exist only in InSIS+ (composed pages), shown at the main page's address + "#ipx:<node>".
   const COMPOSED = new Set(['home', 'courses.mine', 'courses.files', 'notifications', 'plus.settings', 'language',
-    'studies.requests', 'studies.nextdegree', 'course.overview', 'course.files', 'course.submissions', 'course.points', 'course.people',
-    'course.syllabus', 'dest.matters', 'dest.campus', 'dest.all', 'dest.help', 'dest.account']);
+    'course.overview', 'course.files', 'course.submissions', 'course.points', 'course.people', 'dest.matters', 'dest.campus', 'dest.all', 'dest.help', 'dest.account']);
   const home = () => ipx.state.homeUrl || `${ORIGIN}/auth/`;
   const composedUrl = (node, arg) => `${home().split('#')[0]}#ipx:${node}${arg ? '/' + encodeURIComponent(arg) : ''}`;
 

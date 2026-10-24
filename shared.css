@@ -214,7 +214,8 @@ button { font: inherit; color: inherit; }
 .nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 6px 21px; padding-left: 10px; border-left: 1px solid var(--line); }
 .nav-item.sub { min-height: 30px; padding-top: 5px; padding-bottom: 5px; font-size: 13.5px; color: var(--muted); }
 .nav-item.sub.active { color: var(--fg); }
-.shell.collapsed .nav-sub { display: none; }
+.shell.collapsed .nav-sub, .shell.collapsed .nav-place { display: none; }
+.nav-place { display: flex; flex-direction: column; gap: 1px; margin: 4px 0 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 .nav-item .label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
 .side-label {

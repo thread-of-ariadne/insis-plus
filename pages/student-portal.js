@@ -15,6 +15,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { clean, norm, lang } = ipx;
   const { h, icon, anchor, takeover, PORTAL_ACTIONS, nextClasses, classDays, weekStrip, deadlineList,
     facultyColors } = ipx.ui;
@@ -62,7 +67,7 @@
   });
 
   function parse() {
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     const form = page?.querySelector('form[action*="moje_studium"]');
     const menu = page?.querySelector('table.portal_menu');
     if (!form || !menu || !page.querySelector('.rada-ikon')) return null;
@@ -96,7 +101,7 @@
     const study = studies.find((s) => s.active) || studies[0] || null;
 
     // Every link once (the study's own icons first: their labels are the clearest), then sort them out.
-    const seen = new Set([location.href.split('#')[0]]);
+    const seen = new Set([here.href.split('#')[0]]);
     const all = [...(study?.actions || []), ...tabsRow.filter((t) => !t.on), ...icons]
       .filter((l) => l.text && !/moje_studium\.pl$/.test(new URL(l.href).pathname) && !seen.has(l.href) && seen.add(l.href));
     const used = new Set();
@@ -128,7 +133,7 @@
     const s = d.study;
     ipx.state.portal = {
       updated: Date.now(),
-      source: location.href,
+      source: here.href,
       study: s && { faculty: s.faculty, name: s.name[0] || '', detail: s.name.slice(1).join(', '), progress: s.progress, restriction: s.restriction || '' },
       links: d.links,
       // Every portal link by page path, copied verbatim: the new navigation (nav.js) reaches InSIS pages through
@@ -203,6 +208,12 @@
             d.help && anchor({ ...d.help, text: T.insisHelp }, { class: 'sp-link' },
               h('span', { class: 'sp-link-icon' }, icon('alert')), h('span', {}, T.insisHelp))))));
   }
+
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).portal = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parse(); if (data) remember(data); } finally { doc = document; here = location; }
+  };
 
   ipx.ready.then(() => {
     const data = parse();

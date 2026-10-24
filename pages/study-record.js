@@ -22,6 +22,11 @@
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
+
+  // What is being read: this page, or a page fetched by the background sync (sync.js), which hands a parsed
+  // document to the reader below. No InSIS script runs on a fetched page and nothing else is loaded.
+  let doc = document;
+  let here = location;
   const { clean, norm, lang } = ipx;
   const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, styleSlotted, cover, facultyColors, facultyOf } = ipx.ui;
 
@@ -223,9 +228,9 @@
   }).filter(Boolean);
 
   function parseRecord() {
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     if (!page) return null;
-    const isRecord = /pruchod_studiem\.pl/.test(location.pathname) ||
+    const isRecord = /pruchod_studiem\.pl/.test(here.pathname) ||
       page.querySelector('form[action*="pruchod_studiem"]');
     if (!isRecord) return null;
 
@@ -419,7 +424,7 @@
     const t = totals(d);
     ipx.state.studyRecord = {
       updated: Date.now(),
-      source: location.href,
+      source: here.href,
       view: d.view,
       study: d.study,
       period: d.period,
@@ -437,7 +442,7 @@
   const CODE_FAC = { 10: 'FFU', 20: 'FMV', 30: 'FPH', 40: 'FIS', 50: 'NF', 60: 'FM' };
 
   function parseAttainment() {
-    const page = document.getElementById('str1');
+    const page = doc.getElementById('str1');
     const links = [...(page?.querySelectorAll('.vyber-fakult a.fakulta[href]') || [])];
     if (links.length < 2 || !links.every((a) => /hodnoceni\.pl/.test(a.getAttribute('href')))) return null;
     const units = links.map((a) => {
@@ -447,7 +452,7 @@
       return { href: a.href, text: clean(a.querySelector('.nazev')?.textContent) || clean(a.textContent), fac };
     }).filter((u) => u.text);
     const crumbs = [...page.querySelectorAll('.breadcrumb-item')].map((li) => clean(li.textContent)).filter(Boolean);
-    return { units, title: crumbs.at(-1) || clean(document.title), intro: clean(page.querySelector('div.small')?.textContent) };
+    return { units, title: crumbs.at(-1) || clean(doc.title), intro: clean(page.querySelector('div.small')?.textContent) };
   }
 
   function buildAttainment(d) {
@@ -469,6 +474,12 @@
   }
 
   // ---------- start ----------
+
+  // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
+  (ipx.readers ||= {}).studyRecord = (fetched, url) => {
+    doc = fetched; here = new URL(url);
+    try { const data = parseRecord(); if (data) remember(data); } finally { doc = document; here = location; }
+  };
 
   ipx.ready.then(() => {
     const record = parseRecord();
