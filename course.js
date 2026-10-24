@@ -94,16 +94,28 @@
   const syllabi = new Map();
   // The syllabus page is public and read-only (read: on-open). Its content is shown inside the course page, so every
   // link in it goes through the URL rule; anything else becomes plain text.
+  // Shown at once from the session cache when there is one (stale-while-revalidate: a copy older than a day is
+  // fetched again in the background and used next time); otherwise fetched now.
+  const SYLLABUS_FRESH = 24 * 3600e3;
   function syllabusOf(c) {
     if (!c.href) return Promise.resolve(null);
     if (!syllabi.has(c.code)) {
       const url = nav.safe(c.href, 'fetch', { copied: true });
-      // Test pages map InSIS addresses to local snapshots (test/make_fixture.py); the extension never does.
-      const from = url && (globalThis.__ipxFixtureFor?.(url) || url);
-      syllabi.set(c.code, !url ? Promise.resolve(null) : fetch(from, { credentials: 'include' }).then((r) => r.text()).then((html) => {
+      if (!url) return Promise.resolve(null);
+      const parse = (html) => {
         const doc = new DOMParser().parseFromString(html, 'text/html');
         doc.head.prepend(Object.assign(doc.createElement('base'), { href: url }));
         return ipx.syllabus?.parse(doc) || null;
+      };
+      // Test pages map InSIS addresses to local snapshots (test/make_fixture.py); the extension never does.
+      const load = () => fetch(globalThis.__ipxFixtureFor?.(url) || url, { credentials: 'include' }).then((r) => r.text())
+        .then((html) => { ipx.cache?.set(`syllabus:${url}`, html); return html; });
+      syllabi.set(c.code, (ipx.cache?.get(`syllabus:${url}`) || Promise.resolve(null)).then((hit) => {
+        if (hit) {
+          if (Date.now() - hit.at > SYLLABUS_FRESH) load().catch(() => {});
+          return parse(hit.text);
+        }
+        return load().then(parse);
       }).catch(() => null));
     }
     return syllabi.get(c.code);
@@ -203,7 +215,7 @@
             it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
             : h('p', { class: 'muted' }, T.nothing)),
       ];
-      const box = h('div', { class: 'course-syllabus' }, h('p', { class: 'muted' }, T.syllabusLoad));
+      const box = h('div', { class: 'course-syllabus' }, ipx.ui.skeleton('syllabus', 0, T.syllabusLoad));
       syllabusOf(c).then((d) => {
         if (!d) {
           box.replaceChildren(h('div', { class: 'cols' }, h('div', { class: 'stack' }, h('p', { class: 'muted' }, T.syllabusNone)), h('div', { class: 'stack rail' }, own)));
@@ -304,7 +316,7 @@
       ];
     },
     'course.people': (c) => {
-      const teachers = h('div', { class: 'people' }, h('p', { class: 'muted' }, T.syllabusLoad));
+      const teachers = h('div', { class: 'people' }, ipx.ui.skeleton('rows', 2, T.syllabusLoad));
       syllabusOf(c).then((d) => {
         const fact = d?.facts.find((f) => f.key === 'lecturers');
         const people = fact ? [...fact.el.querySelectorAll('a[href]')].map((a) => ({
@@ -318,7 +330,7 @@
           h('span', { class: 'person-text' }, h('strong', {}, p.text), p.role && h('small', {}, p.role))))
           : [h('p', { class: 'muted' }, T.noTeachers)]));
       });
-      const list = h('div', { class: 'people-list' }, h('p', { class: 'muted' }, T.classmatesLoad));
+      const list = h('div', { class: 'people-list' }, ipx.ui.skeleton('rows', 4, T.classmatesLoad));
       const all = c.predmet && portalLink('/auth/student/spoluzaci.pl', { predmet: c.predmet });
       if (all) loadClassmates(all, list);
       else list.replaceChildren(h('p', { class: 'muted' }, T.classmatesNone));
@@ -439,7 +451,7 @@
       const list = current();
       return h('div', { class: 'course-page' },
         list.length ? [h('p', { class: 'muted' }, T.mineHint(list[0].semester)), courseCards(list)]
-          : emptyState(ipx.state.sync?.running && Date.now() - ipx.state.sync.updated < 2 * 60e3 ? '…' : T.coursesEmpty));
+          : ipx.state.sync?.running && Date.now() - ipx.state.sync.updated < 2 * 60e3 ? ipx.ui.skeleton('cards', 3) : emptyState(T.coursesEmpty));
     },
   }));
 

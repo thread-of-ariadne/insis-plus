@@ -17,7 +17,7 @@ import sys
 
 SERVER = "http://localhost:8765/"
 # The content scripts in the extension's order (manifest.json is the source).
-SCRIPTS = json.loads((pathlib.Path(__file__).resolve().parent.parent / "manifest.json").read_text(encoding="utf-8"))["content_scripts"][0]["js"]
+SCRIPTS = json.loads((pathlib.Path(__file__).resolve().parent.parent / "manifest.json").read_text(encoding="utf-8"))["content_scripts"][-1]["js"]
 
 SHIM = """<script>
 window.chrome = {

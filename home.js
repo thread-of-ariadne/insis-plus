@@ -220,14 +220,14 @@
             ? h('div', { class: 'card todo-list' }, todo.map((it) => anchor({ href: it.href }, { class: 'todo-row' },
                 h('span', { class: 'todo-text' }, h('strong', {}, it.title), it.sub && h('small', {}, it.sub)),
                 it.when && h('span', { class: `delta ${it.tone || 'neutral'}` }, it.when))))
-            : h('div', { class: 'card todo-list empty-todo' }, h('p', {}, syncing ? T.loading : T.nothingTodo)),
+            : syncing ? h('div', { class: 'card todo-list' }, ipx.ui.skeleton('rows', 2, T.loading)) : h('div', { class: 'card todo-list empty-todo' }, h('p', {}, T.nothingTodo)),
           h('p', { class: 'checked' }, lastChecked)),
 
         h('section', {},
           sectionHead(nav.label('mycourses'), { href: ipx.nav.composedUrl('courses.mine'), text: T.allCourses }),
           ipx.courseCards?.() || (mine.length
             ? h('div', { class: 'course-list' }, mine.map(card))
-            : emptyState(syncing ? T.loading : T.coursesEmpty))),
+            : syncing ? ipx.ui.skeleton('cards', 3, T.loading) : emptyState(T.coursesEmpty))),
 
         shownNotices.length > 0 && h('section', {}, sectionHead(nav.label('notices')), shownNotices.map(notice))),
 
@@ -236,7 +236,7 @@
         h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, nav.label('timetable')),
             ipx.nav.target('schedule.week') && anchor({ href: ipx.nav.target('schedule.week') }, { class: 'more' }, T.fullSchedule)),
-          (tt && nextClasses(tt.events, ipx.nav.target('schedule.week'))) || h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : syncing ? T.loading : T.scheduleEmpty)),
+          (tt && nextClasses(tt.events, ipx.nav.target('schedule.week'))) || (!tt && syncing ? ipx.ui.skeleton('rows', 2, T.loading) : h('p', { class: 'muted rail-empty' }, tt ? T.scheduleDone : T.scheduleEmpty))),
         h('section', {},
           h('div', { class: 'card-head' }, h('h2', {}, nav.label('newfiles')),
             anchor({ href: ipx.nav.composedUrl('courses.files') }, { class: 'more' }, T.allFiles)),
@@ -245,7 +245,7 @@
                 anchor({ href: ipx.nav.composedUrl('course.files', c.code) }, { class: 'row' },
                   h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(c.code))[1]}` }, c.code), ' ', c.name),
                   h('span', { class: 'delta bad' }, T.newN(c.newCount))))))
-            : h('p', { class: 'muted rail-empty' }, ds.updated ? T.noNewFiles : syncing ? T.loading : T.filesNotRead)),
+            : !ds.updated && syncing ? ipx.ui.skeleton('rows', 2, T.loading) : h('p', { class: 'muted rail-empty' }, ds.updated ? T.noNewFiles : T.filesNotRead)),
         tt && hoursChart(tt.events)));
   }
 
@@ -264,13 +264,20 @@
     // An InSIS+ page (Study matters, All services, …) lives on this address after "#ipx:".
     const where = ipx.ui.here();
     if (where.composed && where.node !== 'home' && ipx.composed) {
+      ipx.home = { draw: () => drawHome(data, name) };
       ipx.composed.show(where);
       return;
     }
 
+    drawHome(data, name);
+  });
+
+  // Home itself; drawn again in place when the student comes back to it from an InSIS+ page (composed.js).
+  function drawHome(data, name) {
     const hour = new Date().getHours();
     const greet = hour < 11 ? T.morning : hour < 18 ? T.day : T.evening;
     const date = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+    ipx.home = { draw: () => drawHome(data, name) };
 
     takeover({
       key: 'home',
@@ -288,5 +295,5 @@
         return wrap;
       },
     });
-  });
+  }
 })();

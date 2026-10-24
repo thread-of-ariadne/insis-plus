@@ -865,3 +865,23 @@ a.person:hover { border-color: var(--accent); }
   .top-actions > .btn > span, .top-actions > a.btn > span { display: none; }
   .top-actions > .btn { padding: 0 11px; }
 }
+
+/* Skeletons (ui.skeleton): the shape of what is loading, with a slow shimmer */
+.skeleton { display: flex; flex-direction: column; gap: 10px; }
+.sk { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--chip) 25%, color-mix(in srgb, var(--chip) 55%, var(--surface)) 50%, var(--chip) 75%);
+  background-size: 200% 100%; animation: sk-shimmer 1.4s ease-in-out infinite; }
+.sk-line { height: 12px; width: 100%; }
+.sk-line.short { width: 60%; }
+.sk-title { height: 18px; width: 45%; }
+.sk-dot { width: 36px; height: 36px; flex: none; border-radius: 50%; }
+.sk-cover { width: 120px; height: 84px; flex: none; border-radius: 11px; }
+.sk-row, .sk-card { display: flex; align-items: center; gap: 12px; }
+.sk-card { padding: 10px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+.sk-col { display: flex; flex: 1; flex-direction: column; gap: 8px; min-width: 0; }
+.sk-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.sk-kpi { height: 92px; border-radius: 16px; }
+.sk-block { display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
+.sk-syllabus { gap: 16px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes sk-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
