@@ -8,7 +8,13 @@
 // Result, Entered, Entered by, ECTS = grade letter, Group, Credits, Type; Czech equivalents too). Then a
 // two-column statistics table (credits enrolled/obtained, courses completed, average score …), the key and
 // the ECTS grade key. Views whose content isn't recognised keep it: #str1 is slotted below the new view with
-// only the recognised parts hidden. A view with neither a course nor a statistics table is left to generic.js.
+// only the recognised parts hidden. A page with neither a course nor a statistics table nor the view row (the
+// attempts of one course) is left to generic.js.
+//
+// Views (teardowns/exams-grades-schedule.md §2.4): InSIS's seven view links are really four views. The basic
+// variants only hide three columns, so InSIS+ always links the detailed one (a copied link to a basic view still
+// renders, as This period / Whole study); Credit statistics belongs to Statistics, linked at the bottom of it.
+// Every view tab is InSIS's own link from that row, through the URL rule. InSIS's portal bar is not repeated.
 //
 // Stored for the dashboard (plain data, no HTML):
 // ipx.state.studyRecord = {
@@ -19,6 +25,8 @@
 //   courses: [{ code, name, href (syllabus), ects: number | null (credits), completion, result, grade: 1–4 | null,
 //               semester, passed: true | false | null (null = no result yet), entered: 'd.m.yyyy' | '' }],
 // }
+// Only a view that lists courses is stored: the statistics and comparison views would otherwise replace the
+// stored courses with none.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
@@ -28,36 +36,47 @@
   let doc = document;
   let here = location;
   const { clean, norm, lang } = ipx;
-  const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, styleSlotted, cover, facultyColors, facultyOf } = ipx.ui;
+  const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, styleSlotted, cover, facultyColors, facultyOf, viewTabs } = ipx.ui;
+  const nav = ipx.nav;
 
   const T = {
-    cs: { title: 'Průchod studiem', earned: 'Získané kredity', toEarn: (n) => `${n} zatím nezískáno`,
+    cs: { passRates: 'Úspěšnost předmětů', title: 'Průchod studiem', earned: 'Získané kredity', toEarn: (n) => `${n} zatím nezískáno`,
       average: 'Průměrný prospěch', avgPage: 'podle InSIS', avgRows: (n) => `z ${n} ${n === 1 ? 'známky' : 'známek'} v tabulce`,
       passed: 'Splněné předměty', ofCourses: (n) => `z ${n} ${n === 1 ? 'předmětu' : 'předmětů'}`,
       failed: (n) => `${n} nesplněno`, progress: 'Probíhá', awaiting: 'bez výsledku',
       stPassed: 'Splněno', stFailed: 'Nesplněno', stProgress: 'Probíhá', stResult: 'Výsledek', stNone: 'Bez výsledku',
       attempt: (n) => `${n}. pokus`, attemptTitle: 'Předchozí termíny zkoušek', credits: 'kr.',
       creditsCard: 'Kredity v období', notEarned: 'Nezískáno', lost: 'Ztraceno', stats: 'Statistika období',
-      portal: 'Portál studenta', ectsKey: 'Stupnice ECTS', study: 'Studium', views: 'Přehledy',
+      ectsKey: 'Stupnice ECTS', study: 'Studium', views: 'Přehledy',
       courses: (n) => `${n} ${n === 1 ? 'předmět' : n < 5 ? 'předměty' : 'předmětů'}`,
       semCredits: (a, b) => (b != null ? `${a} / ${b} kr.` : `${a} kr.`),
       empty: 'V tomto přehledu nejsou žádné předměty.', more: 'Další údaje z InSIS',
       grade: 'Známka', ectsGrade: 'ECTS', entered: 'Zapsáno', by: 'Zapsal',
       faculties: 'Fakulty', units: 'Další součásti', yours: 'vaše fakulta',
+      vThis: 'Toto období', vWhole: 'Celé studium', vStats: 'Statistiky', vCompare: 'Srovnání',
+      creditsByPeriod: 'Kredity po obdobích', creditsByPeriodText: 'Statistika kreditů za jednotlivá období v InSIS',
+      compareNote: 'Srovnání vašich výsledků s ostatními studenty, jak ho ukazuje InSIS.',
+      leftText: 'Kolik kreditů a které předměty vám ve studijním plánu ještě chybí',
+      leftOf: (a, b, m) => `${a} z ${b} kreditů · chybí ${m}`,
       attainmentHint: 'Vyberte fakultu nebo součást, která předmět vyučuje; pak zvolíte předmět.' },
-    en: { title: 'E-study record', earned: 'Credits earned', toEarn: (n) => `${n} not earned yet`,
+    en: { passRates: 'Pass rates', title: 'E-study record', earned: 'Credits earned', toEarn: (n) => `${n} not earned yet`,
       average: 'Average grade', avgPage: 'as stated by InSIS', avgRows: (n) => `from ${n} ${n === 1 ? 'grade' : 'grades'} in the table`,
       passed: 'Courses passed', ofCourses: (n) => `of ${n} ${n === 1 ? 'course' : 'courses'}`,
       failed: (n) => `${n} failed`, progress: 'In progress', awaiting: 'no result yet',
       stPassed: 'Passed', stFailed: 'Failed', stProgress: 'In progress', stResult: 'Result', stNone: 'No result',
       attempt: (n) => `Attempt ${n}`, attemptTitle: 'Past exam sittings', credits: 'cr.',
       creditsCard: 'Credits this period', notEarned: 'Not earned', lost: 'Lost', stats: 'Period statistics',
-      portal: "Student's portal", ectsKey: 'ECTS grades', study: 'Study', views: 'Overviews',
+      ectsKey: 'ECTS grades', study: 'Study', views: 'Overviews',
       courses: (n) => `${n} ${n === 1 ? 'course' : 'courses'}`,
       semCredits: (a, b) => (b != null ? `${a} / ${b} cr.` : `${a} cr.`),
       empty: 'There are no courses in this overview.', more: 'More from InSIS',
       grade: 'Grade', ectsGrade: 'ECTS', entered: 'Entered', by: 'Entered by',
       faculties: 'Faculties', units: 'Other units', yours: 'your faculty',
+      vThis: 'This period', vWhole: 'Whole study', vStats: 'Statistics', vCompare: 'Comparison',
+      creditsByPeriod: 'Credits by period', creditsByPeriodText: "InSIS's credit statistics for each study period",
+      compareNote: 'How your results compare with other students, as InSIS shows it.',
+      leftText: 'How many credits and which courses your study plan still needs',
+      leftOf: (a, b, m) => `${a} of ${b} credits · ${m} missing`,
       attainmentHint: 'Choose the faculty or unit that teaches the course, then pick the course.' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -227,6 +246,25 @@
     return { href: a.href, text: clean(a.textContent), title: clean(a.title), id: sys, on: !!td.querySelector('b a, a b') };
   }).filter(Boolean);
 
+  // The four views and the InSIS view ids each one stands for (the first id is the one linked).
+  const VIEWS = [
+    { ids: ['podrobne_vybrane_obdobi', 'vybrane_obdobi'], text: () => T.vThis },
+    { ids: ['podrobne_vsechna_obdobi', 'vsechna_obdobi'], text: () => T.vWhole },
+    { ids: ['stat_info', 'stat_studia_kred'], text: () => T.vStats },
+    { ids: ['zobrazeni_percentilu'], text: () => T.vCompare },
+  ];
+
+  // View tabs from InSIS's own view links: a view is offered only when InSIS gave its link and it passes the URL
+  // rule. InSIS marks the current view; with none marked (no vyber), the default is the detailed current period.
+  function viewLinks(views, current) {
+    const now = current || 'podrobne_vybrane_obdobi';
+    return VIEWS.map((v) => {
+      const own = views.find((l) => l.id === v.ids[0]);
+      const href = own && nav.safe(own.href, 'link', { copied: true });
+      return href && { href, text: v.text(), on: v.ids.includes(now) };
+    }).filter(Boolean);
+  }
+
   function parseRecord() {
     const page = doc.getElementById('str1');
     if (!page) return null;
@@ -271,7 +309,10 @@
       const key = readEctsKey(table);
       if (key) { ectsKey = key; mark(table); }
     }
-    if (!semesters.length && !stats.length) return null;
+    // The attempts of one course (…;predmet=…) carry no view row of their own meaning: left to generic.js.
+    const address = doc === document ? document.baseURI : here.href;
+    const oneCourse = /[?;&]predmet=/.test(address);
+    if (!semesters.length && !stats.length && (!viewMenu || oneCourse)) return null;
     // A course without a result is in progress only in the current period; in an older one it simply has none.
     for (const r of semesters.flatMap((x) => x.rows)) {
       r.open = r.passed === null && !r.result && (semesters.length === 1 || !period || norm(r.semester) === norm(period));
@@ -384,8 +425,13 @@
   function buildRecord(d) {
     const t = totals(d);
     const single = d.semesters.length === 1;
+    const statsView = /^stat_/.test(d.view || '');
+    const credits = statsView && d.view !== 'stat_studia_kred' && d.views.find((v) => v.id === 'stat_studia_kred');
+    const creditsHref = credits && nav.safe(credits.href, 'link', { copied: true });
     const main = h('div', { class: 'sr-main' },
-      h('div', { class: 'kpis' },
+      viewTabs(viewLinks(d.views, d.view), T.views),
+      d.view === 'zobrazeni_percentilu' && h('p', { class: 'sr-note' }, icon('info'), h('span', {}, T.compareNote)),
+      (t.earned != null || t.average != null || t.rows.length > 0) && h('div', { class: 'kpis' },
         t.earned != null && kpi({ label: T.earned, value: fmt(t.earned), unit: t.registered != null ? `/ ${fmt(t.registered)}` : null,
           status: t.registered ? { tone: t.earned >= t.registered ? 'ok' : 'neutral', text: `${Math.round((t.earned / t.registered) * 100)} %` } : null,
           foot: d.values.notEarned ? T.toEarn(fmt(d.values.notEarned)) : null }),
@@ -395,32 +441,37 @@
           status: t.failed ? { tone: 'bad', text: T.failed(t.failed) } : null }),
         t.rows.length > 0 && kpi({ label: T.progress, value: t.open, foot: T.awaiting })),
 
-      d.views.length > 1 && ipx.ui.linkTabs(d.views.map((v) => ({ ...v, on: v.on || v.id === d.view })), T.views),
-
       d.semesters.length
         ? d.semesters.map((s) => (s.rows.length ? semesterBlock(s, t.registered, single) : [sectionHead(s.semester), emptyState(T.empty)]))
         : null,
       d.stats.map(statsCard),
-      d.leftover && sectionHead(T.more));
+      creditsHref && anchor({ href: creditsHref }, { class: 'card glist-item sr-more-link' },
+        h('span', { class: 'glist-text' }, h('strong', {}, T.creditsByPeriod), h('small', {}, T.creditsByPeriodText)),
+        h('span', { class: 'glist-go' }, icon('arrow'))),
+      d.leftover && d.view !== 'zobrazeni_percentilu' && sectionHead(T.more));
 
-    const portal = d.portal.filter((l) => !l.on);
+    // What's left is a place of its own: a link card, with the plan check's numbers when it was opened this session.
+    const leftHref = nav.target('grades.plan');
+    const plan = ipx.state.planProgress;
     const rail = h('aside', { class: 'sr-rail' },
       (d.study || d.period) && h('section', { class: 'sr-study' },
         h('div', { class: 'card-head' }, h('h2', {}, T.study)),
         d.study && h('p', { class: 'sr-study-name' }, d.study),
         d.period && h('p', { class: 'muted' }, d.period)),
       creditsCard(d, t),
+      leftHref && anchor({ href: leftHref }, { class: 'card glist-item sr-left' },
+        h('span', { class: 'glist-text' }, h('strong', {}, nav.sectionLabel('grades.plan')),
+          h('small', {}, plan?.required != null && plan.earned != null ? T.leftOf(fmt(plan.earned), fmt(plan.required), fmt(plan.missing ?? Math.max(0, plan.required - plan.earned))) : T.leftText)),
+        h('span', { class: 'glist-go' }, icon('arrow'))),
       d.ectsKey && h('details', { class: 'sr-key' },
         h('summary', {}, T.ectsKey),
-        h('dl', { class: 'sr-dl' }, d.ectsKey.map((k) => [h('dt', {}, h('b', { class: 'sr-ects' }, k.letter)), h('dd', {}, k.text)]))),
-      portal.length > 0 && h('section', {},
-        h('div', { class: 'card-head' }, h('h2', {}, T.portal)),
-        h('ul', { class: 'sr-links' }, portal.map((l) => h('li', {}, anchor(l, { class: 'sr-link', title: l.title || null }, h('span', {}, l.text), icon('arrow')))))));
+        h('dl', { class: 'sr-dl' }, d.ectsKey.map((k) => [h('dt', {}, h('b', { class: 'sr-ects' }, k.letter)), h('dd', {}, k.text)]))));
 
     return [main, rail];
   }
 
   function remember(d) {
+    if (!d.semesters.length) return;
     const t = totals(d);
     ipx.state.studyRecord = {
       updated: Date.now(),
@@ -495,8 +546,8 @@
       takeover({
         key: 'study-record',
         css: 'pages/study-record.css',
-        title: record.title || T.title,
-        subtitle: record.period || null,
+        title: nav.sectionLabel('grades.results'),
+        subtitle: nav.label('grades'),
         slotted,
         build: () => h('div', { class: 'sr' + (slotted ? ' has-slot' : '') }, ...buildRecord(record)),
       });
@@ -507,7 +558,9 @@
       takeover({
         key: 'attainment',
         css: 'pages/study-record.css',
-        title: attain.title,
+        // A step below the Catalogue section: InSIS's name for the page, the section as eyebrow (03-pages.md rule 7).
+        title: T.passRates,
+        subtitle: ipx.nav.sectionLabel('courses.catalogue'),
         build: () => buildAttainment(attain),
       });
     }

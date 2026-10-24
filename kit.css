@@ -15,7 +15,7 @@
 .dtable td { padding: 11px 16px; border-bottom: 1px solid var(--line); color: var(--fg-2); vertical-align: top; }
 .dtable tr:last-child td { border-bottom: 0; }
 .dtable .end { text-align: right; white-space: nowrap; }
-.dtable td.main { color: var(--fg); font-weight: 650; }
+.dtable td.dt-main { color: var(--fg); font-weight: 650; }
 .dtable a { color: var(--accent); font-weight: 600; }
 .dtable a:hover { text-decoration: underline; }
 .dtable tr.tone-ok td:first-child { box-shadow: inset 3px 0 0 var(--ok); }
@@ -28,8 +28,8 @@
   .dtable tr:last-child { border-bottom: 0; }
   .dtable td { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; text-align: right; }
   .dtable td::before { content: attr(data-label); color: var(--muted); font-size: 12.5px; text-align: left; }
-  .dtable td.main { display: block; text-align: left; font-size: 15px; }
-  .dtable td.main::before { content: none; }
+  .dtable td.dt-main { display: block; text-align: left; font-size: 15px; }
+  .dtable td.dt-main::before { content: none; }
 }
 
 /* Facts: label / value pairs */
@@ -51,3 +51,10 @@
 .kit-note.ok { background: var(--ok-soft); color: var(--ok); }
 .kit-note.info svg { color: var(--accent); }
 .kit-page .muted.small { margin: 0; font-size: 12.5px; }
+
+/* InSIS mail (pages/messages.js) */
+.msg-status { align-items: center; }
+.msg-status > span { flex: 1; }
+.msg-change { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.msg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.msg-foot a { color: var(--accent); }

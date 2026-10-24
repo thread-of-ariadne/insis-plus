@@ -242,7 +242,7 @@
             anchor({ href: ipx.nav.composedUrl('courses.files') }, { class: 'more' }, T.allFiles)),
           news.length
             ? h('ul', { class: 'recent' }, news.map((c) => h('li', {},
-                anchor({ href: ipx.nav.safe(c.href, 'link', { copied: true }) || ipx.nav.composedUrl('courses.files') }, { class: 'row' },
+                anchor({ href: ipx.nav.composedUrl('course.files', c.code) }, { class: 'row' },
                   h('strong', {}, h('span', { class: 'news-code', style: `color: ${facultyColors(facultyFor(c.code))[1]}` }, c.code), ' ', c.name),
                   h('span', { class: 'delta bad' }, T.newN(c.newCount))))))
             : h('p', { class: 'muted rail-empty' }, ds.updated ? T.noNewFiles : syncing ? T.loading : T.filesNotRead)),

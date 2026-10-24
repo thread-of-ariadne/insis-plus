@@ -1,0 +1,10 @@
+/* InSIS+ Academic calendar › Teaching weeks (pages/weeks.js). Loaded inside the shadow root; the slotted
+   original (when InSIS lists weeks) uses the shared styles of generic.css. Classes prefixed wk-. */
+
+.wk-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 720px; padding: 36px 28px; }
+.wk-empty p { max-width: 560px; margin: 0; line-height: 1.5; }
+.wk-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 4px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); }
+.wk-icon svg { width: 22px; height: 22px; }
+.wk-title { color: var(--fg); font: 800 22px/1.15 var(--display); font-stretch: 80%; }
+.wk-empty .btn { margin-top: 8px; }
+.wk-said { max-width: 720px; }

@@ -1,0 +1,29 @@
+/* InSIS+ e-library folder list (pages/ematerials.js). Loaded inside the shadow root after shared.css and kit.css. */
+
+.el-summary { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: 14px; }
+.el-summary strong { color: var(--fg); font-size: 15px; }
+.el-summary .muted { font-size: 13.5px; }
+
+.el-list { display: flex; flex-direction: column; padding: 8px; }
+.el-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px 9px calc(10px + var(--depth, 0) * 22px); border-radius: 10px; color: var(--fg); }
+.el-row + .el-row { box-shadow: 0 -1px 0 var(--line); }
+.el-row[hidden] { display: none; }
+a.el-row:hover { background: var(--hover); box-shadow: none; }
+a.el-row:hover + .el-row { box-shadow: none; }
+a.el-row:hover .el-go { color: var(--accent); }
+a.el-row:hover strong { color: var(--accent); }
+.el-ico { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+.el-ico svg { width: 17px; height: 17px; }
+.el-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.el-text strong { font-size: 14.5px; font-weight: 600; overflow-wrap: anywhere; }
+.el-text small { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.el-go { flex: none; color: var(--faint); }
+.el-go svg { width: 16px; height: 16px; }
+.el-row.is-empty strong { color: var(--muted); font-weight: 500; }
+.el-nomatch { margin: 0; padding: 10px; font-size: 14px; }
+
+.el-filter-wrap { display: flex; align-items: center; gap: 8px; max-width: 360px; padding: 0 12px; border-radius: 10px; background: var(--chip); color: var(--faint); }
+.el-filter-wrap:focus-within { background: var(--surface); box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-raised); }
+.el-filter-wrap .icon svg { width: 15px; height: 15px; stroke-width: 2; }
+.el-filter { flex: 1; min-width: 0; height: 38px; border: 0; outline: none; background: none; color: var(--fg); font: 14px var(--font); }
+@media (max-width: 640px) { .el-filter-wrap { max-width: none; } }

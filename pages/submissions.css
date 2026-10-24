@@ -91,27 +91,6 @@
 /* ---------- rail ---------- */
 
 .sb-rail .card-head { margin-bottom: 8px; }
-.sb-rail-empty { font-size: 13.5px; line-height: 1.5; }
-
-.sb-next { display: flex; flex-direction: column; gap: 4px; }
-.sb-next-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 14px; }
-.sb-next-row:hover { background: var(--hover); }
-.sb-next-row.first { background: var(--fg); color: var(--surface); }
-.sb-next-row.first:hover { background: var(--fg); filter: brightness(1.15); }
-.sb-next-day { display: flex; flex-direction: column; align-items: center; flex: none; width: 32px; }
-.sb-next-day b { font: 800 26px/1 var(--display); font-stretch: 80%; }
-.sb-next-day small { margin-top: 2px; color: var(--faint); font-size: 10.5px; font-weight: 700; text-transform: uppercase; }
-.sb-next-sep { flex: none; align-self: stretch; width: 1px; background: var(--line); }
-.sb-next-body { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.sb-next-body strong { overflow: hidden; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; }
-.sb-next-body small { overflow: hidden; color: var(--muted); font-size: 12.5px; white-space: nowrap; text-overflow: ellipsis; }
-.sb-next-row.first .sb-next-sep { background: color-mix(in srgb, currentColor 25%, transparent); }
-.sb-next-row.first small { color: color-mix(in srgb, currentColor 70%, transparent); }
-@media (prefers-color-scheme: dark) {
-  :host(:not([data-theme="light"])) .sb-next-row.first, :host(:not([data-theme="light"])) .sb-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
-}
-:host([data-theme="dark"]) .sb-next-row.first, :host([data-theme="dark"]) .sb-next-row.first:hover { background: var(--accent); color: var(--accent-ink); }
-
 .sb-courses { display: flex; flex-direction: column; gap: 2px; }
 .sb-course-row { display: flex; flex-direction: column; gap: 1px; padding: 9px 12px; border-radius: 12px; }
 a.sb-course-row:hover { background: var(--hover); }
@@ -119,8 +98,13 @@ a.sb-course-row:hover { background: var(--hover); }
 .sb-course-row strong { font-size: 14px; font-weight: 700; line-height: 1.3; }
 .sb-course-row small { color: var(--muted); font-size: 12.5px; }
 
-.sb-how .card-head { margin-bottom: 6px; }
-.sb-how .muted { font-size: 13.5px; line-height: 1.5; }
+/* One line above the list: the period and where files are uploaded; the one-course filter line */
+.sb-lead { margin: 0; font-size: 13.5px; }
+.sb-filter { display: flex; align-items: center; gap: 10px; margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; font-weight: 600; }
+.sb-filter > span:not(.icon) { flex: 1; }
+.sb-filter .icon svg { width: 16px; height: 16px; }
+.sb-filter-all { color: var(--accent); white-space: nowrap; }
+.sb-filter-all:hover { text-decoration: underline; }
 
 /* ---------- narrower screens ---------- */
 

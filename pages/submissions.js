@@ -5,8 +5,11 @@
 //   dekorace-terminy-prihlasovaci  "Coursework submissions with submitted files" → confirmed, closed for the student
 //   dekorace-terminy-neprihlasovaci "Where I cannot submit my papers"       → closed or not yet open
 // Columns are found by their header text (Czech or English), so a missing or reordered column only drops a field.
-// The new view is a rebuild: every original link is kept as a link; uploading happens on InSIS's own pages
-// ("Insert files"), nothing here submits, uploads or re-creates a form.
+// The new view is a rebuild: every original link is shown with InSIS's own address, through the URL rule (a link
+// that does not pass is left out); uploading happens on InSIS's own page of each box ("Insert files" opens it),
+// nothing here submits, uploads or re-creates a form. Title by 03-pages.md §1 rule 7 (the section's own page:
+// "All submissions", eyebrow Courses). The rail keeps only the week and the boxes by course: the next deadlines
+// are the KPI and the first group of the list already, and the "how to submit" note is one line above the list.
 //
 // Stored for the dashboard (ipx.state.submissions):
 //   { updated: ms, source: url,
@@ -28,7 +31,7 @@
   const { h, icon, anchor, takeover, kpi, sectionHead, emptyState, weekStrip, facultyColors, facultyOf } = ipx.ui;
 
   const T = {
-    cs: { title: 'Odevzdávárny', open: 'Otevřené odevzdávárny', due7: 'Termín do 7 dní', submitted: 'Odevzdáno',
+    cs: { open: 'Otevřené odevzdávárny', due7: 'Termín do 7 dní', submitted: 'Odevzdáno',
       next: 'Nejbližší termín', none: 'Žádný', of: (n) => `z ${n} odevzdáváren`,
       soon: 'Brzy končí', later: 'Později', upcoming: 'Zatím neotevřené', closed: 'Uzavřené',
       today: 'dnes', tomorrow: 'zítra', inDays: (n) => `za ${n} ${n < 5 ? 'dny' : 'dní'}`,
@@ -42,10 +45,11 @@
       emptyAll: 'Pro předměty v tomto období nejsou vypsané žádné odevzdávárny.',
       emptyOpen: 'Teď není otevřená žádná odevzdávárna.',
       showClosed: (n) => `Zobrazit uzavřené (${n})`, hideClosed: 'Skrýt uzavřené',
-      howTitle: 'Jak odevzdat', how: 'Soubory se nahrávají na stránce InSIS: u otevřené odevzdávárny klikněte na Vložit soubory. InSIS+ nic neodesílá.',
+      how: 'Soubory se nahrávají na stránce InSIS u každé odevzdávárny: klikněte na Vložit soubory.',
+      only: (c) => `Jen ${c}`, showAll: 'Zobrazit vše',
       byCourse: 'Podle předmětů', boxes: (n) => `${n} ${n === 1 ? 'odevzdávárna' : n > 1 && n < 5 ? 'odevzdávárny' : 'odevzdáváren'}`,
       openShort: (n) => `${n} otevř.`, stale: 'Stránka je načtená dříve, stav se mohl změnit. Obnovte ji pro aktuální údaje.' },
-    en: { title: 'Coursework submissions', open: 'Open boxes', due7: 'Due within 7 days', submitted: 'Submitted',
+    en: { open: 'Open boxes', due7: 'Due within 7 days', submitted: 'Submitted',
       next: 'Next deadline', none: 'None', of: (n) => `of ${n} boxes`,
       soon: 'Due soon', later: 'Later', upcoming: 'Not open yet', closed: 'Closed',
       today: 'today', tomorrow: 'tomorrow', inDays: (n) => `in ${n} days`,
@@ -59,7 +63,8 @@
       emptyAll: 'No coursework submissions have been set up for your courses in this period.',
       emptyOpen: 'No submission box is open right now.',
       showClosed: (n) => `Show closed (${n})`, hideClosed: 'Hide closed',
-      howTitle: 'How to submit', how: 'Files are uploaded on the InSIS page: in an open box, click Insert files. InSIS+ never submits anything.',
+      how: 'Files are uploaded on InSIS’s page of each box: press Insert files.',
+      only: (c) => `Only ${c}`, showAll: 'Show all',
       byCourse: 'By course', boxes: (n) => `${n} ${n === 1 ? 'box' : 'boxes'}`,
       openShort: (n) => `${n} open`, stale: 'This page was loaded a while ago, so the status may have changed. Reload it for current data.' },
   }[lang];
@@ -253,6 +258,19 @@
 
   const facStyle = (code) => `--fac: ${facultyColors(facultyFor(code))[1]}`;
 
+  // Every link shown passes the URL rule (nav.js); one that does not is left out. Parsing keeps InSIS's addresses
+  // as they are, so the stored data (remember()) does not change.
+  const nav = ipx.nav;
+  const safeLink = (l) => {
+    const href = l?.href && nav?.safe(l.href, 'link', { copied: true });
+    return href ? { ...l, href } : null;
+  };
+  // A course of mine opens its course page (Submissions tab, the canonical place for one course's boxes);
+  // any other course its syllabus, InSIS's own link.
+  const mine = () => new Set((ipx.state.studyRecord?.courses || []).map((c) => c.code));
+  const courseLink = (code, href) => (code && nav?.composedUrl && mine().has(code)
+    ? { href: nav.composedUrl('course.submissions', code) } : safeLink(href && { href }));
+
   function dateBlock(d, muted) {
     if (!d) return h('span', { class: 'sb-date none' }, h('b', {}, '–'), h('small', {}, T.noDeadline));
     const w = wall(d);
@@ -284,7 +302,11 @@
       icon(sub ? 'check' : 'file'), sub || b.files ? T.files(b.files) : T.noFiles);
 
     // Labels follow the InSIS+ language; the original label stays as the tooltip.
-    const act = (link, label, ic, cls = 'sb-act') => link && anchor(link, { class: cls, title: link.text || label }, ic && icon(ic), h('span', {}, label));
+    const act = (raw, label, ic, cls = 'sb-act') => {
+      const link = safeLink(raw);
+      return link && anchor(link, { class: cls, title: link.text || label }, ic && icon(ic), h('span', {}, label));
+    };
+    const courseTo = courseLink(b.code, b.courseHref);
     const actions = [
       act(b.insert, T.insert, st === 'open' ? 'arrow' : null, st === 'open' ? 'sb-act primary' : 'sb-act'),
       act(b.display, T.display, 'file'),
@@ -304,12 +326,12 @@
       h('div', { class: 'sb-body' },
         h('div', { class: 'sb-course' },
           b.code && h('b', { class: 'sb-code' }, b.code),
-          b.courseHref ? h('a', { href: b.courseHref }, b.name) : h('span', {}, b.name)),
+          courseTo ? anchor(courseTo, {}, b.name) : h('span', {}, b.name)),
         h('strong', { class: 'sb-title', title: course }, b.title || b.name),
         h('span', { class: 'sb-when' }, when),
         meta && h('span', { class: 'sb-meta' }, meta),
         (b.by.length > 0 || b.points) && h('span', { class: 'sb-meta' },
-          b.by.length > 0 && [`${T.by}: `, b.by.map((p, i) => [i ? ', ' : '', p.href ? anchor(p, {}, p.text) : p.text])],
+          b.by.length > 0 && [`${T.by}: `, b.by.map((p, i) => [i ? ', ' : '', safeLink(p) ? anchor(safeLink(p), {}, p.text) : p.text])],
           b.points && [b.by.length ? ' · ' : '', `${T.points}: ${b.points}`])),
       h('div', { class: 'sb-side' },
         h('div', { class: 'sb-status' }, status, filesTag),
@@ -324,23 +346,11 @@
     ];
   }
 
-  function nextRail(list, now) {
-    if (!list.length) return h('p', { class: 'muted sb-rail-empty' }, T.emptyOpen);
-    return h('div', { class: 'sb-next' }, list.slice(0, 4).map((b, i) => {
-      const w = wall(b.closes);
-      return h('a', { class: 'sb-next-row' + (i === 0 ? ' first' : ''), href: (b.insert || b.display)?.href || here.href, style: facStyle(b.code) },
-        h('span', { class: 'sb-next-day' }, h('b', {}, String(w.day.getDate())), h('small', {}, w.day.toLocaleDateString(locale, { weekday: 'short' }))),
-        h('span', { class: 'sb-next-sep' }),
-        h('span', { class: 'sb-next-body' }, h('strong', {}, b.title || b.name), h('small', {}, [b.code, w.time].filter(Boolean).join(' · '))),
-        h('span', { class: `delta ${toneOf(b, now)}` }, countdown(b.closes, now)));
-    }));
-  }
-
   function courseRail(boxes, now) {
     const map = new Map();
     for (const b of boxes) {
       const key = b.code || b.name;
-      if (!map.has(key)) map.set(key, { code: b.code, name: b.name, href: b.courseHref, n: 0, open: 0 });
+      if (!map.has(key)) map.set(key, { code: b.code, name: b.name, link: courseLink(b.code, b.courseHref), n: 0, open: 0 });
       const c = map.get(key);
       c.n++;
       if (stateOf(b, now) === 'open') c.open++;
@@ -352,7 +362,7 @@
         h('strong', {}, c.name),
         h('small', {}, [T.boxes(c.n), c.open ? T.openShort(c.open) : null].filter(Boolean).join(' · ')),
       ];
-      return c.href ? h('a', { class: 'sb-course-row', href: c.href }, body) : h('div', { class: 'sb-course-row' }, body);
+      return c.link ? anchor(c.link, { class: 'sb-course-row' }, body) : h('div', { class: 'sb-course-row' }, body);
     }));
   }
 
@@ -389,6 +399,10 @@
           status: first && { tone: toneOf(first, now), text: countdown(first.closes, now) },
           foot: first && [first.code, first.title].filter(Boolean).join(' · ') })),
       stale && h('p', { class: 'sb-hint' }, icon('alert'), h('span', {}, T.stale)),
+      // InSIS's page of one course (…;predmet=N, from InSIS's own links) lists only that course's boxes: say so.
+      d.only && h('p', { class: 'sb-filter' }, icon('list'), h('span', {}, T.only(d.only.code)),
+        d.only.all && anchor({ href: d.only.all }, { class: 'sb-filter-all' }, T.showAll)),
+      d.boxes.length > 0 && h('p', { class: 'sb-lead muted' }, [d.period, T.how].filter(Boolean).join(' · ')),
       !d.boxes.length ? emptyState(T.emptyAll)
         : [
           !open.length && !upcoming.length && emptyState(T.emptyOpen),
@@ -404,9 +418,7 @@
       .map((x) => (x.getDay() + 6) % 7))];
     const rail = h('aside', { class: 'sb-rail' },
       weekStrip(now, marks),
-      h('section', {}, h('div', { class: 'card-head' }, h('h2', {}, T.next)), nextRail(open.filter((b) => b.closes), now)),
-      d.boxes.length > 0 && h('section', {}, h('div', { class: 'card-head' }, h('h2', {}, T.byCourse)), courseRail(d.boxes, now)),
-      h('section', { class: 'card sb-how' }, h('div', { class: 'card-head' }, h('h2', {}, T.howTitle)), h('p', { class: 'muted' }, T.how)));
+      d.boxes.length > 0 && h('section', {}, h('div', { class: 'card-head' }, h('h2', {}, T.byCourse)), courseRail(d.boxes, now)));
 
     return [main, rail];
   }
@@ -435,11 +447,17 @@
     const data = parse();
     if (!data) return;
     remember(data);
+    // A one-course list: which course, and the whole list (where the sidebar's All submissions leads).
+    if (/[?;&]predmet=/.test(document.baseURI)) {
+      const codes = [...new Set(data.boxes.map((b) => b.code).filter(Boolean))];
+      const all = ipx.nav.target('courses.submissions');
+      if (codes.length === 1) data.only = { code: codes[0], all: all && ipx.nav.route(all).path === ipx.nav.route(document.baseURI).path && !/[?;&]predmet=/.test(all) ? all : null };
+    }
     takeover({
       key: 'submissions',
       css: 'pages/submissions.css',
-      title: T.title,
-      subtitle: data.period || null,
+      title: ipx.nav.sectionLabel('courses.submissions'),
+      subtitle: ipx.nav.label('courses'),
       build: () => {
         const wrap = h('div', { class: 'sb' });
         const state = { showClosed: null, render: () => wrap.replaceChildren(...buildPage(data, state)) };

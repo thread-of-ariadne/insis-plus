@@ -2,8 +2,14 @@
 // The original is one big grid: a header row of 5-minute slots ("08:00-08:05" …), then one row per day
 // ("Mon 14/09/2026" when listing particular days, "Mon" for the weekly summary) with each class as a cell
 // spanning its slots (class rozvrh-pred = lecture, rozvrh-cvic = seminar, …). Times come from the header
-// columns a cell covers. The display-mode form (weekly / particular days, PDF output) stays the original
-// one, slotted below the new view; it is never submitted for the user.
+// columns a cell covers.
+//
+// My week (teardowns/exams-grades-schedule.md §2.7): title from the section label, no "Change criteria" action
+// (the timetable search is a place in the sidebar). Everything that takes the timetable elsewhere is one place
+// (03-pages.md §1 rule 4): the Export page action opens the "Export and print" sheet with the transfer to the
+// university calendar and InSIS's own display-mode form (weekly / particular days, list, PDF). That form is the
+// original element, slotted into the sheet (keepOnly hides the rest of InSIS's page): never copied, filled in or
+// submitted by InSIS+, and nowhere else on the page.
 (() => {
   const ipx = globalThis.insisPlus;
   if (!ipx?.ui) return;
@@ -17,7 +23,7 @@
     keepOnly } = ipx.ui;
 
   const T = {
-    cs: { title: 'Rozvrh', days: ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'],
+    cs: { days: ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'],
       classesWeek: 'Výuka tento týden', classesShown: 'Výuka v týdnu', hoursWeek: 'Hodin tento týden', hoursShown: 'Hodin v týdnu',
       next: 'Další hodina', nextList: 'Nejbližší hodiny', none: 'Žádná', noneLeft: 'V tomto rozvrhu už žádná další hodina není.',
       courses: 'Předměty', sessions: (n) => `${n} ${n === 1 ? 'termín' : n < 5 ? 'termíny' : 'termínů'}`,
@@ -29,11 +35,12 @@
       outside: (r) => `Dnešek je mimo období tohoto rozvrhu (${r}), proto ukazuji nejbližší týden s výukou.`,
       templateNote: 'Rozvrh je ve formě týdenního přehledu: data jednotlivých hodin nejsou uvedena.',
       hoursChart: 'Výuka v týdnu', semesterCourses: 'Předměty v rozvrhu', teachers: 'Vyučující', rooms: 'Místnosti',
-      notes: 'Poznámky', options: 'Export a tisk', optionsHint: 'Výpis, tisk nebo PDF: zvolte typ výpisu, období nebo formát PDF a stiskněte Zobrazit (formulář InSIS).',
+      notes: 'Poznámky', options: 'Export a tisk', printTitle: 'Tisk, PDF nebo seznam',
+      optionsHint: 'Zvolte typ výpisu a formát a stiskněte tlačítko Zobrazit (InSIS). PDF se stáhne jako soubor; seznam a HTML znovu načtou tuto stránku. Váš rozvrh se tím nemění.',
       toCalendar: 'Do Outlooku a telefonu', toCalendarText: 'InSIS přenese rozvrh do kalendáře vašeho univerzitního účtu: uvidíte ho v Outlooku i v telefonu.',
-      criteria: 'Změnit kritéria', print: 'Export', lastChange: 'Poslední změna', noEvents: 'V tomto rozvrhu nejsou žádné hodiny.',
+      calendarTitle: 'Do kalendáře', close: 'Zavřít', print: 'Export', period: 'Období rozvrhu', lastChange: 'Poslední změna', noEvents: 'V tomto rozvrhu nejsou žádné hodiny.',
       inWeek: (n) => `${n}× v týdnu`, total: 'celkem' },
-    en: { title: 'Timetable', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    en: { days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       classesWeek: 'Classes this week', classesShown: 'Classes in week', hoursWeek: 'Hours this week', hoursShown: 'Hours in week',
       next: 'Next class', nextList: 'Next classes', none: 'None', noneLeft: 'There are no more classes in this timetable.',
       courses: 'Courses', sessions: (n) => `${n} ${n === 1 ? 'session' : 'sessions'}`,
@@ -45,9 +52,10 @@
       outside: (r) => `Today is outside this timetable's period (${r}), so this shows the nearest week with classes.`,
       templateNote: 'This timetable is a weekly overview: it does not list the dates of individual classes.',
       hoursChart: 'Teaching this week', semesterCourses: 'Courses in this timetable', teachers: 'Teachers', rooms: 'Rooms',
-      notes: 'Notes', options: 'Export and print', optionsHint: 'A list, print or PDF: choose the list type, period or PDF format and press Display (the InSIS form).',
+      notes: 'Notes', options: 'Export and print', printTitle: 'Print, PDF or list',
+      optionsHint: "Choose the type of list and the format, then press InSIS's Display button. PDF downloads a file; List and HTML reload this page. Your timetable itself doesn't change.",
       toCalendar: 'To Outlook and your phone', toCalendarText: 'InSIS transfers the timetable to the calendar of your university account: it shows in Outlook and on your phone.',
-      criteria: 'Select criteria', print: 'Export', lastChange: 'Last change', noEvents: 'There are no classes in this timetable.',
+      calendarTitle: 'To your calendar', close: 'Close', print: 'Export', period: 'Timetable period', lastChange: 'Last change', noEvents: 'There are no classes in this timetable.',
       inWeek: (n) => `${n}× a week`, total: 'total' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -222,8 +230,6 @@
     const val = (name) => clean(doc.querySelector(`input[name="${name}"]`)?.value);
     const from = parseDate(val('konani_od'));
     const to = parseDate(val('konani_do'));
-    const crumbs = [...doc.querySelectorAll('.breadcrumb-item a[href]')];
-    const criteria = crumbs.find((a) => /rozvrhy_view\.pl$/.test(a.getAttribute('href') || ''));
     const form = doc.querySelector('form input[name="rozvrh_student"]')?.form || null;
     const changed = doc.body.innerText.match(/(?:Last change|Poslední změna)\s*:\s*([0-9./: ]+)/i)?.[1]?.trim() || '';
 
@@ -232,7 +238,6 @@
       weekly: !events.some((e) => e.date),
       from,
       to,
-      criteria: criteria && { href: criteria.href, text: clean(criteria.textContent) },
       form,
       changed,
     };
@@ -454,7 +459,7 @@
       : state.reason === 'outside' ? T.outside(d.from && d.to ? rangeLong(d.from, d.to) : '')
         : state.reason === 'empty' ? T.notThisWeek(range(mondayOf(now), addDays(mondayOf(now), 6))) : null;
 
-    const nav = !d.weekly && d.events.length && h('div', { class: 'tt-nav' },
+    const nav = !d.weekly && d.events.length > 0 && h('div', { class: 'tt-nav' },
       h('button', { type: 'button', class: 'tt-icon', 'aria-label': T.prev, title: T.prev,
         disabled: minWeek && monday <= minWeek ? '' : null, onclick: () => go(addDays(monday, -7)) }, icon('back')),
       h('span', { class: 'tt-nav-label' }, shownLabel),
@@ -484,16 +489,7 @@
           ? [h('div', { class: 'card tt-week' }, weekGrid(list, monday, axis, now, showDays)), weekList(list, monday, now)]
           : emptyState(T.emptyWeek),
 
-      d.events.length > 0 && [sectionHead(T.semesterCourses), courseSummary(d)],
-      // One place for everything that takes the timetable elsewhere: the calendar transfer, then InSIS's own
-      // list / print / PDF form (slotted right under this section).
-      (d.form || ipx.nav.target('schedule.export')) && [
-        h('div', { id: 'tt-export' }, sectionHead(T.options)),
-        ipx.nav.target('schedule.export') && anchor({ href: ipx.nav.target('schedule.export') }, { class: 'card glist-item tt-export' },
-          h('span', { class: 'tt-export-ico' }, icon('calendar')),
-          h('span', { class: 'glist-text' }, h('strong', {}, T.toCalendar), h('small', {}, T.toCalendarText)),
-          h('span', { class: 'glist-go' }, icon('arrow'))),
-        d.form && h('p', { class: 'muted tt-options-hint' }, T.optionsHint)]);
+      d.events.length > 0 && [sectionHead(T.semesterCourses), courseSummary(d)]);
 
     const marks = [...new Set(list.map((e) => e.weekday))];
     const rail = h('aside', { class: 'tt-rail' },
@@ -502,9 +498,36 @@
         h('div', { class: 'card-head' }, h('h2', {}, T.nextList)),
         nextList(next, now)),
       hoursChart(list, monday, now),
-      d.changed && h('p', { class: 'muted tt-changed' }, `${T.lastChange}: ${d.changed}`));
+      ((d.from && d.to) || d.changed) && h('p', { class: 'muted tt-changed' },
+        d.from && d.to && h('span', {}, `${T.period}: ${rangeLong(d.from, d.to)}`),
+        d.changed && h('span', {}, `${T.lastChange}: ${d.changed}`)));
 
     return [main, rail];
+  }
+
+  // Export and print (one place per job): a side sheet on this page. (a) the transfer to the university calendar
+  // (a link to InSIS's settings page, which only the student changes there); (b) InSIS's display-mode form, which
+  // shows in the sheet through the <slot> (the form element itself, slotted; never copied or submitted here).
+  function exportSheet(calendar, withForm) {
+    const sheet = h('dialog', { class: 'tt-sheet', 'aria-labelledby': 'tt-sheet-title' });
+    const close = () => sheet.close();
+    // A click on the backdrop (outside the panel) closes the sheet, like Escape.
+    sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+    sheet.append(h('div', { class: 'tt-sheet-body' },
+      h('div', { class: 'tt-sheet-head' },
+        h('h2', { id: 'tt-sheet-title' }, T.options),
+        h('button', { type: 'button', class: 'btn ghost tt-sheet-close', onclick: close }, T.close)),
+      calendar && h('section', { class: 'tt-sheet-part' },
+        h('h3', {}, T.calendarTitle),
+        anchor({ href: calendar }, { class: 'card glist-item tt-export' },
+          h('span', { class: 'tt-export-ico' }, icon('calendar')),
+          h('span', { class: 'glist-text' }, h('strong', {}, T.toCalendar), h('small', {}, T.toCalendarText)),
+          h('span', { class: 'glist-go' }, icon('arrow')))),
+      withForm && h('section', { class: 'tt-sheet-part' },
+        h('h3', {}, T.printTitle),
+        h('p', { class: 'muted tt-options-hint' }, T.optionsHint),
+        h('slot'))));
+    return sheet;
   }
 
   // What the dashboard rail needs: plain fields only, no HTML.
@@ -544,25 +567,27 @@
 
     const now = new Date();
     const start = initialWeek(data, now);
+    const calendar = ipx.nav.target('schedule.export');
+    const sheet = (slotted || calendar) ? exportSheet(calendar, !!slotted) : null;
     const extra = [
-      data.criteria && anchor(data.criteria, { class: 'tt-action', title: T.criteria }, icon('calendar'), h('span', {}, T.criteria)),
-      (slotted || ipx.nav.target('schedule.export')) && h('button', { type: 'button', class: 'tt-action', title: T.print,
-        onclick: (e) => e.currentTarget.getRootNode().getElementById('tt-export')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, icon('file'), h('span', {}, T.print)),
+      sheet && h('button', { type: 'button', class: 'tt-action', title: T.options, 'aria-haspopup': 'dialog',
+        onclick: () => sheet.showModal() }, icon('file'), h('span', {}, T.print)),
     ];
 
     takeover({
       key: 'timetable',
       css: 'pages/timetable.css',
-      title: T.title,
-      subtitle: data.from && data.to ? rangeLong(data.from, data.to) : data.weekly ? T.template : null,
+      title: ipx.nav.sectionLabel('schedule.week'),
+      subtitle: ipx.nav.label('schedule'),
       extra,
       slotted,
       build: () => {
-        const wrap = h('div', { class: 'tt' });
+        // The week view redraws itself (week navigation); the sheet stays outside it, so its slot is never lost.
+        const view = h('div', { class: 'tt-view' });
         const state = { monday: start.monday, initial: start.monday, reason: start.reason,
-          render: () => wrap.replaceChildren(...buildPage(data, state)) };
+          render: () => view.replaceChildren(...buildPage(data, state)) };
         state.render();
-        return wrap;
+        return h('div', { class: 'tt' }, view, sheet);
       },
     });
   });

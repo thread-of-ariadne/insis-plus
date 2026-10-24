@@ -178,3 +178,22 @@ html.ipx-takeover.ipx-keep #str1 [data-ipx-keep="node"] p { margin: 4px 0; }
 /* Legends that InSIS toggles with jQuery */
 html.ipx-generic #str1 .uisLegend { margin: 10px 0; padding: 10px 14px; border-radius: 12px; background: var(--chip); color: var(--muted); font-size: 13.5px; }
 html.ipx-generic #str1 .uisLegendTitle a { font-weight: 700; }
+
+/* InSIS numbers stacked tab rows ("1", "2"): the numbers go; a second row is a sub-level, drawn as a small
+   segmented control under the first (one level of view tabs, then a narrower choice inside it). */
+html.ipx-generic #str1 .portal_menu_order { display: none; }
+html.ipx-generic #str1 table.portal_menu ~ table.portal_menu,
+html.ipx-generic #str1 :has(> table.portal_menu) ~ :has(> table.portal_menu) table.portal_menu {
+  display: block; width: fit-content; max-width: 100%; margin-top: -8px; padding: 3px; border: 0; border-radius: 10px; background: var(--chip);
+}
+html.ipx-generic #str1 table.portal_menu ~ table.portal_menu tr,
+html.ipx-generic #str1 :has(> table.portal_menu) ~ :has(> table.portal_menu) table.portal_menu tr { gap: 2px; }
+html.ipx-generic #str1 table.portal_menu ~ table.portal_menu a,
+html.ipx-generic #str1 :has(> table.portal_menu) ~ :has(> table.portal_menu) table.portal_menu a {
+  padding: 5px 12px; margin: 0; border: 0; border-radius: 8px; font-size: 13px;
+}
+html.ipx-generic #str1 table.portal_menu ~ table.portal_menu b a,
+html.ipx-generic #str1 :has(> table.portal_menu) ~ :has(> table.portal_menu) table.portal_menu b a {
+  background: var(--surface); box-shadow: var(--shadow-raised);
+}
+html.ipx-generic #str1 td.portal_menu_hole { display: none; }

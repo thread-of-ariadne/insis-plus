@@ -7,6 +7,8 @@
   const { clean, lang } = ipx;
   const { h, takeover, cover, facultyOf, facultyColors, T: UI } = ipx.ui;
 
+  // The people search (lide/) uses the same search field: the catalogue is recognised by its address first.
+  if (ipx.nav && ipx.nav.route(document.baseURI.split('#')[0]).path !== '/auth/katalog/') return;
   const input = document.querySelector('input.uisSearchInput[name="vzorek"]');
   const page = document.getElementById('str1');
   if (!input || !page) return;

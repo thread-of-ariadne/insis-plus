@@ -1,0 +1,95 @@
+/* InSIS+ What's left: the plan check (pages/plan-progress.js). Loaded inside the shadow root only: the original
+   page is never slotted. Classes prefixed pp-. */
+
+/* ---------- layout: main column + rail ---------- */
+
+:host .content:has(> .pp) { padding: 0; }
+.pp { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 100%; }
+.pp-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px 32px 48px; }
+.pp-rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px 28px 48px 24px; border-left: 1px solid var(--line); }
+.pp-main .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* ---------- the answer: credits of the plan ---------- */
+
+.pp-hero { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
+.pp-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.pp-hero-label { margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.pp-big { margin: 0; font: 800 48px/1 var(--display); font-stretch: 80%; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pp-big small { color: var(--faint); font-size: 24px; font-weight: 700; }
+.pp-hero .delta { font-size: 12.5px; padding: 3px 9px; }
+.pp-plan { margin: 0; font-size: 13.5px; }
+
+.pp-bar { height: 8px; overflow: hidden; border-radius: 6px; background: var(--chip); }
+.pp-bar span { display: block; height: 100%; min-width: 2px; border-radius: 6px; background: var(--accent); }
+.pp-bar span.t-ok { background: var(--ok); }
+
+.pp-lines { display: flex; flex-direction: column; gap: 8px; }
+.pp-line-link { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- course rows ---------- */
+
+.pp-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.pp-mine { padding: 4px 18px; }
+.pp-course { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto minmax(96px, auto); align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.pp-list > .pp-course:first-child { border-top: 0; }
+.pp-code { color: var(--muted); font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.pp-title { display: flex; flex-direction: column; min-width: 0; }
+.pp-title a, .pp-title strong { color: var(--fg); font-weight: 650; overflow-wrap: anywhere; }
+.pp-title a:hover { color: var(--accent); }
+.pp-title small { color: var(--muted); font-size: 12.5px; }
+.pp-cr { min-width: 48px; color: var(--fg); font: 800 17px/1 var(--display); font-stretch: 80%; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pp-cr small { margin-left: 2px; color: var(--faint); font: 700 11px var(--font); }
+.pp-course .delta { justify-self: end; }
+.pp-course.st-not .pp-title a, .pp-course.st-not .pp-title strong { font-weight: 550; }
+
+/* ---------- groups ---------- */
+
+.pp-groups { display: flex; flex-direction: column; gap: 12px; }
+.pp-group { padding: 0; }
+.pp-group > summary { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; cursor: pointer; list-style: none; border-radius: 16px; }
+.pp-group > summary::-webkit-details-marker { display: none; }
+.pp-group > summary:hover { background: var(--hover); }
+.pp-group > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.pp-group-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.pp-group-head::before { content: ''; flex: none; width: 8px; height: 8px; margin-top: 7px; border-right: 2px solid var(--faint); border-bottom: 2px solid var(--faint); transform: rotate(-45deg); transition: transform 0.15s; }
+.pp-group[open] .pp-group-head::before { transform: rotate(45deg); }
+.pp-group-name { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.pp-group-name strong { font: 700 17px/1.2 var(--display); letter-spacing: -0.01em; }
+.pp-group-name small { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.pp-group-progress { display: flex; align-items: center; gap: 12px; padding-left: 20px; }
+.pp-group-progress .pp-bar { flex: 1; max-width: 320px; height: 6px; }
+.pp-group-progress small { color: var(--muted); font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pp-group-body { display: flex; flex-direction: column; gap: 8px; padding: 0 18px 16px 38px; }
+.pp-group-body:empty { display: none; }
+.pp-sub { margin: 6px 0 0; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.pp-none { margin: 0; font-size: 13.5px; }
+.pp-choose { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.pp-choose .btn .icon svg { width: 16px; height: 16px; }
+.pp-lazy { display: flex; flex-direction: column; gap: 6px; align-self: stretch; }
+.pp-filter { width: 100%; max-width: 360px; height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--fg); font: 500 14px var(--font); }
+.pp-filter:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.pp-more { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-top: 6px; font-size: 13px; }
+.pp-more p { margin: 0; }
+
+/* ---------- narrower screens ---------- */
+
+@media (max-width: 1100px) {
+  .pp { grid-template-columns: minmax(0, 1fr); }
+  .pp-rail { padding: 0 32px 48px; border-left: 0; }
+}
+@media (max-width: 900px) {
+  .pp-main { padding: 16px; }
+  .pp-rail { padding: 0 16px 24px; }
+  .pp-main .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pp-big { font-size: 40px; }
+  .pp-group-body { padding: 0 14px 14px; }
+  .pp-group-progress { padding-left: 0; }
+  .pp-course { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; }
+  .pp-code { grid-column: 1; grid-row: 1; }
+  .pp-title { grid-column: 1; grid-row: 2; }
+  .pp-cr { grid-column: 2; grid-row: 1; }
+  .pp-course .delta { grid-column: 2; grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-group-head::before { transition: none; }
+}

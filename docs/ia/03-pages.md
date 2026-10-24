@@ -1,4 +1,4 @@
-# InSIS+: page by page (draft 1)
+# InSIS+: page by page (draft 2)
 
 `02-redesign.md` decides *where* every InSIS page lives. This document decides *what each page looks like*: every
 page type a student meets gets a treatment, a reason and, for the complex ones, a teardown (what the InSIS page
@@ -37,9 +37,20 @@ Rules that follow:
    view tabs.
 
 Section changes made by these rules (`mapping.json` `structure.tabs`): Schedule loses *Export to calendar* (an
-action of My week); Exams shows *Exam dates* (four views) and *Online tests*; Study matters loses *Requests* and
-*Next degree* (a card on its overview); *Study plans* moves from Campus › Information to Grades & credits, next to
-*What's left* (both answer "what does my programme require").
+action of My week); Exams shows *Exam dates* (four views) and *Online tests*; Study matters loses *Next degree* (never
+read: a card on its overview) and keeps *Requests*, whose page is the Contact centre's list of request forms
+(interruption, recognition, transfers, scholarships); *Study plans* moves from Campus › Information to Grades &
+credits, next to *What's left* (both answer "what does my programme require"). *Who to ask* has one home, Campus ›
+Contacts; Help links to it.
+
+6. **Top-bar places** (Messages, Account, Help) are not destinations: while the student is in one, the sidebar shows
+   its sections in a block above the destinations.
+7. **Titles**: on a section's own page the title is the section's label and the eyebrow is the destination; on a
+   page below a section (a person, a folder, a box, a step) the title is that thing and the eyebrow is the section.
+   View tabs name the views, never repeat the title.
+8. **Empty views**: a view of the student's own list that is empty right now stays, with 0 (*My dates 0*); a view
+   whose source cannot have data for this student (no submission boxes in a course, no teaching-weeks data) is
+   hidden.
 
 ## 2. Page anatomy
 
@@ -57,6 +68,28 @@ Every page, InSIS's or InSIS+'s, is built from the same parts, in this order:
    submitted by InSIS+), styled as a form card, with one line above it saying what it does and what happens when
    the student presses InSIS's button.
 
+**States** every page uses the same way (shared components, never invented per page): *loading* (first read
+running), *not checked yet* (the source was never read: says which page to open), *stale* (shows the time it was
+last checked), *failed* (says so and links InSIS's page), *session expired* (one notice: log in again), *empty*
+(says what it means and what to do), *unmatched* (a record InSIS+ could not tie to a course: shown under "Not
+matched", never dropped).
+
+**InSIS's filter forms** (Restrict, Filter, Search within a list) are slotted whole, collapsed under *Filter*, never
+removed or trimmed; an active InSIS filter shows as "Showing only … · Show all" (the link InSIS gives).
+
+**Moving InSIS's elements** (safety review): an InSIS element may be moved into an InSIS+ row only if it is a link
+(`a` with an http(s) address), outside any form, without `on…` attributes or an `id` InSIS's scripts use, and its
+address passes the URL rule; it is put back in Classic view. Everything else (form controls, links inside forms,
+action links: generating a document, opening a stored document, filling in a questionnaire, removing an
+authorisation) stays where InSIS put it, inside the slotted original, styled in place with CSS and `data-` attributes
+only. A table that holds form controls is treatment L *in place*: its summary is drawn above it, its rows are styled
+(cards on phones) and never rebuilt, reordered or wrapped.
+
+**What a background read may do**: fetch the page as text and parse it (no script runs, nothing else loads); only
+with the student's current study and period values (another value may switch InSIS's working period); a list InSIS
+shows filtered is not used for To do or Notifications; every new kind of data says its key and shape and is session
+data (local storage keeps only settings).
+
 Never on a page: InSIS's breadcrumbs, InSIS's page heading (the header has it), the portal bar, InSIS's icon
 images used as decoration, layout tables, InSIS's help paragraphs repeated word for word (shortened into the line
 above the form or a gloss), empty InSIS sections, "back" links (the sidebar and browser do that).
@@ -69,19 +102,35 @@ above the form or a gloss), empty InSIS sections, "back" links (the sidebar and 
 | **R** | Rebuilt: the InSIS page is read and drawn again with InSIS+ components; the original is hidden; links are the originals (URL rule) | pages that show information |
 | **F** | Form page: header, a summary of what is there, InSIS's form slotted as a form card, InSIS's result table rebuilt | pages whose point is one action (excuse note, bank account, ID card validity, thesis topic) |
 | **L** | List with actions: the list is rebuilt for reading; each row's action is InSIS's own control or link, kept in place | exam dates, submissions, registration, mail |
-| **G** | Generic: InSIS's content with the shared component styles, portal bar and decoration removed | only the exceptions in §6 |
+| **B** | Baseline: InSIS's content under an InSIS+ header (title by rule 7); portal bar, breadcrumbs, InSIS heading, help paragraphs and legends removed; tables, forms and tab rows in the shared component styles; InSIS's own tab row as view tabs | rare pages (staff tools, deep drill-downs, settings that affect only classic InSIS), until use shows they need more |
+| **G** | Generic: as B, for pages that must keep InSIS's exact wording or are never read | only the exceptions in §6 |
 
-## 4. Inventory
+## 4. Inventory and teardowns
 
-One row per page type a student meets (from `mapping.json`). *Now* is the state before this document:
-**M** = own module, **S** = generic shell only, **–** = not built. Snapshot: **✓** in `test/fixtures/private/`,
-**crawl** = only the crawl's structure, **–** = needs a snapshot (collected read-only while logged in).
+Per destination, with the treatment of every page type, its teardown and what needs a fresh snapshot:
 
-*(filled in per destination below; teardowns in §5)*
+- Courses and the course page: `teardowns/courses.md`
+- Exams, Grades & credits, Schedule: `teardowns/exams-grades-schedule.md`
+- Study matters: `teardowns/study-matters.md`
+- Campus & people, Messages, Help, Account, All services: `teardowns/campus-messages-account.md`
 
-## 5. Teardowns
+Where a teardown and §7 (review decisions) disagree, §7 wins. Rare pages a teardown rebuilds in full (access system,
+department detail views, pass rates levels 2–4, study plans drill-down, e-library item pages, rooms below the
+building, account device pages) start as **B**.
 
-*(per destination, below)*
+## 5. Build order
+
+1. Contradictions in the current code (done in round 1: Requests, titles, signposts, sidebar blocks, portal bar).
+2. Baseline (B) for every page still in the generic shell: titles by rule 7, portal bar and InSIS chrome removed,
+   InSIS's tab row as view tabs, filter forms collapsed.
+3. Exam dates (L): summary, view tabs, rows in place; snapshot as soon as dates open (November).
+4. The course folder (`dok_server/slozka.pl`, L): needs a snapshot.
+5. Submission box page and Online tests.
+6. Confirmations (*Get a confirmation*, InSIS's own links styled in place).
+7. Results (four view tabs) and What's left (the 835 kB page, parsed once with `textContent`).
+8. Course evaluation (before December), Registration overview (before January).
+9. InSIS mail, Requests / Contact centre, Who to ask.
+10. Everything else, by frequency.
 
 ## 6. Exceptions (G)
 
@@ -93,6 +142,29 @@ Pages that stay InSIS's content in the shared styles, and why:
   system and licence information, the game room, InSIS documentation pages (`dok/…` except Help's front page).
 - Pages InSIS+ never opens (`read: never` and `link: insis-only`), e.g. a questionnaire being filled in.
 
-## 7. Review history
+## 7. Review history and decisions
 
-*(rounds below)*
+**Round 1 (2026-10-24)**: two independent reviews of the four teardowns, UX/IA and safety/feasibility. Decisions
+adopted (they override the teardowns):
+
+1. Requests is a section (Contact centre's request forms, `kc/kc.pl`); Help's *Ask a question* opens it; the
+   overview card keeps only Next degree.
+2. Who to ask: Campus › Contacts only.
+3. e-library: Courses › Materials, as a link card; Library links to it; never a tab.
+4. Thesis topics: node `studies.thesis`, view tabs *Faculty topics · Department topics*; *Propose a topic* is a page
+   action; the department page links to its topics. Theses archive stays in Campus › Information.
+5. Registration overview: composed page with live state on every step (open now / opens on / closed).
+6. Course › Points: InSIS's result, the attempt count (link to Results), upcoming dates (link to Exam dates); no
+   past dates; online tests only here.
+7. Excuse notes: no "Absent?" link in My week; gloss "Your excuse notes" until the add form is seen.
+8. Rules 6–8 of §1 (top-bar places, titles, empty views), the States, filter-form, moving and background-read rules
+   of §2, treatment B of §3.
+9. Overviews of destinations show facts only (a section appears there only with a live fact); Help, Account and All
+   services are indexes by nature.
+10. Safety, done in round 1: background reads parse fetched text (no InSIS script, no analytics); local storage keeps
+    settings only; pages with credentials or sensitive personal data are `read: never` (app pairing, personal data
+    check, bank accounts, card passes, operations log), settings pages too; delivered documents only on open; the
+    contact centre's form pages are never fetched; the action-parameter deny list is extended and case-insensitive.
+11. Still open, need snapshots: everything listed under "needs a snapshot" in the teardowns; the effect of viewing the
+    delivered-documents list; whether opening a contact-centre form page creates a draft; how InSIS marks an active
+    exam-list filter.
