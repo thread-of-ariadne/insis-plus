@@ -223,7 +223,7 @@
       const list = courses();
       return h('div', { class: 'course-page' },
         list.length ? [h('p', { class: 'muted' }, T.mineHint), h('div', { class: 'course-list' }, list.map(card))]
-          : emptyState(ipx.state.sync?.running ? '…' : T.coursesEmpty));
+          : emptyState(ipx.state.sync?.running && Date.now() - ipx.state.sync.updated < 2 * 60e3 ? '…' : T.coursesEmpty));
     },
   }));
 

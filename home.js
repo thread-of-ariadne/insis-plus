@@ -179,7 +179,8 @@
   // new materials by course and teaching hours.
   function buildPage({ notices }, state) {
     const now = new Date();
-    const syncing = ipx.state.sync?.running;
+    // A sync interrupted by a reload leaves running: true behind; it counts only for the 2-minute lock of sync.js.
+    const syncing = ipx.state.sync?.running && Date.now() - ipx.state.sync.updated < 2 * 60e3;
     const tt = ipx.state.timetable;
     const ds = ipx.state.docserver || {};
     const viewed = Object.values(ipx.state.courses || {});

@@ -16,22 +16,22 @@ vyhledávání Ctrl+K a čitelné sylaby. Vše běží jen ve vašem prohlíže�
 
 ## Features
 
-- **Sidebar with the whole InSIS menu**, regrouped by what you want to do (Study, Communication, Documents,
-  Account & settings, Other), with a filter, pins and a switch back to InSIS's own grouping.
-- **Dashboard**: new documents and tasks, the Student's portal main actions, the courses you are enrolled in, this
-  week, next classes, submission deadlines, courses with new documents, teaching hours, recently opened pages.
-  Filled right after you log in: the pages it needs are read in the background (see [PRIVACY.md](PRIVACY.md)).
-- **Student's portal** around the main actions (exams, course registration, timetable, study record, submissions,
-  plan check) instead of unlabelled icons.
-- **Personal timetable** as a week view; **study record** with credits, average and status per course;
-  **document server** by course with new-document badges; **coursework submissions** ordered by deadline.
+- **A new structure instead of InSIS's 12 boxes of links**: Home, Courses, Schedule, Exams, Grades & credits, Study
+  matters, Campus & people, and All services for the rare things. Every InSIS page has one place in it
+  ([docs/ia](docs/ia)); every other page still opens, inside the same shell.
+- **Home**: what you have to do (deadlines, restrictions, InSIS's requests), your courses, InSIS notices; the week,
+  next classes, new materials by course and teaching hours on the side. Filled right after you log in.
+- **A page for every course**: next classes, what is coming, materials folder, submission boxes, result, teachers
+  and classmates, syllabus, gathered from the pages InSIS spreads them over.
+- **Messages** (InSIS mail, and where it is forwarded), **Notifications** (new documents, results entered),
+  **Help** with "who to ask", an **account menu**, Czech/English switch.
+- **Personal timetable** as a week view; **e-index** with credits, average and status per course; **document
+  server** by course with new-document badges; **coursework submissions** ordered by deadline; readable
+  **syllabi** and **catalogue**.
 - **Ctrl+K search** over InSIS pages, diacritics-insensitive and typo-tolerant. `Ctrl+D` pins a page.
-- **Course syllabus** as a readable page: credits and hours of work, completion, language, lecturers,
-  how the grade is made up, workload.
-- **Course catalogue** results as one card per course, with semesters side by side.
-- **Every other page** gets the same shell and a clean look for InSIS tables, tabs and forms. Forms keep working
-  exactly as before.
-- Czech and English, light and dark theme, phone layout.
+- **Never acts for you**: every action happens on InSIS's own page, by your click. Data read from InSIS lives only
+  for the session (see [PRIVACY.md](PRIVACY.md)); a shared-computer mode keeps nothing.
+- Czech and English, light and dark theme, phone layout with a bottom bar.
 
 ## Install
 
@@ -69,8 +69,11 @@ and open `http://localhost:8765/test/mock-home.html` or a page in `test/fixtures
 
 ### How it works
 
-`content.js` keeps local state and the search palette. `ui.js` builds the app shell in a closed shadow root and
-provides shared components (`ipx.ui`). Page modules (`home.js`, `syllabus.js`, `catalog.js`, `pages/*.js`) recognise
+`content.js` keeps state (personal data per session, settings per user) and the search palette. `nav.js` holds the
+navigation model generated from `docs/ia/mapping.json` (where each InSIS page belongs, which addresses InSIS+ may
+read or link to). `ui.js` builds the app shell in a closed shadow root and provides shared components (`ipx.ui`);
+`composed.js` and `course.js` draw the pages that exist only in InSIS+; `todo.js` gathers what you have to do;
+`bg.js` wipes session data after inactivity. Page modules (`home.js`, `syllabus.js`, `catalog.js`, `pages/*.js`) recognise
 their page by its content and either rebuild it from parsed data or move InSIS's original content into the shell.
 `generic.js` handles every page without a module. Pages are detected by content, not URL, and a module that isn't
 sure does nothing. `sync.js` loads the pages the dashboard needs in a hidden same-origin frame, where the same
