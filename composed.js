@@ -271,8 +271,28 @@
     return true;
   }
 
-  // Moving between InSIS+ pages only changes the hash: draw the new one.
-  addEventListener('hashchange', () => { if (/^#ipx:/.test(location.hash)) location.reload(); });
+  // Moving between InSIS+ pages (and back to Home) stays in this document: the page is drawn again from the data
+  // InSIS+ already holds, without asking InSIS's server for its main page. Only on InSIS's main page address.
+  const homeAddress = () => (ipx.state.homeUrl || '').split('#')[0];
+  const onHome = () => !!homeAddress() && location.href.split('#')[0] === homeAddress();
+  function drawHere() {
+    const where = ipx.ui.here();
+    if (where.composed && where.node !== 'home') show(where);
+    else if (ipx.home) ipx.home.draw();
+    else location.reload();
+  }
+  addEventListener('hashchange', () => { if (onHome()) drawHere(); });
+  addEventListener('popstate', () => { if (onHome()) drawHere(); });
+  // A link inside an InSIS+ page: true when it was handled here (drawn in place).
+  ipx.inPlace = (href) => {
+    if (!onHome()) return false;
+    const url = new URL(href, location.href);
+    if (url.href.split('#')[0] !== homeAddress()) return false;
+    if (url.hash === location.hash) return true; // the page already shown
+    history.pushState(null, '', url.href);
+    drawHere();
+    return true;
+  };
 
   ipx.composed = { register, show, teachers, teacherGrid };
   ipx.notifications = { list: notifications, unseen };

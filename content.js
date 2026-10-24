@@ -100,8 +100,29 @@
 
   const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
 
+  // Pages InSIS+ reads when the student opens a page that shows them (a course's syllabus): kept for the session in a
+  // key of their own, so the state stays small; wiped with the personal data. { [key]: { at, text } }
+  const CACHE_KEY = 'insisPlusCache';
+  const CACHE_MAX = 40;
+  const cache = {
+    async get(key) {
+      try { return (await session.area.get(CACHE_KEY))[CACHE_KEY]?.[key] || null; } catch { return null; }
+    },
+    async set(key, text) {
+      if (shared) return;
+      try {
+        const all = (await session.area.get(CACHE_KEY))[CACHE_KEY] || {};
+        all[key] = { at: Date.now(), text };
+        const keys = Object.keys(all).sort((a, b) => all[b].at - all[a].at);
+        for (const k of keys.slice(CACHE_MAX)) delete all[k];
+        await session.area.set({ [CACHE_KEY]: all });
+      } catch {}
+    },
+  };
+
   async function wipePersonal() {
     await session.area.remove(session.key);
+    await session.area.remove(CACHE_KEY);
     for (const k of personalKeys(state)) delete state[k];
   }
 
@@ -319,6 +340,7 @@
       if (explicit) el.dataset.theme = explicit;
       else delete el.dataset.theme;
     }
+    globalThis.__ipxBootTheme?.(theme); // the first-frame skeleton (boot.js) in the same colours
   }
   function setTheme(theme) {
     state.plus = { ...state.plus, theme };
@@ -485,7 +507,13 @@
     true,
   );
 
+  // Marks for measuring InSIS+'s own cost (Performance panel; nothing is sent anywhere).
+  performance.mark('insis-plus:start');
   const ready = load().then(() => {
+    performance.mark('insis-plus:ready');
+    // Once every module has had its turn on this page: if none drew an InSIS+ page, the skeleton of the first frame
+    // (boot.js) gives way to InSIS's own page.
+    setTimeout(() => globalThis.__ipxBootDone?.(), 0);
     watchActivity();
     applyTheme();
     indexPage();
@@ -495,6 +523,7 @@
 
   // Shared with ui.js, sync.js and the page modules (same content-script world).
   globalThis.insisPlus = {
+    cache,
     ready,
     onData: (fn) => dataListeners.push(fn),
     notify: () => dataListeners.forEach((fn) => fn()),

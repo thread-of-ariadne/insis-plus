@@ -19,6 +19,16 @@
         "https://insis.vse.cz/*"
       ],
       "js": [
+        "boot.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://insis.vse.cz/*"
+      ],
+      "js": [
         "content.js",
         "nav-data.js",
         "nav.js",

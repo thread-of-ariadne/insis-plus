@@ -7,14 +7,14 @@
   const { lang, clean, norm } = ipx;
 
   const T = {
-    cs: { ask: 'Zeptat se nebo podat žádost', classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', search: 'Hledat v InSIS…',
+    cs: { loading: 'Načítám…', ask: 'Zeptat se nebo podat žádost', classic: 'Klasické zobrazení', back: 'Vzhled InSIS+', search: 'Hledat v InSIS…',
       menu: 'Menu', collapse: 'Sbalit panel',
       note: 'Neoficiální rozšíření. Data zůstávají ve vašem prohlížeči.', unpin: 'Odepnout',
       pinned: 'Připnuté', semester: 'Semestr', now: 'právě teď', teaching: 'Výuka tento týden',
       inMin: (n) => `za ${n} min`, inHours: (n) => `za ${n} h`, todayAt: 'dnes', creditsOf: (a, b) => `${a} z ${b} kreditů`, creditsN: (a) => `${a} kreditů`, nothingDue: 'Nic nečeká na odevzdání', tomorrowAt: 'zítra',
       inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), navigation: 'Navigace', account: 'Účet',
       pageHelp: 'Nápověda k této stránce', allHelp: 'Veškerá nápověda' },
-    en: { ask: 'Ask or make a request', classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
+    en: { loading: 'Loading…', ask: 'Ask or make a request', classic: 'Classic view', back: 'InSIS+ view', search: 'Search InSIS…',
       menu: 'Menu', collapse: 'Collapse sidebar',
       note: 'Unofficial extension. Your data stays in your browser.', unpin: 'Unpin',
       pinned: 'Pinned', semester: 'Semester', now: 'now', teaching: 'Teaching this week',
@@ -329,6 +329,10 @@
   // Replaces the original page with the InSIS+ shell rendered in a closed shadow root.
   // `slotted` nodes stay in the light DOM (so InSIS's own scripts and forms keep working) and show in the content area.
   function takeover({ key, css, title, subtitle, extra, build, slotted }) {
+    // Drawing another InSIS+ page in the same document (moving between Home and the InSIS+ pages that live on its
+    // address): the previous one goes. Only pages without slotted InSIS content are ever redrawn this way.
+    const previous = document.getElementById('insis-plus-page');
+    if (previous && !previous.children.length) previous.remove();
     if (!document.getElementById('insis-plus-takeover-style')) {
       const style = h('style', { id: 'insis-plus-takeover-style' });
       style.textContent = `
@@ -396,6 +400,15 @@
       n.before(n._ipxHome);
     });
     document.body.prepend(host);
+    performance.mark('insis-plus:drawn');
+    // Links to Home or to another InSIS+ page of this same document are drawn in place (composed.js), without
+    // asking InSIS's server for its main page again.
+    root.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.composedPath().find((n) => n.tagName === 'A');
+      if (!a || !a.href || a.target === '_blank' || !ipx.inPlace) return;
+      if (ipx.inPlace(a.href)) e.preventDefault();
+    });
     ipx.applyTheme?.();
 
     function apply() {
@@ -411,6 +424,7 @@
       pill.hidden = !classic;
       ipx.setFab(classic);
       window.scrollTo(0, 0);
+      globalThis.__ipxBootDone?.(); // the first-frame skeleton (boot.js) gives way to this page
     }
     apply();
     return root;
@@ -492,6 +506,24 @@
     h('div', { class: 'tabs', role: 'group' }, items.map((t) =>
       h('button', { type: 'button', class: 'tab' + (t.id === active ? ' on' : ''), 'aria-pressed': String(t.id === active),
         onclick: () => onPick(t.id) }, t.label)));
+
+  // Placeholder while something loads, in the shape of what is coming (lines, rows, course cards, KPIs), so the page
+  // does not jump when it arrives. The text is for screen readers only ("Loading …").
+  // kind: 'lines' | 'rows' | 'cards' | 'kpis' | 'syllabus'
+  function skeleton(kind = 'lines', n = 3, label = T.loading) {
+    const bar = (cls) => h('i', { class: `sk ${cls}` });
+    const shapes = {
+      lines: () => Array.from({ length: n }, (_, i) => bar(i === n - 1 ? 'sk-line short' : 'sk-line')),
+      rows: () => Array.from({ length: n }, () => h('span', { class: 'sk-row' }, bar('sk-dot'), h('span', { class: 'sk-col' }, bar('sk-line'), bar('sk-line short')))),
+      cards: () => Array.from({ length: n }, () => h('span', { class: 'sk-card' }, bar('sk-cover'), h('span', { class: 'sk-col' }, bar('sk-line short'), bar('sk-title'), bar('sk-line')))),
+      kpis: () => h('span', { class: 'sk-kpis' }, Array.from({ length: n }, () => bar('sk-kpi'))),
+      syllabus: () => [h('span', { class: 'sk-kpis' }, Array.from({ length: 4 }, () => bar('sk-kpi'))),
+        h('span', { class: 'sk-block' }, bar('sk-title'), bar('sk-line'), bar('sk-line'), bar('sk-line short')),
+        h('span', { class: 'sk-block' }, bar('sk-title'), bar('sk-line'), bar('sk-line short'))],
+    };
+    return h('div', { class: `skeleton sk-${kind}`, role: 'status', 'aria-busy': 'true' },
+      h('span', { class: 'sr-only' }, label), (shapes[kind] || shapes.lines)());
+  }
 
   // Dashed box for "nothing here yet", with an optional link.
   const emptyState = (text, link) =>
@@ -708,7 +740,7 @@
     PORTAL_ACTIONS, quickActions, here, nodeLinks, viewTabs, h, icon, anchor, initials, langLinks, takeover, styleSlotted, onPinsChange,
     cover, facultyOf, facultyColors,
     facultyFromCode, facultyFor, wallTime, countdown, deadlineTone, deadlineList, keepOnly, hideInSlot,
-    kpi, sectionHead, tabs, emptyState, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,
+    kpi, sectionHead, tabs, emptyState, skeleton, notice, courseCard, weekStrip, nextClasses, hoursChart, classDays,
     T, MAIN, locale,
   };
 })();

@@ -9,7 +9,7 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SERVER = "http://localhost:8765/"
-scripts = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))["content_scripts"][0]["js"]
+scripts = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))["content_scripts"][-1]["js"]
 tags = "".join(f'<script src="{SERVER}{s}"></script>\n' for s in scripts)
 pattern = re.compile(r'(?:<script src="' + re.escape(SERVER) + r'[\w/.-]+\.js"></script>\n?)+')
 for f in [*ROOT.glob("test/fixtures/*.html"), *ROOT.glob("test/fixtures/private/*.built.html")]:
