@@ -29,6 +29,23 @@
     const title = (isEntry && sectionName) || insisName;
     const eyebrow = isEntry ? (where.dest && nav.label(where.dest)) : sectionName && sectionName !== title ? sectionName : null;
 
+    // A page of a section with views (kit.section): the section's own header, so moving between its tabs never
+    // changes it; InSIS's own tab rows, breadcrumbs and heading are hidden (the header has them).
+    const inSection = ipx.kit?.sectionFor();
+    if (inSection) {
+      const { section, view } = inSection;
+      ipx.ui.hideInSlot([...page.querySelectorAll('table.portal_menu, nav[aria-label="breadcrumb"], #titulek')]);
+      styleSlotted();
+      takeover({
+        key: 'generic', css: ['kit.css'], title: section.title(), subtitle: section.subtitle?.(), extra: section.actions?.(view),
+        slotted: [page],
+        build: () => ipx.ui.h('div', { class: 'kit-page' },
+          ipx.kit.sectionTabs(section, view),
+          view == null && insisName !== section.title() && ipx.ui.h('h2', { class: 'section-title' }, insisName),
+          ipx.ui.h('slot')),
+      });
+      return;
+    }
     styleSlotted();
     takeover({ key: 'generic', title, subtitle: eyebrow, slotted: [page] });
   });

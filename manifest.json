@@ -47,6 +47,7 @@
         "pages/persons.js",
         "pages/noticeboard.js",
         "pages/requests.js",
+        "pages/exams.js",
         "generic.js",
         "sync.js"
       ],

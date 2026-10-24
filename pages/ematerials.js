@@ -29,6 +29,25 @@
 
   const PATHS = new Set(['/auth/eknihovna/', '/auth/eknihovna/strom_slozek.pl']);
 
+  // One header for every e-Library page (kit.section): Folders and Search are the views; a folder's contents and an
+  // item are pages below them (drawn by generic.js around InSIS's content). The view links are InSIS's own tab links
+  // of the page at hand (every e-Library page carries the same row; they hold the library's folder id).
+  const library = kit.section({
+    id: 'elibrary',
+    title: () => T.title,
+    subtitle: () => nav.sectionLabel('courses.files'),
+    pages: { '/auth/eknihovna/': 'folders', '/auth/eknihovna/strom_slozek.pl': 'folders', '/auth/eknihovna/slozky_objekty.pl': null,
+      '/auth/eknihovna/vyhledavani.pl': 'search' },
+    views: () => {
+      const row = kit.insisTabs(document.getElementById('str1') || document)[0] || [];
+      const pick = (re) => row.find((x) => re.test(x.href))?.href || null;
+      return [
+        { id: 'folders', href: pick(/strom_slozek\.pl/) || nav.safe(new URL('/auth/eknihovna/', document.baseURI).href, 'link'), text: T.folders },
+        { id: 'search', href: pick(/vyhledavani\.pl/), text: T.search },
+      ];
+    },
+  });
+
   // The folder rows of table.strom. Leading cells hold the tree lines, so their number is the folder's depth.
   function folders(page) {
     const out = [];
@@ -51,15 +70,6 @@
   }
 
   // InSIS's tab row → the two views; "Contents of folder" is left out (a level, not a view).
-  function views(page) {
-    const row = kit.insisTabs(page)[0] || [];
-    const pick = (re, text) => {
-      const t = row.find((x) => re.test(x.href));
-      return t && { href: t.href, text, on: t.on };
-    };
-    return [pick(/strom_slozek\.pl/, T.folders), pick(/vyhledavani\.pl/, T.search)].filter(Boolean);
-  }
-
   function folderRow(f) {
     const inner = [
       h('span', { class: 'el-ico' }, icon('folder')),
@@ -82,7 +92,7 @@
       css: 'pages/ematerials.css',
       title: T.title,
       subtitle: nav.sectionLabel('courses.files'),
-      tabs: views(page),
+      tabs: kit.sectionTabs(library, 'folders'),
       build: () => {
         if (!list.length) return emptyState(kit.looseText(page) || T.none);
         const rows = list.map((f) => ({ f, el: folderRow(f) }));

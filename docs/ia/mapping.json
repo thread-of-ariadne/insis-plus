@@ -490,6 +490,7 @@
         "/auth/uloziste/"
       ],
       "studies.status": [
+        "/auth/student/moje_studium.pl",
         "/auth/student/studium.pl"
       ],
       "studies.excuses": [

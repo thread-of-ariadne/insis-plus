@@ -19,6 +19,7 @@
 // Stored for the dashboard (plain data, no HTML):
 // ipx.state.studyRecord = {
 //   updated: Date.now(), source: location.href, view: 'podrobne_vybrane_obdobi' | … | null,
+//   viewLinks: [{ id, href }] | null (InSIS's own links to the four views, for the Results header on every page),
 //   study: 'FIS C-BI pres [term 1, E]' | '', period: 'WS 2026/2027 - FIS' | '',
 //   credits: { earned: number | null, registered: number | null },   // from the statistics table, else row sums
 //   average: number | null,                                          // as InSIS states it, else mean of row grades
@@ -266,6 +267,27 @@
     }).filter(Boolean);
   }
 
+  // The view links InSIS gave on the last record page of this session (the attempts page of one course may not
+  // carry them): kept in memory and in the session data, so every Results page shows the same four tabs.
+  let lastViews = null;
+  const viewIdOf = (r) => r.params?.get?.('vyber') || null;
+  const results = ipx.kit.section({
+    id: 'results',
+    title: () => nav.sectionLabel('grades.results'),
+    subtitle: () => nav.label('grades'),
+    // A course's attempts (…;predmet=…) is a page below the views; the views themselves are drawn by this module.
+    pages: { '/auth/student/pruchod_studiem.pl': (r) => (r.params?.has?.('predmet') ? null : (VIEWS.find((v) => v.ids.includes(viewIdOf(r)))?.ids[0] || 'podrobne_vybrane_obdobi')) },
+    views: () => {
+      const menu = [...(document.getElementById('str1')?.querySelectorAll('table.portal_menu') || [])]
+        .find((t) => t.hasAttribute('data-pm-selected') || t.querySelector('[data-pm-sysid]'));
+      const links = menu && !menu.querySelector('a[href*="moje_studium.pl"]') ? menuLinks(menu) : (lastViews || ipx.state.studyRecord?.viewLinks || []);
+      return VIEWS.map((v) => {
+        const own = links.find((l) => l.id === v.ids[0]);
+        return { id: v.ids[0], href: own && nav.safe(own.href, 'link', { copied: true }), text: v.text() };
+      });
+    },
+  });
+
   function parseRecord() {
     const page = doc.getElementById('str1');
     if (!page) return null;
@@ -280,6 +302,7 @@
     const portalMenu = menus.find((t) => t !== viewMenu);
     menus.forEach(mark);
     const views = viewMenu ? menuLinks(viewMenu) : [];
+    if (views.length) lastViews = views.map(({ id, href }) => ({ id, href }));
     const view = viewMenu?.getAttribute('data-pm-selected') || views.find((v) => v.on)?.id || null;
     const portal = portalMenu ? menuLinks(portalMenu) : [];
 
@@ -478,6 +501,7 @@
     ipx.state.studyRecord = {
       updated: Date.now(),
       source: here.href,
+      viewLinks: lastViews || ipx.state.studyRecord?.viewLinks || null,
       view: d.view,
       study: d.study,
       period: d.period,

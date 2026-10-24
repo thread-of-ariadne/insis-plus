@@ -30,6 +30,27 @@
   }[lang];
 
   const at = (path) => new URL(path, doc.baseURI).href;
+
+  // One header for every page of InSIS mail (kit.section): the mail box draws its folders as tabs itself; the pages
+  // below it (a new message, settings, forwarding, folder administration, group messages) are drawn by generic.js
+  // with the same title and the same two page actions, and InSIS's own tab row hidden.
+  const mailActions = () => {
+    const write = nav.safe(new URL('/auth/posta/nova_zprava.pl', document.baseURI).href, 'link');
+    const outlook = nav.data.external?.outlook?.url;
+    return [
+      write && anchor({ href: write }, { class: 'btn', title: T.write }, icon('mail'), h('span', {}, T.write)),
+      outlook && anchor({ href: outlook, target: '_blank' }, { class: 'btn ghost', title: T.outlook }, icon('globe'), h('span', {}, T.outlook)),
+    ].filter(Boolean);
+  };
+  ipx.kit?.section({
+    id: 'mail',
+    title: () => nav.sectionLabel('messages.mail'),
+    subtitle: () => nav.label('messages'),
+    pages: { '/auth/posta/nova_zprava.pl': null, '/auth/posta/nastaveni.pl': null, '/auth/posta/forwardy.pl': null,
+      '/auth/posta/slozky.pl': null, '/auth/posta/hz_ng_sprava_mlistu.pl': null, '/auth/posta/kontakty.pl': null },
+    views: () => [],
+    actions: mailActions,
+  });
   const link = (a) => a && nav.safe(a.href, 'link', { copied: true });
 
   function parse() {
@@ -115,10 +136,7 @@
       css: ['kit.css'],
       title: nav.sectionLabel('messages.mail'),
       subtitle: nav.label('messages'),
-      extra: [
-        data.write && anchor({ href: data.write }, { class: 'btn', title: T.write }, icon('mail'), h('span', {}, T.write)),
-        data.outlook && anchor({ href: data.outlook, target: '_blank' }, { class: 'btn ghost', title: T.outlook }, icon('globe'), h('span', {}, T.outlook)),
-      ],
+      extra: mailActions(),
       slotted: [data.page],
       build: () => h('div', { class: 'kit-page' },
         h('p', { class: 'kit-note info msg-status' }, icon('info'), line,

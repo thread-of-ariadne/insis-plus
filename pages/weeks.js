@@ -5,7 +5,7 @@
 // has not been set."), which leave the student at a dead end.
 // Here: the header by rule 7 (the section is Academic calendar, the destination Schedule) and
 // - no weeks: an empty state that says what the message means and where the key dates are instead (Key dates is
-//   the other view of the section; with no teaching weeks this view is hidden, so there are no view tabs);
+//   the other view of the section; the view tabs stay, so the header does not change between the two views);
 // - weeks: InSIS's content slotted under view tabs Key dates · Teaching weeks, with InSIS's chrome (portal bar,
 //   heading, help sentence) hidden. No snapshot with weeks exists yet, so the list itself keeps InSIS's markup
 //   in the shared table styles until one does.
@@ -31,6 +31,26 @@
       open: 'Open the academic calendar', insis: 'InSIS says' },
   }[lang];
 
+  // One header for both views of the section (kit.section): Key dates (harmonogram.pl, drawn by generic.js) and
+  // Teaching weeks (this page). The weeks view stays a tab even when InSIS has no weeks to show: it explains why,
+  // and the header does not change as the student moves between the two.
+  const plainLink = (path) => nav.safe(new URL(path, document.baseURI).href, 'link');
+  const calendar = kit.section({
+    id: 'calendar',
+    title: () => nav.sectionLabel('schedule.calendar'),
+    subtitle: () => nav.label('schedule'),
+    pages: { '/auth/student/harmonogram.pl': 'key', [PATH]: 'weeks' },
+    views: () => {
+      const key = nav.target('schedule.calendar');
+      return [
+        { id: 'key', href: key && nav.route(key).path !== PATH ? key : plainLink('/auth/student/harmonogram.pl'), text: T.keyDates },
+        // The weeks overview needs the study and period: the student's own link (portal), or this page's address.
+        { id: 'weeks', href: kit.portalLink(PATH) || (nav.route(document.baseURI.split('#')[0]).path === PATH
+          ? nav.safe(document.baseURI.split('#')[0], 'link', { copied: true }) : null), text: T.weeks },
+      ];
+    },
+  });
+
   // InSIS's "ko" boxes (class uis_msg ko) are not one of kit.messages()'s tones; their text is what matters here.
   const boxes = (page) => [...page.querySelectorAll('.uis_msg')].map((m) => clean((m.querySelector('.text') || m).textContent)).filter(Boolean);
 
@@ -46,7 +66,6 @@
     const tables = kit.findTables(page);
 
     if (tables.length) {
-      const here = nav.safe(document.baseURI.split('#')[0], 'link', { copied: true });
       const chrome = [...page.querySelectorAll('nav[aria-label="breadcrumb"], #titulek, table.portal_menu, div.small')];
       // InSIS's own heading of this page: a bold line directly in the page, before the tables.
       const heading = [...page.querySelectorAll('b')].find((b) => !b.closest('table') && /week|týdn/i.test(b.textContent));
@@ -56,7 +75,7 @@
       takeover({
         key: 'weeks', css: ['kit.css', 'pages/weeks.css'], title, subtitle, slotted: [page],
         build: () => h('div', { class: 'kit-page' },
-          viewTabs([keyLink && { href: keyLink, text: T.keyDates }, { href: here || location.href.split('#')[0], text: T.weeks, on: true }].filter(Boolean), T.views),
+          kit.sectionTabs(calendar, 'weeks'),
           h('slot')),
       });
       return;
@@ -68,6 +87,7 @@
       css: 'pages/weeks.css',
       title,
       subtitle,
+      tabs: kit.sectionTabs(calendar, 'weeks'),
       build: () => [
         h('section', { class: 'empty wk-empty' },
           h('span', { class: 'wk-icon' }, icon('calendar')),

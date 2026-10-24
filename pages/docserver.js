@@ -208,28 +208,8 @@
     return to ? h('a', { ...props, href: to }, ...kids) : h('span', props, ...kids);
   };
 
-  // InSIS's tab row split by what each tab is: the views of the document server (Document tree, New documents,
-  // Searching) become view tabs after InSIS+'s "By course"; a form (DS settings) and a rarely used list of the
-  // student's own folders (All my folders, which has a tab row of its own) are page actions (03-pages.md §1 rule 1).
-  const ACTION = [[/nastaveni_stromu\.pl/, () => T.settings, 'gear'], [/moje_dok\.pl/, () => T.myFolders, 'folder']];
-
-  function tabsNav(tabs) {
-    // The same names as the row on Courses › Materials (course.js), in the student's words.
-    const name = (t) => (/nove_dok\.pl/.test(t.href) ? T.fresh : /vyhledavani\.pl/.test(t.href) ? T.searchTab
-      : /index\.pl|dok_server\/(\?|$)/.test(t.href) ? T.treeTab : t.text);
-    const views = tabs.filter((t) => !ACTION.some(([re]) => re.test(t.href)))
-      .map((t) => ({ href: safe(t.href), text: name(t), on: t.active, count: t.count })).filter((t) => t.href);
-    return ipx.ui.viewTabs([{ href: nav.composedUrl('courses.files'), text: T.byCourseTab }, ...views], T.views);
-  }
-
-  function pageActions(tabs) {
-    // On phones the top bar has one row: the actions shrink to their icons (the label stays as the accessible name).
-    return ACTION.map(([re, label, ic]) => {
-      const t = tabs.find((x) => re.test(x.href));
-      const to = t && safe(t.href);
-      return to && anchor({ href: to }, { class: 'btn ghost ds-action', title: t.text, 'aria-label': label() }, icon(ic), h('span', { class: 'ds-action-label' }, label()));
-    }).filter(Boolean);
-  }
+  // The Materials header (title, view tabs, page actions) is shared with Courses › Materials: course.js.
+  const materials = ipx.materials;
 
   function when(d, text) {
     if (!d) return text || '';
@@ -306,7 +286,7 @@
       d.quota.map((r) => `${r.label} ${r.value}${r.extra ? ` ${r.extra}` : ''}`).join(' · '));
 
     return h('div', { class: 'ds' },
-      tabsNav(d.tabs),
+      materials.tabs(d.kind === 'tree' ? 'tree' : 'new'),
       // Summary: which of the student's courses have new files; the files themselves are one tab away.
       withNews.length > 0 && h('a', { class: 'card ds-pointer', href: nav.composedUrl('courses.files') },
         h('span', { class: 'ds-pointer-text' }, h('strong', {}, T.byCourse),
@@ -376,7 +356,7 @@
     const refresh = d.refresh && safe(d.refresh.href);
 
     return h('div', { class: 'ds' },
-      tabsNav(d.tabs),
+      materials.tabs(d.kind === 'tree' ? 'tree' : 'new'),
       d.docs.length > 0 && h('div', { class: 'kpis' },
         kpi({ label: T.fresh, value: count, status: { tone: 'bad', text: T.tag } }),
         mapped && kpi({ label: T.inCourses, value: inCourses, foot: courseGroups.length ? T.ofCourses(courseGroups.length) : null }),
@@ -427,12 +407,15 @@
     try { const data = parseTree() || parseNew(); if (data) remember(data); } finally { doc = document; here = location; }
   };
 
+  // Every other page of the document server (Search, a folder, DS settings, My folders) gets the same Materials
+  // header through the section registry (kit.section in course.js), drawn by generic.js around InSIS's content.
+
   ipx.ready.then(() => {
     const data = parseTree() || parseNew();
     if (!data) return;
     remember(data);
     const common = { key: 'docserver', css: ['kit.css', 'pages/docserver.css'], title: nav.sectionLabel('courses.files'),
-      subtitle: nav.label('courses'), extra: pageActions(data.tabs) };
+      subtitle: nav.label('courses'), extra: materials.actions(null) };
 
     if (data.kind === 'tree') {
       takeover({ ...common, build: () => buildTree(data) });

@@ -267,7 +267,7 @@
       title: nav.label(route.node),
       build: () => emptyState(T.soon),
     };
-    takeover({ key: 'composed', css: page.css, title: page.title, subtitle: page.subtitle, build: page.build });
+    takeover({ key: 'composed', css: page.css, title: page.title, subtitle: page.subtitle, extra: page.actions, build: page.build });
     return true;
   }
 
