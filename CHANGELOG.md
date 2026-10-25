@@ -7,6 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Added
+- Extension icons (16–128 px), and a separate Chrome build (`insis-plus-x.y.z-chrome.zip`) without the
+  Firefox-only manifest keys Chrome warns about.
 - Top bar: one language menu instead of a button per language — a globe button with the current language (CS / SK /
   EN) opens Čeština · Slovenčina · English, each named in its own language, the current one ticked (InSIS shows
   only the other languages, so the current one used to be invisible); a light/dark toggle next to it (saved as the

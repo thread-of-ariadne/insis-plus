@@ -1,6 +1,7 @@
 """Build the extension zip that is uploaded to the stores and attached to GitHub releases.
 
-Usage: python scripts/package.py   ->  dist/insis-plus-<version>.zip
+Usage: python scripts/package.py   ->  dist/insis-plus-<version>.zip (Firefox, unpacked installs)
+                                       dist/insis-plus-<version>-chrome.zip (Chrome Web Store)
 
 Only what the extension needs goes in: manifest.json, the scripts and styles it lists, the pages/ folder,
 LICENSE and PRIVACY.md. Tests, docs and tooling stay out. Fails if a file the manifest references is missing.
@@ -40,12 +41,24 @@ def main():
     if missing:
         sys.exit(f"Missing files referenced by manifest.json: {', '.join(missing)}")
 
-    out = ROOT / "dist" / f"insis-plus-{manifest['version']}.zip"
-    out.parent.mkdir(exist_ok=True)
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for n in names:
-            z.write(ROOT / n, n)
-    print(f"{out.relative_to(ROOT)}  ({len(names)} files)")
+    (ROOT / "dist").mkdir(exist_ok=True)
+    for suffix, man in (("", manifest), ("-chrome", chrome_manifest(manifest))):
+        out = ROOT / "dist" / f"insis-plus-{manifest['version']}{suffix}.zip"
+        with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+            for n in names:
+                if n == "manifest.json":
+                    z.writestr(n, json.dumps(man, indent=2, ensure_ascii=False) + "\n")
+                else:
+                    z.write(ROOT / n, n)
+        print(f"{out.relative_to(ROOT)}  ({len(names)} files)")
+
+
+def chrome_manifest(manifest):
+    """The Chrome Web Store build: without the Firefox-only keys Chrome warns about."""
+    man = json.loads(json.dumps(manifest))
+    man.pop("browser_specific_settings", None)
+    man.get("background", {}).pop("scripts", None)
+    return man
 
 
 if __name__ == "__main__":
