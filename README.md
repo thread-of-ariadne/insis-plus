@@ -37,8 +37,9 @@ vyhledávání Ctrl+K a čitelné sylaby. Vše běží jen ve vašem prohlíže�
 
 Store releases are coming. Until then, install from source:
 
-1. Download the latest `insis-plus-x.y.z.zip` from [Releases](https://github.com/thread-of-ariadne/insis-plus/releases)
-   and unzip it, or clone this repository.
+1. Download the latest release from [Releases](https://github.com/thread-of-ariadne/insis-plus/releases)
+   (`insis-plus-x.y.z-chrome.zip` for Chrome, Edge and Brave, `insis-plus-x.y.z.zip` for Firefox) and unzip it,
+   or clone this repository.
 2. **Chrome / Edge / Brave**: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and
    choose the folder.
    **Firefox**: open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and choose
