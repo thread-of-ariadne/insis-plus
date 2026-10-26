@@ -1,7 +1,7 @@
 """Repository checks run by CI (and runnable locally): python scripts/check.py
 
 - manifest.json is valid JSON, its version is x.y.z and every file it references exists;
-- no logged-in InSIS snapshot (personal data) is tracked by git;
+- no logged-in InSIS snapshot (personal data) is tracked by git, nor any image or recording outside icons/;
 - CHANGELOG.md has an [Unreleased] section and an entry for the manifest version;
 - nav-data.js matches docs/ia/mapping.json, and the mapping passes scripts/ia_check.py.
 JavaScript syntax is checked separately with `node --check`.
@@ -30,6 +30,11 @@ for name in files_from_manifest(manifest):
 
 tracked = subprocess.run(["git", "ls-files", "test/fixtures/private"], cwd=ROOT, capture_output=True, text=True).stdout.split()
 leaked = [t for t in tracked if not t.endswith(".gitignore")]
+# Images, recordings and documents outside icons/: screenshots of InSIS pages show personal data.
+media = [t for t in subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.split()
+         if t.lower().endswith((".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".heic", ".webm", ".mp4", ".pdf")) and not t.startswith("icons/")]
+if media:
+    errors.append("images or recordings are tracked outside icons/ (screenshots can show personal data): " + ", ".join(media))
 if leaked:
     errors.append("private snapshots are tracked by git (personal data): " + ", ".join(leaked))
 

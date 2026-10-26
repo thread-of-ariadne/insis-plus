@@ -2,6 +2,21 @@
 test/fixtures/private/*
 !test/fixtures/private/.gitignore
 
+# Screenshots, recordings and documents: test tooling writes them to a scratch folder, never here (they can show
+# personal InSIS pages). Only the extension's icons are images of the repository.
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.bmp
+*.heic
+*.webm
+*.mp4
+*.pdf
+!icons/*.png
+docs/ia/review.html
+
 # Local tooling
 .claude/
 .vscode/
