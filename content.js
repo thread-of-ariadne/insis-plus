@@ -207,6 +207,7 @@
   async function clearAll() {
     await session.area.remove(session.key);
     await session.area.remove(CACHE_KEY);
+    await chrome.storage.local.remove('insisPlusBootTheme');
     const local = (await chrome.storage.local.get(STORE_KEY))[STORE_KEY] || {};
     await chrome.storage.local.set({ [STORE_KEY]: { shared: local.shared, sharedAsked: local.sharedAsked, users: {} } });
   }
@@ -332,6 +333,8 @@
   // ---------- theme (InSIS+ settings: system / light / dark) ----------
   // An explicit choice is an attribute: on <html> for InSIS's own content (generic.css), and data-theme on every
   // InSIS+ shadow host (marked data-ipx-host), whose stylesheets read it with :host([data-theme]).
+  const BOOT_THEME_KEY = 'insisPlusBootTheme';
+  let lastBootTheme = null;
   function applyTheme() {
     const theme = state.plus?.theme;
     const explicit = theme === 'light' || theme === 'dark' ? theme : null;
@@ -342,6 +345,14 @@
       else delete el.dataset.theme;
     }
     globalThis.__ipxBootTheme?.(theme); // the first-frame skeleton (boot.js) in the same colours
+    // The next page's first frame (boot.js) runs before the student is known, so it cannot read this student's
+    // settings: the last appearance used on this device is kept apart, as one word (light / dark / system).
+    const boot = explicit || 'system';
+    // Shared computer mode keeps nothing between sessions, this word included.
+    if (boot !== lastBootTheme) {
+      lastBootTheme = boot;
+      try { if (shared) chrome.storage.local.remove(BOOT_THEME_KEY); else chrome.storage.local.set({ [BOOT_THEME_KEY]: boot }); } catch {}
+    }
     globalThis.insisPlus?.ui?.syncTheme?.(); // the top bar's light/dark button
   }
   function setTheme(theme) {

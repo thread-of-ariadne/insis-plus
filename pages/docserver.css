@@ -2,7 +2,7 @@
    and, on the New documents page, into the page itself for InSIS's slotted "mark as read" form and its list
    (rules under html.ipx-ds). One column: the views have no rail (the New documents view is the one list of news). */
 
-.ds { display: flex; flex-direction: column; gap: 16px; max-width: 1000px; min-width: 0; }
+.ds { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .ds-sub { margin: 0; font-size: 13px; }
 .ds-inline { color: var(--accent); font-weight: 600; }
 .ds-inline:hover { text-decoration: underline; }

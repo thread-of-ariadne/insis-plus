@@ -23,6 +23,10 @@ itself), in the extension's local storage:
 - a small record for Notifications: the time of your last visit to Notifications and the last count of new
   documents (plain values; nothing about your grades or courses).
 
+**The appearance last used on this device** (one word: light, dark or system), not tied to any user, so the first
+frame of the next page is drawn in the right colours before InSIS+ knows who is logged in. Not kept in shared
+computer mode.
+
 **Shared computer mode** (asked once on the main page, changeable in InSIS+ settings): nothing at all is kept
 between sessions, no settings, no pins, no record.
 

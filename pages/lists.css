@@ -21,7 +21,7 @@ html.ipx-generic.ipx-il #str1 :is(div:not(.text):not(.small):not([class*="uis"])
 html.ipx-generic.ipx-il #str1 .small { width: auto !important; max-width: 100%; }
 
 /* ---------- a list: a card of rows ---------- */
-html.ipx-generic.ipx-il #str1 table[data-il] { display: block; width: 100%; max-width: 1100px; margin: 0 0 18px; border: 0; border-radius: 16px;
+html.ipx-generic.ipx-il #str1 table[data-il] { display: block; width: 100%; margin: 0 0 18px; border: 0; border-radius: 16px;
   background: var(--surface); box-shadow: var(--shadow-card); overflow: hidden; box-sizing: border-box; }
 html.ipx-generic.ipx-il #str1 table[data-il][data-il-title]::before { content: attr(data-il-title); display: block; padding: 14px 16px 4px; color: var(--fg);
   font: 700 15px "Figtree", system-ui, sans-serif; }
@@ -108,7 +108,7 @@ html.ipx-generic.ipx-il #str1 table[data-il] a[data-il-file="PDF"] { background:
 html.ipx-generic.ipx-il #str1 table[data-il] tr[data-il-row]:has(a[data-il-file]) > td:not([data-il-col="lead"]) :is(a, input, select, button) { position: relative; z-index: 2; }
 html.ipx-generic.ipx-il #str1 table[data-il]:has(a[data-il-file]) { --il-lead-w: 70px; }
 /* InSIS's explanation under its message */
-html.ipx-generic.ipx-il #str1 [data-il-msgnote] { display: block; max-width: 1100px; margin: -8px 0 14px; padding: 0 14px; color: var(--muted); font-size: 13px; }
+html.ipx-generic.ipx-il #str1 [data-il-msgnote] { display: block; margin: -8px 0 14px; padding: 0 14px; color: var(--muted); font-size: 13px; }
 
 /* A chip after a cell's text (a countdown to InSIS's date): data-il-chip, toned by data-il-tone */
 html.ipx-generic.ipx-il #str1 table[data-il] td[data-il-chip]::after { content: attr(data-il-chip); display: inline-block; margin-left: 8px; padding: 1px 7px;
@@ -171,7 +171,7 @@ html.ipx-generic.ipx-il #str1 [data-il-heading]:not([data-il-heading=""]) { font
 html.ipx-generic.ipx-il #str1 [data-il-heading]:not([data-il-heading=""])::before { content: attr(data-il-heading); font-size: 16px; }
 
 /* ---------- InSIS's messages ---------- */
-html.ipx-generic.ipx-il #str1 .uis_msg:not([data-ipx-keep="hide"]) { display: flex !important; align-items: flex-start; gap: 10px; width: auto !important; max-width: 1100px; margin: 0 0 14px; padding: 12px 14px; border: 0;
+html.ipx-generic.ipx-il #str1 .uis_msg:not([data-ipx-keep="hide"]) { display: flex !important; align-items: flex-start; gap: 10px; width: auto !important; margin: 0 0 14px; padding: 12px 14px; border: 0;
   border-radius: 12px; background: var(--chip); color: var(--fg-2); font-size: 14px; line-height: 1.45; box-sizing: border-box; }
 html.ipx-generic.ipx-il #str1 .uis_msg .text { color: inherit; font-weight: 600; }
 /* InSIS's message icon goes (the box's colour carries the tone); its empty box left a gutter before the text */
@@ -181,7 +181,7 @@ html.ipx-generic.ipx-il #str1 .uis_msg.warning { background: color-mix(in srgb, 
 html.ipx-generic.ipx-il #str1 .uis_msg.success, html.ipx-generic.ipx-il #str1 .uis_msg.ok { background: color-mix(in srgb, var(--il-ok) 13%, transparent); color: var(--il-ok); }
 
 /* ---------- InSIS's forms as cards, with one line saying what InSIS does (data-il-form) ---------- */
-html.ipx-generic.ipx-il #str1 [data-il-form] { display: block; max-width: 1100px; margin: 0 0 18px; padding: 16px 18px; border-radius: 16px; background: var(--surface);
+html.ipx-generic.ipx-il #str1 [data-il-form] { display: block; margin: 0 0 18px; padding: 16px 18px; border-radius: 16px; background: var(--surface);
   box-shadow: var(--shadow-card); box-sizing: border-box; }
 html.ipx-generic.ipx-il #str1 [data-il-form]:not([data-il-form=""])::before { content: attr(data-il-form); display: block; margin: 0 0 12px; color: var(--muted);
   font-size: 13.5px; line-height: 1.45; }
@@ -196,7 +196,7 @@ html.ipx-generic.ipx-il #str1 [data-il-form] table[data-il] { width: calc(100% +
 html.ipx-generic.ipx-il:not(.ipx-il-filter) #str1 form[data-il-fold] { display: none; }
 /* A filter table inside the list's own form (a form-edit table): a card of its own, folded under Filter */
 html.ipx-generic.ipx-il:not(.ipx-il-filter) #str1 table.form-edit[data-il-fold] { display: none; }
-html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter] { display: block; max-width: 1100px; margin: 0 0 14px; padding: 14px 16px; border-radius: 16px;
+html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter] { display: block; margin: 0 0 14px; padding: 14px 16px; border-radius: 16px;
   background: var(--surface); box-shadow: var(--shadow-card); box-sizing: border-box; }
 html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter]::before { content: attr(data-il-filter); display: block; margin: 0 0 10px; color: var(--muted); font-size: 13.5px; }
 html.ipx-generic.ipx-il #str1 table.form-edit[data-il-filter] td { padding: 4px 12px 4px 0 !important; border: 0 !important; background: none !important; vertical-align: middle; }

@@ -300,6 +300,11 @@
       // The course's files live here (04-materials.md §4.1): new documents first, then the folders that hold files
       // as one flat list with readable names; a folder opens InSIS's folder page, drawn as this course page.
       const f = folderOf(c.code);
+      // The document tree not read yet in this session (the background read runs a moment after the page loads; the
+      // page is drawn again when it arrives, composed.js): loading, not "no folder".
+      const sync = ipx.state.sync;
+      const pending = !ipx.state.plus?.pause && (sync?.running || !(sync?.updated > performance.timeOrigin));
+      if (!f && !ipx.state.docserver?.updated && pending) return [ipx.ui.skeleton('rows', 4)];
       if (!f || !nav.safe(f.href, 'link', { copied: true })) {
         return [emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }), h('p', { class: 'muted' }, T.moodle)];
       }

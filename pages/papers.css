@@ -7,7 +7,7 @@
 html.ipx-generic.ipx-papers #str1 .clm_main, html.ipx-generic.ipx-papers #str1 p:empty, html.ipx-generic.ipx-papers #str1 div:has(> form) > br { display: none !important; }
 
 /* ---------- Get a confirmation: two cards (sealed PDF, to print), the documents as a CZ | EN matrix of tiles ---------- */
-html.ipx-generic.ipx-papers #str1 table[data-ipx-block] { display: block; width: 100%; max-width: 860px; margin: 0 0 18px; padding: 6px 0 10px;
+html.ipx-generic.ipx-papers #str1 table[data-ipx-block] { display: block; width: 100%; margin: 0 0 18px; padding: 6px 0 10px;
   border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-card); }
 html.ipx-generic.ipx-papers #str1 table[data-ipx-block]::before { content: attr(data-ipx-title); display: block; padding: 10px 18px 8px; color: var(--fg);
   font: 700 15.5px "Figtree", sans-serif; }

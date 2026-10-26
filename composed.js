@@ -271,8 +271,26 @@
       build: () => emptyState(T.soon),
     };
     takeover({ key: 'composed', css: page.css, title: page.title, subtitle: page.subtitle, extra: page.actions, build: page.build });
+    shownNode = route.node;
     return true;
   }
+
+  // A composed page drawn before its data arrived (a new session that opens a course page first: the background
+  // read of the document tree, the timetable … finishes a few seconds later) is drawn again when the data comes,
+  // at the same scroll position; Home redraws itself (home.js). Data events are rare (one background read per
+  // page load, or another tab), so a reader is not interrupted while reading.
+  let shownNode = null;
+  let redraw = 0;
+  ipx.onData?.(() => {
+    clearTimeout(redraw);
+    redraw = setTimeout(() => {
+      const where = ipx.ui.here();
+      if (!shownNode || !where.composed || where.node !== shownNode || where.node === 'home') return;
+      const y = scrollY;
+      show(where);
+      scrollTo(0, y);
+    }, 250);
+  });
 
   // Moving between InSIS+ pages (and back to Home) stays in this document: the page is drawn again from the data
   // InSIS+ already holds, without asking InSIS's server for its main page. Only on InSIS's main page address.

@@ -3,7 +3,7 @@
    - in the shadow root (cat-…): the lead, the result cards, the rail. */
 
 /* ---------- InSIS's form, in place ---------- */
-html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] { display: block; max-width: 1100px; padding: 18px 20px; border-radius: 16px; background: var(--surface);
+html.ipx-generic.ipx-cat #str1 form[data-ipx-cat] { display: block; padding: 18px 20px; border-radius: 16px; background: var(--surface);
   box-shadow: var(--shadow-card); color: var(--fg-2); box-sizing: border-box;
   /* InSIS writes its label, the spacing and the result lines as loose text in the form: that text is hidden here
      (the results are drawn again under the form), every element gets its size back. */

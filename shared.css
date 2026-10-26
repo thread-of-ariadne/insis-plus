@@ -750,7 +750,7 @@ button.chip-btn { border: 0; cursor: pointer; }
 button.avatar { border: 0; cursor: pointer; }
 
 /* Grouped lists (Study matters, Campus & people, All services, Help, Account) */
-.glist { display: flex; flex-direction: column; gap: 26px; max-width: 980px; }
+.glist { display: flex; flex-direction: column; gap: 26px; }
 .glist-group { display: flex; flex-direction: column; gap: 12px; }
 .glist-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .glist-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; transition: transform 0.2s; }
@@ -854,7 +854,7 @@ a.person:hover { border-color: var(--accent); }
 .people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
 
 /* ---------- destination overview pages (Study matters, Campus & people) ---------- */
-.dest-page { display: flex; flex-direction: column; gap: 18px; max-width: 1100px; }
+.dest-page { display: flex; flex-direction: column; gap: 18px; }
 .dest-page .pad { padding: 16px 18px; }
 .dest-page .card-title { margin: 0 0 10px; font-size: 15.5px; font-weight: 700; }
 .dest-top { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; }

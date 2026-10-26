@@ -1,6 +1,6 @@
 /* InSIS+ course page and the Courses pages (course.js). Components and tokens in shared.css. */
 
-.course-page { display: flex; flex-direction: column; gap: 16px; max-width: 1000px; }
+.course-page { display: flex; flex-direction: column; gap: 16px; }
 .course-head { display: flex; flex-direction: column; gap: 8px; }
 .course-head .course-code { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
 .course-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; color: var(--muted); font-size: 14px; }

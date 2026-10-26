@@ -4,7 +4,8 @@
 // draws it (ui.takeover calls __ipxBootDone), or when InSIS+ does not take the page over (classic view, the login
 // page, a page no module recognises). Safety nets: InSIS's original page always comes back by itself — shortly after
 // the page has loaded, and in any case after a fixed time — so a failure in InSIS+ can never leave a blank page.
-// Nothing is read or sent; the theme comes from the system setting until InSIS+'s own setting is known.
+// Nothing is sent; the only thing read is the appearance last used on this device (light / dark / system, kept by
+// content.js), so the skeleton is never dark while InSIS+ is set to light, or the other way round.
 (() => {
   if (window.top !== window) return;
   const path = location.pathname;
@@ -15,7 +16,7 @@
   const style = document.createElement('style');
   style.id = 'insis-plus-boot';
   style.textContent = `
-    html.ipx-boot { background: #f2f4f8; }
+    html.ipx-boot:not(.ipx-boot-pending) { background: #f2f4f8; }
     html.ipx-boot body { visibility: hidden !important; }
     html.ipx-boot.ipx-boot-dark { background: #0c0e13; }
     #insis-plus-boot { position: fixed; inset: 0; z-index: 2147483647; display: grid; grid-template-columns: 256px minmax(0, 1fr);
@@ -51,15 +52,29 @@
   main.append(top, bar('b-tabs'), bar('b-card'), bar('b-card tall'), bar('b-card'));
   skel.append(side, main);
 
-  if (matchMedia('(prefers-color-scheme: dark)').matches) root.classList.add('ipx-boot-dark');
-  root.classList.add('ipx-boot');
-  root.append(style, skel);
+  // The original page is hidden at once; the skeleton is painted once the appearance is known (the read takes a few
+  // milliseconds; without it, e.g. on test pages, the system setting decides).
+  const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
+  const paint = (theme) => {
+    root.classList.remove('ipx-boot-pending');
+    if (finished) return;
+    root.classList.toggle('ipx-boot-dark', theme === 'dark' || (theme !== 'light' && systemDark()));
+    root.classList.add('ipx-boot');
+    root.append(skel);
+  };
+  root.classList.add('ipx-boot', 'ipx-boot-pending');
+  root.append(style);
+  try {
+    chrome.storage.local.get('insisPlusBootTheme').then((r) => paint(r?.insisPlusBootTheme), () => paint(null));
+  } catch {
+    queueMicrotask(() => paint(null)); // after `finished` below is set up
+  }
 
   let finished = false;
   const done = () => {
     if (finished) return;
     finished = true;
-    root.classList.remove('ipx-boot', 'ipx-boot-dark');
+    root.classList.remove('ipx-boot', 'ipx-boot-dark', 'ipx-boot-pending');
     style.remove();
     skel.remove();
   };

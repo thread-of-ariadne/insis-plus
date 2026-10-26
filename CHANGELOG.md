@@ -27,6 +27,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   widths the search box folds to its icon before a title wraps.
 
 ### Fixed
+- A course's Files tab said "The course folder could not be matched" when the page was drawn before the
+  background read of the document tree had finished; InSIS+ pages are now drawn again when their data arrives
+  (at the same scroll position), and the tab shows a loading placeholder until then.
+- The first-frame skeleton flashed dark on every page load when InSIS+ was set to light on a dark system (or the
+  other way round): it now uses the appearance last chosen on this device.
+- Pages had different widths (980–1100 px or the full width), so some sat squeezed to the left on wide screens:
+  every page now fills the content area; only long text keeps a reading width.
 - Catalogue: InSIS's result links are no longer moved out of its form, and the filters fold with CSS only.
 - Syllabus: the copied text keeps only text structure (an allow-list); images, frames and objects from
   teacher-entered HTML are dropped; the back link that failed the URL rule is gone; InSIS's output form is shown.
