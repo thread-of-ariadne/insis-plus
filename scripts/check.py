@@ -22,6 +22,8 @@ manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
 version = manifest.get("version", "")
 if not re.fullmatch(r"\d+\.\d+\.\d+", version):
     errors.append(f"manifest version '{version}' is not x.y.z")
+if len(manifest.get("description", "")) > 132:
+    errors.append(f"manifest description is {len(manifest['description'])} characters; the Chrome Web Store allows 132")
 for name in files_from_manifest(manifest):
     if not (ROOT / name).is_file():
         errors.append(f"manifest references a missing file: {name}")

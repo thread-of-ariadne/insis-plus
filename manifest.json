@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "InSIS+",
   "version": "0.9.0",
-  "description": "Faster, friendlier InSIS (insis.vse.cz): a task-based menu, Ctrl+K search, a dashboard and redesigned study pages. Everything stays in your browser.",
+  "description": "A friendlier InSIS (insis.vse.cz): task-based menu, Ctrl+K search, a dashboard and readable study pages. Data stays in your browser.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
