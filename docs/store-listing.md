@@ -72,8 +72,8 @@ Google Fonts (no code).
 
 - Personally identifiable information (name shown by InSIS)
 - Personal communications (unread count of InSIS mail)
-- Website content (InSIS pages)
-- Student data in the sense of the policy: timetable, results, deadlines
+- Web history (addresses and titles of InSIS pages opened, for Ctrl+K search)
+- Website content (InSIS pages: timetable, results, deadlines)
 
 Certify: not sold to third parties; not used or transferred for purposes unrelated to the single purpose; not used
 for creditworthiness or lending.
