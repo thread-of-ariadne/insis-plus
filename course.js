@@ -80,11 +80,14 @@
   // New documents in the student's courses (red badges count these only; faculty and university folders do not).
   function courseNewCount() {
     const ds = ipx.state.docserver;
-    if (!ds?.courses) return null;
+    // Unknown until the document tree has been read (the New list alone does not say which folder is a course's):
+    // no number at all then, never a "0" that is not true.
+    if (!ds?.updated || !ds.courses?.length) return null;
     const mine = new Set(courses().map((c) => c.code));
     return ds.courses.filter((c) => !mine.size || mine.has(c.code)).reduce((sum, c) => sum + (c.newCount || 0), 0);
   }
   ipx.courseNewCount = courseNewCount;
+  let triedTree = false;
   const folderOf = (code) => (ipx.state.docserver?.courses || []).find((c) => c.code === code) || null;
   const boxesOf = (code) => (ipx.state.submissions?.boxes || []).filter((b) => b.code === code);
 
@@ -302,9 +305,13 @@
       const f = folderOf(c.code);
       // The document tree not read yet in this session (the background read runs a moment after the page loads; the
       // page is drawn again when it arrives, composed.js): loading, not "no folder".
-      const sync = ipx.state.sync;
-      const pending = !ipx.state.plus?.pause && (sync?.running || !(sync?.updated > performance.timeOrigin));
-      if (!f && !ipx.state.docserver?.updated && pending) return [ipx.ui.skeleton('rows', 4)];
+      // The document tree not read yet in this session: read now (sync.js), loading meanwhile; the page is drawn again
+      // when it arrives (composed.js). A read that brought nothing ends in the message below, not in endless loading.
+      if (!f && !ipx.state.docserver?.updated && !ipx.state.plus?.pause && ipx.syncNow && !triedTree) {
+        triedTree = true;
+        ipx.syncNow('docserver');
+        return [ipx.ui.skeleton('rows', 4)];
+      }
       if (!f || !nav.safe(f.href, 'link', { copied: true })) {
         return [emptyState(T.noFolder, { href: nav.composedUrl('courses.files'), text: T.allFolders }), h('p', { class: 'muted' }, T.moodle)];
       }

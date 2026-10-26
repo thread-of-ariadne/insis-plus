@@ -169,3 +169,23 @@ html.ipx-generic.ipx-folder #str1 [data-ipx-block="ops"], html.ipx-generic.ipx-f
 
 html.ipx-generic.ipx-folder #str1 table[data-ipx-list] td[data-ipx-col="num"] { display: none !important; }
 html.ipx-generic.ipx-folder #str1 table[data-ipx-list] > tbody > tr > td:not([data-ipx-col]) { display: none !important; }
+
+/* InSIS's "Mark … as read" submits (folder.js): side by side under the pager, quiet, as wide as their text */
+/* The form's grid gets a fourth column so the two buttons sit side by side at their own widths; the sort control
+   spans the first two (wide screens; phones stack everything in one column). */
+@media (min-width: 641px) {
+  html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"]:has([data-ipx-part="mark-box"]) { grid-template-columns: max-content max-content max-content minmax(0, 1fr); }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"]:has([data-ipx-part="mark-box"]) > [data-ipx-part="sort"] { grid-column: 1 / 3; }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"]:has([data-ipx-part="mark-box"]) > [data-ipx-part="sort-go"] { grid-column: 3; justify-self: start; }
+}
+html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > [data-ipx-part="mark-box"] { grid-column: auto; grid-row: 5; justify-self: start; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-mark] { width: auto !important; min-height: 36px; padding: 0 14px; border-radius: 9px; background: var(--chip) !important;
+  color: var(--fg) !important; font-size: 13px; font-weight: 600; white-space: nowrap; }
+html.ipx-generic.ipx-folder #str1 [data-ipx-mark]:hover { color: var(--accent) !important; filter: none; }
+@media (max-width: 640px) {
+  html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] > [data-ipx-part="mark-box"] { grid-column: 1 / -1; grid-row: auto; justify-self: stretch; }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-mark] { width: 100% !important; max-width: 100%; }
+  /* The sort control's column must not be wider than the phone: the grid's columns shrink with it */
+  html.ipx-generic.ipx-folder #str1 [data-ipx-block="docs"] { grid-template-columns: minmax(0, 1fr) auto; }
+  html.ipx-generic.ipx-folder #str1 [data-ipx-part="sort"] { width: 100%; max-width: 100%; }
+}

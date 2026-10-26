@@ -96,6 +96,17 @@
         while (help && help.tagName === 'BR') help = help.previousElementSibling;
         if (help?.classList.contains('small')) help.setAttribute('data-ipx-part', 'sort-help');
       }
+      // InSIS's "Mark all items on page as read" / "… in folder as read": two different submits, drawn side by side
+      // under the list as quiet buttons (InSIS's own controls, only marked: the box that holds each, as a child of
+      // the form, so the grid can place it).
+      for (const b of form?.querySelectorAll('input[type="submit"], button[type="submit"]') || []) {
+        if (b.getAttribute('data-ipx-part') || b.closest('[data-ipx-part="sort"]')) continue;
+        let box = b;
+        while (box.parentElement && box.parentElement !== form) box = box.parentElement;
+        if (box.contains(docs) || box.querySelector('ul.paginator')) continue;
+        box.setAttribute('data-ipx-part', 'mark-box');
+        b.setAttribute('data-ipx-mark', '');
+      }
       const pagers = [...(form?.querySelectorAll('ul.paginator') || [])];
       if (pagers.length > 1) pagers[0].setAttribute('data-ipx-part', 'pager-top');
       [...(form?.querySelectorAll(':scope > .small') || [])].find((d) => /\d/.test(d.textContent))?.setAttribute('data-ipx-part', 'count');

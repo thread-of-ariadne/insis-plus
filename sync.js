@@ -13,7 +13,9 @@
   if (!ipx?.ui) return;
 
   const MAX_AGE = 3 * 3600e3; // data older than this is loaded again
-  const LOCK = 2 * 60e3; // another tab started a sync less than this ago: let it finish
+  // Another tab's sync that showed life less than this ago: let it finish. Each step renews it, so a run that was
+  // cut short (the student moved on to another page) holds the lock only briefly.
+  const LOCK = 20e3;
   const TIMEOUT = 25e3;
 
   const at = (path) => new URL(path, document.baseURI).href;
@@ -57,20 +59,37 @@
     // The portal first: it has this student's own addresses for the other pages.
     if (stale('portal', 12 * 3600e3)) await load('portal', at('/auth/student/moje_studium.pl'));
     const links = ipx.state.portal?.links || {};
+    // Small and most used first: a student moving on quickly still gets the timetable and the course folders; the
+    // study record (the largest page) last but one.
     const steps = [
       ['timetable', links.timetable?.href],
-      ['studyRecord', links.record?.href],
-      ['submissions', links.submissions?.href],
       ['docserver', at('/auth/dok_server/')],
+      ['submissions', links.submissions?.href],
+      ['studyRecord', links.record?.href],
       // The mail box: only the unread count it shows, for the envelope badge (pages/messages.js).
       ['messages', at('/auth/posta/slozka.pl')],
     ];
-    for (const [key, url] of steps) if (url && stale(key)) await load(key, url);
+    for (const [key, url] of steps) {
+      if (!url || !stale(key) || asked.has(key)) continue;
+      ipx.state.sync = { updated: Date.now(), running: true };
+      await load(key, url);
+    }
 
     ipx.state.sync = { updated: Date.now(), running: false };
     await ipx.save();
     ipx.notify();
   }
+
+  // A page that needs one of these right now (a course's Files tab needs the document tree) asks for it at once,
+  // without waiting for the queue; the page is drawn again when it arrives (ipx.onData).
+  const asked = new Set();
+  ipx.syncNow = (key) => {
+    if (asked.has(key) || ipx.state.plus?.pause || !new URL(document.baseURI).pathname.startsWith('/auth/')) return;
+    const url = { docserver: at('/auth/dok_server/') }[key];
+    if (!url) return;
+    asked.add(key);
+    load(key, url).then(() => ipx.notify());
+  };
 
   ipx.ready.then(() => {
     // Only for a logged-in student (every logged-in page is under /auth/), in the tab's top window.

@@ -27,6 +27,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   widths the search box folds to its icon before a title wraps.
 
 ### Fixed
+- A black frame on every page change: the new InSIS+ page appeared for a moment before its stylesheet had loaded
+  (its icons filled the window). A page is now shown only with its styles; until then the skeleton or the previous
+  page stays.
+- A course's Files tab loaded for a long time: the background read was cut short whenever the student moved on
+  and then held its lock for 2 minutes. The lock is now 20 s and renewed at each step, the document tree is read
+  second, and the Files tab reads the tree at once when it is missing.
+- "New documents" showed 0 until the document tree had been read; it now shows no number until it is known.
+- A folder page's "Mark all items on page / in folder as read" (InSIS's two buttons) were two full-width primary
+  bars; they are now quiet buttons side by side.
 - A syllabus's Regular course units (also on the course page) are drawn like the academic calendar: the next
   session and how many have taken place, then the sessions by month, past ones dimmed, the next marked. InSIS's
   repeated rows (one per study programme) are shown once; when the personal timetable says which group is yours,

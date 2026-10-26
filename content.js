@@ -526,7 +526,8 @@
     performance.mark('insis-plus:ready');
     // Once every module has had its turn on this page: if none drew an InSIS+ page, the skeleton of the first frame
     // (boot.js) gives way to InSIS's own page.
-    setTimeout(() => globalThis.__ipxBootDone?.(), 0);
+    // (A page that did draw one ends the skeleton itself, once its styles are in: ui.takeover.)
+    setTimeout(() => { if (!document.getElementById('insis-plus-page')) globalThis.__ipxBootDone?.(); }, 0);
     watchActivity();
     applyTheme();
     indexPage();

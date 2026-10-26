@@ -403,8 +403,10 @@
   function takeover({ key, css, title, subtitle, extra, build, slotted }) {
     // Drawing another InSIS+ page in the same document (moving between Home and the InSIS+ pages that live on its
     // address): the previous one goes. Only pages without slotted InSIS content are ever redrawn this way.
-    const previous = document.getElementById('insis-plus-page');
-    if (previous && !previous.children.length) previous.remove();
+    // It stays on screen until the new one has its styles (below), so the switch is one frame, not a blank one.
+    const previousHost = document.getElementById('insis-plus-page');
+    const previous = previousHost && !previousHost.children.length ? previousHost : null;
+    previous?.removeAttribute('id');
     if (!document.getElementById('insis-plus-takeover-style')) {
       const style = h('style', { id: 'insis-plus-takeover-style' });
       style.textContent = `
@@ -455,8 +457,25 @@
       bottomBar());
     const pill = h('button', { class: 'pill', type: 'button', onclick: () => setClassic(false) }, icon('layout'), T.back);
 
+    // The page is shown only once its stylesheet has loaded: before that, an unstyled shell would flash (its icons are
+    // SVGs that fill the window in black). Until then the first-frame skeleton (boot.js) or the previous InSIS+ page
+    // stays; the host is out of view (display: none still loads the stylesheets of its shadow root).
+    host.style.display = 'none';
+    const shell = shellEl;
+    let shown = false;
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      host.style.removeProperty('display');
+      previous?.remove();
+      if (!isClassic()) globalThis.__ipxBootDone?.(); // the first-frame skeleton gives way to this page
+      requestAnimationFrame(() => shell.classList.add('ready'));
+    };
     const sharedCss = h('link', { rel: 'stylesheet', href: chrome.runtime.getURL('shared.css') });
-    sharedCss.addEventListener('load', () => requestAnimationFrame(() => shellEl.classList.add('ready')));
+    sharedCss.addEventListener('load', show);
+    // A stylesheet that fails (or never answers) must not keep the page hidden.
+    sharedCss.addEventListener('error', show);
+    setTimeout(show, 3000);
     root.append(
       ...[
         sharedCss,
@@ -496,7 +515,8 @@
       pill.hidden = !classic;
       ipx.setFab(classic);
       window.scrollTo(0, 0);
-      globalThis.__ipxBootDone?.(); // the first-frame skeleton (boot.js) gives way to this page
+      // Classic view: InSIS's own page at once. Otherwise the skeleton gives way when the styles are in (show).
+      if (classic) { host.style.removeProperty('display'); previous?.remove(); globalThis.__ipxBootDone?.(); }
     }
     apply();
     return root;

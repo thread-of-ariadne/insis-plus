@@ -427,7 +427,7 @@
         fresh: d.docs.slice(0, 60).map((doc) => ({ id: doc.id, name: doc.name, type: doc.type || '', author: doc.author?.text || '',
           date: doc.date ? doc.date.toISOString() : null, folderId: doc.folder?.id || null, folderName: doc.folder?.name || '', code: codeOf(doc) })),
         freshPartial: partial,
-        courses: partial ? prev.courses || [] : (prev.courses || []).map((c) => {
+        courses: partial || !prev.courses ? prev.courses : prev.courses.map((c) => {
           const tree = recount(c.tree);
           const fresh = perFolder[folderId(c.href)] || 0;
           return { ...c, newCount: perCourse[c.code] || 0, fresh, tree };
