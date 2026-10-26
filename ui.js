@@ -268,7 +268,7 @@
     return h('aside', { class: 'side', 'aria-label': T.navigation },
       h('div', { class: 'side-head' },
         h('a', { class: 'brand', href: destHref(DESTS[0]) },
-          h('span', { class: 'mark' }, 'VŠE'),
+          h('span', { class: 'mark', 'aria-hidden': 'true' }, 'I', h('i', {}, '+')),
           h('span', { class: 'brand-name' }, 'InSIS', h('i', {}, '+'))),
         h('button', { class: 'icon-btn collapse', type: 'button', title: T.collapse, 'aria-label': T.collapse,
           onclick: () => setCollapsed(!ipx.state.sideCollapsed) }, icon('panel'))),

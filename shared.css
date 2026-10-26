@@ -131,17 +131,19 @@ button { font: inherit; color: inherit; }
 .side-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 22px 14px 16px 22px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .mark {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: #1e2a8a;
+  background: #2b4c9b;
   color: #fff;
-  font: 700 11px var(--font);
+  font: 700 17px var(--font);
   letter-spacing: 0.02em;
 }
+.mark i { font-style: normal; color: #8fb0ff; }
 .brand-name { font: 700 18px var(--display); letter-spacing: -0.02em; color: var(--fg); }
 .brand-name i { font-style: normal; color: var(--accent); }
 
