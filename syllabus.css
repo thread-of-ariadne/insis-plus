@@ -128,3 +128,27 @@ details.legend[open] summary { margin-bottom: 10px; }
    takes the icon (span.icon) too — the icon stays here (shared fix requested). */
 .page-actions > .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .page-actions > .btn > span.icon svg { width: 16px; height: 16px; }
+
+/* Regular course units (syllabus.js unitsBlock): the academic calendar's time line (pages/weeks.css), su- prefix */
+.su-kpis { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 6px; }
+.su-kpis .num.text { font-size: 20px; line-height: 1.2; }
+.su-month { margin: 14px 0 4px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.su-events { margin: 0; padding: 0; list-style: none; }
+.su-event { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; align-items: baseline; gap: 6px 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+.su-month + .su-events .su-event:first-child { border-top: 0; }
+.su-when { color: var(--fg-2); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.su-what { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.su-what strong { color: var(--fg); font-size: 14.5px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.su-what small { color: var(--faint); font-size: 12px; }
+.su-event.past { opacity: .55; }
+.su-event.next { box-shadow: inset 3px 0 0 var(--accent); padding-left: 12px; margin-left: -12px; }
+.su-event.next .su-when { color: var(--accent); }
+.su-type { padding: 1px 8px; border-radius: 6px; background: var(--chip); color: var(--muted); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.su-type.lecture { background: var(--accent-soft); color: var(--accent); }
+.su-teacher { margin: 10px 0 0; }
+@media (max-width: 600px) {
+  .su-event { grid-template-columns: minmax(0, 1fr) auto; }
+  .su-when { grid-column: 1 / -1; }
+}
+.su-units .card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.su-groups button { min-height: 32px; font-size: 13px; }

@@ -20,14 +20,17 @@
       grading: 'Z čeho se skládá hodnocení', workload: 'Časová zátěž', details: 'Další údaje', total: 'Celkem',
       table: 'Zobrazit tabulku', syllabusLang: 'Jazyk sylabu', output: 'PDF a další formáty',
       outputLead: 'Vyberte formát a stiskněte Zobrazit; InSIS ho vytvoří. Druhá podoba sylabu:', coursePage: 'Stránka předmětu', passRates: 'Úspěšnost',
-      none: 'Žádné údaje.' },
+      none: 'Žádné údaje.', next: 'Příští', held: 'Proběhlo', heldOf: (a, b) => `${a} z ${b}`, heldFoot: 'termínů tohoto rozvrhu',
+      every: 'Každý týden', today: 'dnes', tomorrow: 'zítra', inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), capacity: 'kapacita', allHeld: 'Všechny termíny proběhly', mine: 'Moje skupina', allGroups: (n) => `Všechny skupiny (${n})`, groups: 'Skupiny' },
     en: { ects: 'ECTS credits', work: (n) => `≈ ${n} h of work`, completion: 'Completion', language: 'Language',
       mode: 'Teaching per week', modeHint: 'lectures / seminars', semester: 'Semester', lecturers: 'Lecturers',
       grading: 'How the grade is made up', workload: 'Workload', details: 'More details', total: 'Total',
       table: 'Show table', syllabusLang: 'Syllabus language', output: 'PDF and other formats',
       outputLead: 'Choose a format and press Display; InSIS creates it. The other form of the syllabus:', coursePage: 'Course page', passRates: 'Pass rates',
-      none: 'No data.' },
+      none: 'No data.', next: 'Next', held: 'Held', heldOf: (a, b) => `${a} of ${b}`, heldFoot: 'sessions of this timetable',
+      every: 'Every week', today: 'today', tomorrow: 'tomorrow', inDays: (n) => `in ${n} days`, capacity: 'capacity', allHeld: 'All sessions have taken place', mine: 'My group', allGroups: (n) => `All groups (${n})`, groups: 'Groups' },
   }[lang];
+  const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
   // Label → key, matched on diacritic-free lowercase label text (English and Czech).
   const FACTS = [
@@ -231,6 +234,118 @@
     ipx.save();
   }
 
+  // ---------- Regular course units: a time line like the academic calendar (pages/weeks.js) ----------
+  // InSIS's table has one row per timetable entry (a lecture, a seminar group) and, in its Day / Time / Room / Type
+  // cells, one line per session (dates joined by <br>), or a weekday when the entry repeats. Drawn as: a summary
+  // (the next session, how many have taken place), then the sessions grouped by month, past ones dimmed, the next
+  // one marked; weekly entries as one "Every week" group. InSIS's own table stays one click away (Show table): it
+  // also has the capacity, exceptions and notes.
+  const lines = (td) => {
+    if (!td) return [];
+    const out = [''];
+    for (const n of td.childNodes) { if (n.nodeName === 'BR') out.push(''); else out[out.length - 1] += n.textContent; }
+    return out.map((t) => clean(t)).filter((t, i, a) => t || i < a.length - 1);
+  };
+  function readUnits(el) {
+    const table = el.querySelector('table');
+    const heads = table ? [...table.querySelectorAll('thead th, tr.zahlavi > th')].map((th) => norm(clean(th.textContent))) : [];
+    const col = (re) => heads.findIndex((t) => re.test(t));
+    const iDay = col(/^(day|den)$/), iTime = col(/^(time|cas)$/), iRoom = col(/^(room|mistnost)$/);
+    if (iDay < 0 || iTime < 0) return null;
+    const iType = col(/type of event|typ akce/), iTeacher = col(/^(teacher|vyucujici)$/), iCap = col(/^(capacity|kapacita)$/);
+    const iExc = col(/^(exceptions|vyjimky)$/), iNote = col(/^(note|poznamka)$/);
+    const dated = [];
+    const weekly = [];
+    const seen = new Set();
+    const groups = [];
+    for (const tr of table.querySelectorAll('tbody > tr')) {
+      const td = [...tr.children];
+      if (td.length < heads.length) continue; // "No suitable data found."
+      // InSIS lists the same entry once per study programme it is open to: identical rows are one entry.
+      const sig = td.map((c) => clean(c.textContent)).join('|');
+      if (seen.has(sig)) continue;
+      seen.add(sig);
+      const day = lines(td[iDay]), time = lines(td[iTime]), room = lines(td[iRoom]), type = lines(td[iType]);
+      const at = (arr, i) => arr[i] ?? arr[0] ?? '';
+      const extra = [iExc, iNote].map((i) => clean(td[i]?.textContent)).filter((t) => t && t !== '-');
+      const group = groups.length;
+      groups.push({ start: (at(time, 0).match(/\d{1,2}:\d{2}/) || [''])[0], type: at(type, 0) });
+      const row = { group, teacher: clean(td[iTeacher]?.textContent), capacity: clean(td[iCap]?.textContent), extra: extra.join(' · ') };
+      day.forEach((d, i) => {
+        const t = at(time, i);
+        const from = ipx.kit.dateOf(`${d} ${(t.match(/\d{1,2}:\d{2}/) || [''])[0]}`.trim());
+        const unit = { ...row, day: d, time: t.replace(/\s*-\s*/, '–'), room: at(room, i), type: at(type, i), from };
+        (from ? dated : weekly).push(unit);
+      });
+    }
+    if (!dated.length && !weekly.length) return null;
+    dated.sort((a, b) => a.from - b.from);
+    return { dated, weekly, groups };
+  }
+
+  function unitsBlock(all, label, el, code) {
+    const zero = (t) => t.replace(/^(\d):/, '0$1:');
+    let mine = [];
+    let choosable = false;
+    const box = h('section', { class: 'card block su-units' });
+    const draw = (onlyMine) => {
+      const myStarts = new Set((ipx.state.timetable?.events || []).filter((e) => e.code === code && e.start).map((e) => zero(e.start)));
+      mine = all.groups.map((g, i) => (myStarts.has(zero(g.start)) ? i : -1)).filter((i) => i >= 0);
+      choosable = all.groups.length > 1 && mine.length > 0 && mine.length < all.groups.length;
+      onlyMine = onlyMine && choosable;
+      const pick = (x) => !onlyMine || mine.includes(x.group);
+      box.replaceChildren(...unitsBody({ dated: all.dated.filter(pick), weekly: all.weekly.filter(pick) }, label, el,
+        choosable && h('div', { class: 'segmented su-groups', role: 'radiogroup', 'aria-label': T.groups },
+          [[true, T.mine], [false, T.allGroups(all.groups.length)]].map(([v, text]) => h('button', { type: 'button', role: 'radio',
+            class: v === onlyMine ? 'on' : null, 'aria-checked': String(v === onlyMine), onclick: () => draw(v) }, text)))));
+    };
+    draw(true);
+    // The personal timetable may arrive after the page was drawn (background read): the student's group then
+    // becomes known, and the block is drawn again with it (only while the student has not switched).
+    let touched = false;
+    box.addEventListener('click', (e) => { if (e.target.closest('.su-groups')) touched = true; });
+    ipx.onData?.(() => { if (box.isConnected && !touched && !choosable) draw(true); });
+    return box;
+  }
+
+  function unitsBody(u, label, el, switcher) {
+    const now = new Date();
+    const dayStart = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const end = (x) => { const m = x.time.match(/–(\d{1,2}):(\d{2})/); const e = new Date(x.from); if (m) e.setHours(+m[1], +m[2]); return e; };
+    const past = u.dated.filter((x) => end(x) < now);
+    const next = u.dated.find((x) => end(x) >= now);
+    const dayLabel = (d) => d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+    const until = (d) => { const n = Math.round((dayStart(d) - dayStart(now)) / 864e5); return n <= 0 ? T.today : n === 1 ? T.tomorrow : T.inDays(n); };
+    const teachers = new Set(u.dated.concat(u.weekly).map((x) => x.teacher));
+    const what = (x) => h('span', { class: 'su-what' }, h('strong', {}, [x.time, x.room].filter(Boolean).join(' · ')),
+      (teachers.size > 1 || x.extra) && h('small', {}, [teachers.size > 1 && x.teacher, x.extra].filter(Boolean).join(' · ')));
+    const chip = (x) => x.type && h('span', { class: 'su-type' + (/lecture|prednask/.test(norm(x.type)) ? ' lecture' : '') }, x.type);
+    const months = new Map();
+    for (const x of u.dated) {
+      const key = x.from.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+      if (!months.has(key)) months.set(key, []);
+      months.get(key).push(x);
+    }
+    return [
+      h('div', { class: 'card-head' }, h('h2', {}, label), switcher),
+      u.dated.length > 0 && h('div', { class: 'kpis su-kpis' },
+        next ? kpi(T.next, `${dayLabel(next.from)}, ${next.time.split('–')[0]}`, [next.room, until(next.from)].filter(Boolean).join(' · '), true)
+          : kpi(T.next, T.allHeld, null, true),
+        kpi(T.held, T.heldOf(past.length, u.dated.length), T.heldFoot, true)),
+      h('div', { class: 'su-timeline' },
+        [...months].map(([m, list]) => [
+          h('h3', { class: 'su-month' }, m),
+          h('ul', { class: 'su-events' }, list.map((x) => h('li', { class: 'su-event' + (end(x) < now ? ' past' : '') + (x === next ? ' next' : '') },
+            h('span', { class: 'su-when' }, dayLabel(x.from)), what(x), chip(x))))]),
+        u.weekly.length > 0 && [
+          h('h3', { class: 'su-month' }, T.every),
+          h('ul', { class: 'su-events' }, u.weekly.map((x) => h('li', { class: 'su-event' },
+            h('span', { class: 'su-when' }, x.day), what(x), chip(x))))]),
+      teachers.size === 1 && [...teachers][0] && h('p', { class: 'muted small su-teacher' }, [...teachers][0],
+        u.dated.concat(u.weekly)[0].capacity && ` · ${T.capacity} ${u.dated.concat(u.weekly)[0].capacity}`),
+      h('details', { class: 'legend' }, h('summary', {}, T.table), content(el))];
+  }
+
   // embedded: inside the course page (no back link, no language switch); rail: nodes to put on top of the right
   // column (the course page's next classes and to-do).
   function buildPage(d, { embedded = false, rail: railTop = [] } = {}) {
@@ -248,7 +363,10 @@
     const rail = [];
     d.sections.forEach((s, i) => {
       const chart = shares(s.el);
-      if (chart) {
+      const units = !chart && readUnits(s.el);
+      if (units) {
+        main.push({ id: `s${i}`, label: s.label, node: unitsBlock(units, s.label, s.el, d.code) });
+      } else if (chart) {
         rail.push(h('section', { class: 'card' },
           h('div', { class: 'card-head' }, h('h2', {}, chart.unit === '%' ? T.grading : T.workload)),
           shareChart(chart),

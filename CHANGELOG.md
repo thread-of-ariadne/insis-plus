@@ -27,6 +27,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   widths the search box folds to its icon before a title wraps.
 
 ### Fixed
+- A syllabus's Regular course units (also on the course page) are drawn like the academic calendar: the next
+  session and how many have taken place, then the sessions by month, past ones dimmed, the next marked. InSIS's
+  repeated rows (one per study programme) are shown once; when the personal timetable says which group is yours,
+  only your group is shown, with All groups one click away. InSIS's table stays under Show table.
 - A course's Files tab said "The course folder could not be matched" when the page was drawn before the
   background read of the document tree had finished; InSIS+ pages are now drawn again when their data arrives
   (at the same scroll position), and the tab shows a loading placeholder until then.
