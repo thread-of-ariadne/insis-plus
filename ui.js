@@ -542,33 +542,236 @@
   const facultyFor = (code, text = '') =>
     Object.values(ipx.state.courses || {}).find((c) => c.code === code)?.faculty || facultyOf(text) || facultyFromCode(code);
 
-  // A cover drawn from the course code: the same code always gives the same picture of "bursts"
-  // (rays from a centre), so every course is recognisable at a glance without any images.
-  function cover(code, fac, W = 150, H = 108) {
-    let seed = 0;
-    for (const ch of code || '?') seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-    const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
-    const [bg, ink] = facultyColors(fac);
-    const bursts = [];
-    const n = 1 + Math.floor(rnd() * 3);
-    for (let i = 0; i < n; i++) {
-      const big = i === 0;
-      const cx = (big ? 0.3 + rnd() * 0.25 : 0.65 + rnd() * 0.25) * W;
-      const cy = (0.25 + rnd() * 0.5) * H;
-      const r = (big ? 0.34 + rnd() * 0.12 : 0.12 + rnd() * 0.1) * Math.min(W, H) * 1.2;
-      const rays = [6, 8, 12, 16][Math.floor(rnd() * 4)];
-      const turn = rnd() * Math.PI;
-      let d = '';
-      for (let k = 0; k < rays; k++) {
-        const a = turn + (k / rays) * Math.PI * 2;
-        d += `M${cx.toFixed(1)} ${cy.toFixed(1)}L${(cx + Math.cos(a) * r).toFixed(1)} ${(cy + Math.sin(a) * r).toFixed(1)}`;
-      }
-      const ring = big && rnd() > 0.5 ? `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(r * 0.45).toFixed(1)}"/>` : '';
-      bursts.push(`<g stroke="#2a2a3a" stroke-opacity=".75" stroke-width="1" fill="none"><path d="${d}"/>${ring}</g>` +
-        `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${big ? 3 : 2}" fill="${ink}"/>`);
+  // Seeded random numbers from the course code (string hash + mulberry32), so the same code always draws
+  // the same cover and codes that differ in one digit still look different.
+  function seededRandom(str) {
+    let s = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      s = Math.imul(s ^ str.charCodeAt(i), 3432918353);
+      s = (s << 13) | (s >>> 19);
     }
+    let a = s >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const pickOf = (rnd, list) => list[Math.floor(rnd() * list.length)];
+  const r1 = (n) => Math.round(n * 10) / 10;
+  const hexRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const rgbHex = (c) => '#' + c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+  const mixHex = (a, b, t) => { const x = hexRgb(a), y = hexRgb(b); return rgbHex(x.map((v, i) => v + (y[i] - v) * t)); };
+  function hueShift(hex, deg) {
+    const [r, g, b] = hexRgb(hex).map((v) => v / 255);
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let hue = 0, s = 0;
+    if (d) {
+      s = d / (1 - Math.abs(2 * l - 1));
+      hue = 60 * (mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4);
+    }
+    hue = (hue + deg + 360) % 360;
+    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((hue / 60) % 2) - 1)), m = l - c / 2;
+    const rgb = hue < 60 ? [c, x, 0] : hue < 120 ? [x, c, 0] : hue < 180 ? [0, c, x] : hue < 240 ? [0, x, c] : hue < 300 ? [x, 0, c] : [c, 0, x];
+    return rgbHex(rgb.map((v) => (v + m) * 255));
+  }
+  // Smooth value noise on a seeded lattice, two octaves.
+  function valueNoise(rnd) {
+    const N = 32, v = Array.from({ length: N * N }, rnd);
+    const at = (x, y) => v[(((y % N) + N) % N) * N + (((x % N) + N) % N)];
+    const s = (t) => t * t * (3 - 2 * t);
+    const n = (x, y) => {
+      const xi = Math.floor(x), yi = Math.floor(y), xf = s(x - xi), yf = s(y - yi);
+      const a = at(xi, yi), b = at(xi + 1, yi), c = at(xi, yi + 1), d = at(xi + 1, yi + 1);
+      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+    };
+    return (x, y) => n(x, y) * 0.7 + n(x * 2.1 + 7.3, y * 2.1 + 1.7) * 0.3;
+  }
+
+  // Every faculty has its own generative motif, so the faculty shows in the picture, not only in its colour.
+  // Each takes (rnd, W, H, palette) and returns SVG markup.
+  const MOTIFS = {
+    // FIS: circuit board. Traces walk a grid in 45° steps without crossing and end in pads.
+    circuit(rnd, W, H, p) {
+      const g = H > 80 ? H / 9 : Math.max(4.5, H / 6), cols = Math.floor(W / g), rows = Math.floor(H / g);
+      const ox = (W - (cols - 1) * g) / 2, oy = (H - (rows - 1) * g) / 2;
+      const used = new Set(), key = (x, y) => x + ',' + y;
+      const DIR = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
+      const free = (x, y) => x >= 0 && y >= 0 && x < cols && y < rows && !used.has(key(x, y));
+      const traces = [];
+      for (let t = 0; t < cols * rows; t++) {
+        let x = Math.floor(rnd() * cols), y = Math.floor(rnd() * rows);
+        if (!free(x, y)) continue;
+        let dir = Math.floor(rnd() * 4) * 2;
+        const pts = [[x, y]];
+        used.add(key(x, y));
+        const len = 3 + Math.floor(rnd() * Math.max(cols, rows));
+        for (let k = 0; k < len; k++) {
+          if (rnd() < 0.25) dir = (dir + (rnd() < 0.5 ? 1 : 7)) % 8;
+          const [dx, dy] = DIR[dir];
+          // A diagonal step must not cut through another trace's diagonal.
+          if (!free(x + dx, y + dy) || (dx && dy && used.has(key(x + dx, y)) && used.has(key(x, y + dy)))) break;
+          x += dx; y += dy;
+          used.add(key(x, y));
+          pts.push([x, y]);
+        }
+        if (pts.length > 2) traces.push(pts);
+      }
+      let thin = '', bold = '', pads = '';
+      for (const pts of traces) {
+        const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(ox + x * g)} ${r1(oy + y * g)}`).join('');
+        if (rnd() < 0.3) bold += d; else thin += d;
+        for (const [x, y] of [pts[0], pts[pts.length - 1]]) pads += `<circle cx="${r1(ox + x * g)}" cy="${r1(oy + y * g)}" r="${r1(g * 0.24)}"/>`;
+      }
+      let chip = '';
+      if (H > 80 && rnd() < 0.6) {
+        const x = ox + Math.floor(rnd() * (cols - 3)) * g, y = oy + Math.floor(rnd() * (rows - 2)) * g;
+        chip = `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(g * 3)}" height="${r1(g * 2)}" rx="${r1(g * 0.25)}" fill="${p.dark}"/>`;
+      }
+      return `<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${thin}" stroke="${p.mid}" stroke-width="${r1(Math.max(1, g * 0.16))}"/>` +
+        `<path d="${bold}" stroke="${p.ink}" stroke-width="${r1(Math.max(1.4, g * 0.26))}"/></g>` +
+        `<g fill="${p.bg}" stroke="${p.ink}" stroke-width="${r1(Math.max(1, g * 0.12))}">${pads}</g>${chip}`;
+    },
+
+    // NF: topographic map, isolines of a noise field (marching squares).
+    contours(rnd, W, H, p) {
+      const noise = valueNoise(rnd), g = Math.max(W, H) / 34, nx = Math.ceil(W / g) + 1, ny = Math.ceil(H / g) + 1;
+      const sc = 2.4 / H, ox = rnd() * 20, oy = rnd() * 20;
+      const v = [];
+      for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) v.push(noise(ox + i * g * sc, oy + j * g * sc));
+      const at = (i, j) => v[j * nx + i];
+      // Corner mask -> segments between cell edges (0 top, 1 right, 2 bottom, 3 left).
+      const SEGS = [null, [[3, 2]], [[2, 1]], [[3, 1]], [[0, 1]], [[3, 0], [2, 1]], [[0, 2]], [[3, 0]],
+        [[3, 0]], [[0, 2]], [[0, 1], [3, 2]], [[0, 1]], [[3, 1]], [[2, 1]], [[3, 2]]];
+      const levels = 9;
+      let out = '';
+      for (let L = 1; L < levels; L++) {
+        const t = 0.15 + (L / levels) * 0.75;
+        let d = '';
+        for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+          const a = at(i, j), b = at(i + 1, j), c = at(i + 1, j + 1), e = at(i, j + 1);
+          const idx = (a > t) * 8 + (b > t) * 4 + (c > t) * 2 + (e > t);
+          if (!idx || idx === 15) continue;
+          const x = i * g, y = j * g, k = (p1, p2) => (t - p1) / (p2 - p1);
+          const E = [[x + g * k(a, b), y], [x + g, y + g * k(b, c)], [x + g * k(e, c), y + g], [x, y + g * k(a, e)]];
+          for (const [m, n] of SEGS[idx]) d += `M${r1(E[m][0])} ${r1(E[m][1])}L${r1(E[n][0])} ${r1(E[n][1])}`;
+        }
+        const strong = L % 4 === 0;
+        out += `<path d="${d}" fill="none" stroke="${strong ? p.ink : p.mid}" stroke-width="${strong ? 1.3 : 0.8}" stroke-linecap="round"/>`;
+      }
+      return out;
+    },
+
+    // FFU: guilloché rosettes, like banknote engraving. Coprime R:r, so a curve closes and never collapses into an ellipse.
+    guilloche(rnd, W, H, p) {
+      const [R, r] = pickOf(rnd, [[7, 3], [8, 3], [9, 4], [11, 4], [10, 3], [7, 2], [9, 2], [11, 3], [12, 5], [13, 5]]);
+      const cx = W * (0.35 + rnd() * 0.3), cy = H * (0.4 + rnd() * 0.2), reach = Math.max(W, H) * (0.5 + rnd() * 0.25);
+      let out = '';
+      for (const [k, col, sw] of [[1, p.mid, 0.8], [0.7, p.ink, 0.9], [0.42, p.accent, 1]]) {
+        const d0 = r * (0.6 + rnd() * 1.2), S = (reach * k) / (R - r + d0), N = 520;
+        let d = '';
+        for (let i = 0; i <= N; i++) {
+          const t = (i / N) * 2 * Math.PI * r;
+          const x = (R - r) * Math.cos(t) + d0 * Math.cos(((R - r) / r) * t);
+          const y = (R - r) * Math.sin(t) - d0 * Math.sin(((R - r) / r) * t);
+          d += `${i ? 'L' : 'M'}${r1(cx + x * S)} ${r1(cy + y * S)}`;
+        }
+        out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${sw}"/>`;
+      }
+      return out;
+    },
+
+    // FPH: Bauhaus grid, every cell a colour plus one rotated shape.
+    bauhaus(rnd, W, H, p) {
+      const rows = H > 80 ? 3 : 2, cs = H / rows, cols = Math.ceil(W / cs);
+      const colors = [p.bg, p.ink, p.mid, p.light, p.dark, p.accent], weights = [3, 2, 2, 2, 1, 1];
+      const total = weights.reduce((a, b) => a + b);
+      const color = () => { let t = rnd() * total, i = 0; while ((t -= weights[i]) > 0) i++; return colors[i]; };
+      const c = r1(cs), half = r1(cs / 2);
+      const shapes = [
+        `<path d="M0 0H${c}A${c} ${c} 0 0 1 0 ${c}Z"/>`,
+        `<path d="M0 ${c}A${half} ${half} 0 0 1 ${c} ${c}Z"/>`,
+        `<path d="M0 0L${c} 0L0 ${c}Z"/>`,
+        `<circle cx="${half}" cy="${half}" r="${r1(cs * 0.32)}"/>`,
+        `<path d="M0 0H${c}A${c} ${c} 0 0 1 0 ${c}Z"/><circle cx="${c}" cy="${c}" r="${r1(cs * 0.18)}"/>`,
+        '',
+      ];
+      let out = '';
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        const fill = color();
+        let shape = color();
+        if (shape === fill) shape = fill === p.ink ? p.light : p.ink;
+        out += `<g transform="translate(${r1(x * cs)} ${r1(y * cs)}) rotate(${Math.floor(rnd() * 4) * 90} ${half} ${half})">` +
+          `<rect width="${c}" height="${c}" fill="${fill}"/><g fill="${shape}">${pickOf(rnd, shapes)}</g></g>`;
+      }
+      return out;
+    },
+
+    // FMV: flow field, short streamlines following the angle of a noise field.
+    flow(rnd, W, H, p) {
+      const noise = valueNoise(rnd), sc = 1.6 / H, ox = rnd() * 20, oy = rnd() * 20, step = Math.min(W, H) / 40;
+      const lines = Math.round((W * H) / 260), turns = 3 + rnd() * 3;
+      let thin = '', bold = '';
+      for (let n = 0; n < lines; n++) {
+        let x = rnd() * W, y = rnd() * H, d = `M${r1(x)} ${r1(y)}`;
+        for (let k = 0; k < 24; k++) {
+          const a = noise(ox + x * sc, oy + y * sc) * Math.PI * turns;
+          x += Math.cos(a) * step; y += Math.sin(a) * step;
+          d += `L${r1(x)} ${r1(y)}`;
+          if (x < -5 || y < -5 || x > W + 5 || y > H + 5) break;
+        }
+        if (rnd() < 0.18) bold += d; else thin += d;
+      }
+      return `<path d="${thin}" fill="none" stroke="${p.mid}" stroke-width=".9" stroke-linecap="round"/>` +
+        `<path d="${bold}" fill="none" stroke="${p.ink}" stroke-width="1.8" stroke-linecap="round"/>`;
+    },
+
+    // FM: circle packing, the biggest circle that fits at each random point.
+    packing(rnd, W, H, p) {
+      const circles = [], rmax = Math.min(W, H) * 0.32, rmin = Math.max(1.2, Math.min(W, H) / 70);
+      for (let t = 0; t < 500 && circles.length < 140; t++) {
+        const x = rnd() * W, y = rnd() * H;
+        let r = rmax;
+        for (const c of circles) { r = Math.min(r, Math.hypot(c[0] - x, c[1] - y) - c[2] - 1.2); if (r < rmin) break; }
+        if (r >= rmin) circles.push([x, y, r * (0.75 + rnd() * 0.25)]);
+      }
+      let out = '';
+      for (const [x, y, r] of circles) {
+        const k = rnd(), at = `cx="${r1(x)}" cy="${r1(y)}"`;
+        if (k < 0.3) out += `<circle ${at} r="${r1(r)}" fill="${p.ink}"/>`;
+        else if (k < 0.6) out += `<circle ${at} r="${r1(r)}" fill="${p.mid}"/>`;
+        else out += `<circle ${at} r="${r1(r - 0.6)}" fill="none" stroke="${p.ink}" stroke-width="1.2"/>` +
+          (r > 6 ? `<circle ${at} r="${r1(r * 0.45)}" fill="${p.accent}"/>` : '');
+      }
+      return out;
+    },
+
+    // Unknown faculty: Truchet tiles, two quarter arcs per cell that join into long tubes.
+    truchet(rnd, W, H, p) {
+      const s = H / (H > 80 ? pickOf(rnd, [3, 4, 5]) : pickOf(rnd, [2, 3])), cols = Math.ceil(W / s) + 1, rows = Math.ceil(H / s);
+      const r = r1(s / 2), tube = 0.22 + rnd() * 0.2;
+      let d = '';
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        const X = x * s, Y = y * s;
+        d += rnd() < 0.5
+          ? `M${r1(X + s / 2)} ${r1(Y)}A${r} ${r} 0 0 1 ${r1(X)} ${r1(Y + s / 2)}M${r1(X + s / 2)} ${r1(Y + s)}A${r} ${r} 0 0 1 ${r1(X + s)} ${r1(Y + s / 2)}`
+          : `M${r1(X + s / 2)} ${r1(Y)}A${r} ${r} 0 0 0 ${r1(X + s)} ${r1(Y + s / 2)}M${r1(X)} ${r1(Y + s / 2)}A${r} ${r} 0 0 1 ${r1(X + s / 2)} ${r1(Y + s)}`;
+      }
+      return `<path d="${d}" fill="none" stroke="${p.mid}" stroke-width="${r1(s * tube)}"/>` +
+        `<path d="${d}" fill="none" stroke="${p.ink}" stroke-width="${r1(s * 0.1)}"/>`;
+    },
+  };
+  const MOTIF_BY_FACULTY = { FIS: 'circuit', NF: 'contours', FFU: 'guilloche', FPH: 'bauhaus', FMV: 'flow', FM: 'packing' };
+
+  // A cover drawn from the course code in the faculty's colours and motif: every course is recognisable
+  // at a glance without any images, and its faculty shows in the picture itself.
+  function cover(code, fac, W = 150, H = 108) {
+    const [bg, ink] = facultyColors(fac);
+    const p = { bg, ink, mid: mixHex(bg, ink, 0.45), light: mixHex(bg, '#ffffff', 0.55), accent: hueShift(ink, 38), dark: mixHex(ink, '#10131f', 0.55) };
+    const art = MOTIFS[MOTIF_BY_FACULTY[fac] || 'truchet'](seededRandom(code || '?'), W, H, p);
     return h('span', { class: 'cover', 'aria-hidden': 'true' },
-      svg(`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"><rect width="${W}" height="${H}" fill="${bg}"/>${bursts.join('')}</svg>`));
+      svg(`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"><rect width="${W}" height="${H}" fill="${bg}"/>${art}</svg>`));
   }
 
   // ---------- shared components (documented in docs/agents.md) ----------
