@@ -42,7 +42,7 @@
   });
 
   const heading = (node) => {
-    for (let n = node.previousElementSibling, k = 0; n && k < 8; n = n.previousElementSibling, k++) if (n.tagName === 'B') return n;
+    for (let n = ipx.kit.prev(node), k = 0; n && k < 8; n = ipx.kit.prev(n), k++) if (n.tagName === 'B') return n;
     return null;
   };
 

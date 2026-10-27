@@ -279,7 +279,7 @@ higher than the page-load counts in `01-current-map.md` §2. ↓ marks a regress
 | Register courses | 5+ (icon) | Courses → Registration & enrolment → InSIS step page → submit | 4+ | 4+ |
 | Did I pass | 3 | Grades & credits | 1 | 1 |
 | What's left in my plan | 3 | Grades & credits → What's left | 2 | 2 |
-| Points so far | 5 | Course card → Points (to verify: lectures sheet read on opening) | 2 | 2 |
+| Points so far | 5 | Course card (or Grades & credits) → Points: the sheets and totals | 1 | 1 |
 | New materials in a course | 3–6 | Home › New materials → the course's folder | 1 | 1 |
 | Materials of any of my courses | 3–6 | Courses → Materials → the course's folder (or course card → Files → folder) | 3 | 3 |
 | Full timetable | 2 (hunt) | Home › Full timetable → (or Schedule › My week) | 1 | 1 |

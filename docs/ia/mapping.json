@@ -2042,7 +2042,7 @@
     },
     "/auth/student/list.pl": {
       "node": "course.points",
-      "note": "never read until verify_effect is confirmed (safety review 2026-10-24)",
+      "note": "verify_effect confirmed 2026-10-27: the points page (prubezne=1) is a plain view (no seen or new state anywhere: the lectures sheet is byte-identical, analytics id aside, before and after four points pages were read); only that variant is read, when a course's Points tab opens. The lectures sheet itself (no predmet) is not read; its notice switch (predmet_e, email_on) is an action and never linked.",
       "also": [
         "course.files",
         "course.overview"
@@ -2051,15 +2051,17 @@
         "no predmet": "courses.mine",
         "predmet=mine": "course.points"
       },
-      "read": "never",
+      "read": "on-open",
       "link": "shell",
+      "fetch": [
+        "obdobi,predmet,prubezne,studium"
+      ],
       "links": [
         "obdobi,predmet,prubezne,studium",
         "obdobi,studium"
       ],
       "action": "link",
-      "verify_data": "course-folder links",
-      "verify_effect": "that reading it when the course page opens marks nothing as seen"
+      "verify_data": "course-folder links"
     },
     "/auth/student/mapa_studii.pl": {
       "node": "grades.plan",

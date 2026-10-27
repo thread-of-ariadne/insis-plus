@@ -134,6 +134,14 @@
       if (line?.classList.contains('small')) line.setAttribute('data-ipx-block', dirs.querySelector('tbody > tr a[href*="slozka.pl"]') ? 'folders-line' : 'folders-empty');
     }
 
+    // A document's details (View information) opened from a course's folder stay inside the course too: the same
+    // fragment on InSIS's own link (it changes nothing that is requested; the details page reads it, course.js).
+    if (/[#&]ipx-in=course/.test(location.hash)) {
+      for (const a of page.querySelectorAll('a[href*="dokumenty_cteni.pl"]')) {
+        if (!a.getAttribute('href').includes('#')) a.setAttribute('href', `${a.getAttribute('href')}#ipx-in=course`);
+      }
+    }
+
     // The folder's administrators line (InSIS's intro paragraph) and the actions row ("Transactions in folder").
     const intro = [...page.querySelectorAll(':scope div.small')].find((d) => d.querySelector('a[href*="clovek.pl"]'));
     intro?.setAttribute('data-ipx-block', 'admins');
@@ -142,8 +150,8 @@
       ops.parentElement.setAttribute('data-ipx-block', 'ops');
       ops.setAttribute('data-ipx-title', T.actions);
       // InSIS's heading and help line above the actions: shown by the block's own title instead.
-      let el = ops.parentElement.previousElementSibling;
-      for (let i = 0; el && i < 6; i++, el = el.previousElementSibling) {
+      let el = ipx.kit.prev(ops.parentElement);
+      for (let i = 0; el && i < 6; i++, el = ipx.kit.prev(el)) {
         if (el.tagName === 'B' || el.classList.contains('small')) { el.setAttribute('data-ipx-block', 'ops-head'); if (el.tagName === 'B') break; }
       }
     }

@@ -121,7 +121,7 @@
       const block = strip.closest('table') || strip;
       block.setAttribute('data-ipx-block', sealed ? 'sealed' : 'plain');
       block.setAttribute('data-ipx-title', sealed ? T.sealed : T.plain);
-      for (let el = block.previousElementSibling, i = 0; el && i < 6; el = el.previousElementSibling, i++) {
+      for (let el = ipx.kit.prev(block), i = 0; el && i < 6; el = ipx.kit.prev(el), i++) {
         if (el.matches('b, .small, br, p')) el.setAttribute('data-ipx-keep', 'hide');
         if (el.tagName === 'B') break;
       }

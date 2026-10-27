@@ -51,7 +51,7 @@
   // Which of InSIS's four tables: by the bold heading before it (Czech or English), else by position.
   const KINDS = [['mine', /registered for|jsem prihlasen|prihlasen/], ['open', /can register|mohu|lze/], ['rejected', /reject|zamit/], ['closed', /closed|uzavren/]];
   function headingOf(table) {
-    for (let n = table.previousElementSibling, k = 0; n && k < 8; n = n.previousElementSibling, k++) {
+    for (let n = ipx.kit.prev(table), k = 0; n && k < 8; n = ipx.kit.prev(n), k++) {
       if (n.tagName === 'B') return n;
       if (n.tagName === 'TABLE') return null;
     }

@@ -4,6 +4,7 @@
 // InSIS's forms are never copied or submitted: formCard() shows the form element itself (slotted) inside a card.
 //
 // ipx.kit.portalLink(path, add)  → the student's own link to an InSIS page (from the portal), through the URL rule
+// ipx.kit.prev(el)                → the element before el, past InSIS's table-manager insertions
 // ipx.kit.plural(n, one, few, many)  → the Czech plural form for n (0 and 5+ take "many")
 // ipx.kit.readTable(table)        → { head: [text], rows: [{ cells: [{ text, links, el }], el }] }
 // ipx.kit.findTables(root)        → InSIS data tables (with a header row) in reading order
@@ -123,6 +124,16 @@
   const FACULTY_BY_LOGO = { ffu: 'FFU', fmv: 'FMV', fph: 'FPH', fis: 'FIS', fnh: 'NF', fmh: 'FM' };
   const FACULTY_BY_CODE = { 10: 'FFU', 20: 'FMV', 30: 'FPH', 40: 'FIS', 50: 'NF', 60: 'FM' };
 
+  // The element before `el`, past what InSIS's table manager inserts in front of a sortable table on the live page
+  // (its toolbox, the "Display:" column toggles and their scripts). Headings found by walking back from a table
+  // ("Extra-semestral courses that you can enrol in the future") are then as far away as in the page's markup.
+  const INJECTED = (n) => /^(SCRIPT|STYLE|NOSCRIPT)$/.test(n.tagName) || (n.tagName === 'DIV' && n.matches('.jstm-toolbox, .clm_main'));
+  function prev(el) {
+    let n = el?.previousElementSibling || null;
+    while (n && INJECTED(n)) n = n.previousElementSibling;
+    return n;
+  }
+
   // Czech plural forms: 1 → one, 2–4 → few, everything else (0, 5+) → many. ("1 složka, 3 složky, 0 / 5 složek")
   const plural = (n, one, few, many) => (n === 1 ? one : n >= 2 && n <= 4 ? few : many);
 
@@ -209,5 +220,5 @@
 
     const note = ({ tone, text }) => h('p', { class: `kit-note ${tone}` }, ipx.ui.icon(tone === 'bad' || tone === 'warn' ? 'alert' : 'info'), h('span', {}, text));
 
-  ipx.kit = { section, sectionFor, sectionTabs, plural, portalLink, FACULTY_BY_LOGO, FACULTY_BY_CODE, readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
+  ipx.kit = { prev, section, sectionFor, sectionTabs, plural, portalLink, FACULTY_BY_LOGO, FACULTY_BY_CODE, readTable, findTables, keyValues, insisTabs, messages, looseText, dateOf, linkOf, cellText, dataTable, facts, note, formCard, page };
 })();

@@ -50,7 +50,7 @@
       emptyNew: 'Nemáte žádné nové dokumenty.', inCourses: 'Ve složkách předmětů', ofCourses: (n) => `${n} ${ipx.kit.plural(n, 'předmět', 'předměty', 'předmětů')}`,
       perCourse: 'Podle předmětů', otherFolders: (n) => `${n} v ostatních složkách (fakulta, škola)`,
       markLead: 'Seznam je původní seznam InSIS. Otevřený dokument se v něm už nemusí znovu ukázat. Více dokumentů najednou označíte jako přečtené zaškrtnutím a tlačítkem InSIS pod seznamem.',
-      treeTip: 'Předměty u nových dokumentů InSIS+ pozná, až jednou otevřete Strom dokumentů.' },
+      treeTip: 'Předměty u nových dokumentů InSIS+ pozná, až jednou otevřete Strom dokumentů.', courseFiles: 'Soubory předmětu' },
     en: { tag: 'new', fresh: 'New documents', newBadge: (n) => `${n} new`,
       inside: (n) => `${n} new ${n === 1 ? 'document' : 'documents'} in subfolders`,
       files: (n) => `${n} ${n === 1 ? 'file' : 'files'}`,
@@ -63,7 +63,7 @@
       emptyNew: 'You have no new documents.', inCourses: 'In course folders', ofCourses: (n) => `${n} ${n === 1 ? 'course' : 'courses'}`,
       perCourse: 'By course', otherFolders: (n) => `${n} in other folders (faculty, university)`,
       markLead: 'This is InSIS\'s own list. A document you open may no longer show up in it. To mark several as read at once, tick them and press InSIS\'s button under the list.',
-      treeTip: 'InSIS+ can tell the courses of new documents once you have opened the Document tree.' },
+      treeTip: 'InSIS+ can tell the courses of new documents once you have opened the Document tree.', courseFiles: 'Course files' },
   }[lang];
   const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
 
@@ -194,8 +194,8 @@
         author: personA ? { text: clean(personA.textContent), href: personA.href, target: personA.target ? '_blank' : null } : null,
         dateText: clean(dateTd?.textContent), date: parseDate(dateTd?.textContent),
         file: fileA?.href || null, info: infoA?.href || null, type: mime.toUpperCase(),
-        // InSIS's folder cell of the row (never stored): gets the course chip, styled in place.
-        cell: folderTd >= 0 ? tds[folderTd] : null,
+        // InSIS's folder cell and row (never stored): get the course chip and the cell roles, styled in place.
+        cell: folderTd >= 0 ? tds[folderTd] : null, row: tr,
       });
     }
     const refresh = [...doc.querySelectorAll('#str1 a[href]')].find((a) => /nove_dok\.pl(\?lang=\w+)?$/.test(a.getAttribute('href')) && clean(a.textContent) && !a.closest('table.portal_menu'));
@@ -346,11 +346,21 @@
 
   // The rows of InSIS's table get the column name as a data attribute, so on phones each row reads as a card
   // (CSS only: the cells, links and checkboxes stay exactly where InSIS put them).
+  // The role of each column by its header (InSIS: Sel. · Folder · Name · Comments · Entered by · Entered on · Display ·
+  // Attachment; Ozn. · Složka · Název · Komentář · Vložil · Vloženo · Zobrazit · Příloha), for the row layout.
+  const ROLES = [['sel', /^(sel|ozn)/], ['folder', /^(folder|slozka)/], ['name', /^(name|nazev)/], ['note', /^(comment|koment|poznam)/],
+    ['by', /^(entered by|vlozil)/], ['date', /^(entered on|vlozeno|date|datum)/], ['info', /^(display|zobraz)/], ['file', /^(attachment|priloha)/]];
   function labelCells(table) {
-    const heads = [...(table?.querySelectorAll('thead th, tr.zahlavi > th') || [])].map((th) => clean(th.textContent).replace(/\s*\(.*$/, ''));
+    const raw = [...(table?.querySelectorAll('thead th, tr.zahlavi > th') || [])].map((th) => clean(th.textContent).replace(/\s*\(.*$/, ''));
+    const roles = raw.map((t) => ROLES.find(([, re]) => re.test(norm(t)))?.[0] || null);
     for (const tr of table?.querySelectorAll('tbody tr') || []) {
-      [...tr.children].forEach((td, i) => { if (heads[i]) td.setAttribute('data-ipx-label', heads[i]); });
+      [...tr.children].forEach((td, i) => {
+        if (raw[i]) td.setAttribute('data-ipx-label', raw[i]);
+        if (roles[i]) td.setAttribute('data-ipx-col', roles[i]);
+      });
     }
+    // The rows' layout applies only when every role was recognised (an unknown InSIS column keeps the plain table).
+    if (roles.length && roles.every(Boolean)) table.setAttribute('data-ipx-rows', '');
   }
 
   function buildNew(d) {
@@ -437,6 +447,29 @@
     ipx.save();
   }
 
+  // A document's details (dokumenty_cteni.pl, "View information"): InSIS's form holds a two-column table (Name ·
+  // Entered by · Document date · Comments · Attachment, with empty spacer rows) and its "Download and save" button,
+  // which submits the form. Everything stays InSIS's, in place: each row gets its role and pages/docserver.css draws
+  // the form as one card (the name as its title, the facts under it, the attachment with InSIS's button last).
+  // The header (Materials, or the course when opened from it) and the path come from the sections in course.js.
+  function docDetails() {
+    const page = document.getElementById('str1');
+    const form = page?.querySelector('form[action*="dokumenty_cteni"]');
+    const table = form?.querySelector('table');
+    if (!table) return;
+    const rows = [...table.querySelectorAll(':scope > tbody > tr')];
+    rows.forEach((tr, i) => {
+      const role = !clean(tr.textContent) ? 'gap' : tr.querySelector('input[type="submit"]') ? 'file' : i === 0 ? 'name' : 'fact';
+      tr.setAttribute('data-ipx-doc', role);
+    });
+    form.setAttribute('data-ipx-doc-card', '');
+    // InSIS's one-line help ("Use this application to read documents.") says what the page is; the header does.
+    const help = [...page.querySelectorAll('div.small')].filter((d) => !form.contains(d));
+    ipx.ui.hideInSlot([...help, ...help.map((d) => d.nextElementSibling).filter((n) => n?.tagName === 'BR')]);
+    document.documentElement.classList.add('ipx-docinfo');
+    styleSlotted('pages/docserver.css');
+  }
+
   // Background read (sync.js): parse a fetched page and store its data; nothing is drawn.
   (ipx.readers ||= {}).docserver = (fetched, url) => {
     doc = fetched; here = new URL(url);
@@ -448,7 +481,16 @@
 
   ipx.ready.then(() => {
     const data = parseTree() || parseNew();
-    if (!data) return;
+    if (!data) {
+      // Any other page of the document server (a folder, a document's details, Search, settings) carries InSIS's tab
+      // row with "New documents (N)" (no number: none new): the Materials tab's count follows it, before the header
+      // is drawn (generic.js), so every page of the section shows InSIS's own number.
+      const path = nav.route(document.baseURI.split('#')[0]).path || '';
+      const tab = path.startsWith('/auth/dok_server/') && newTab(tabRow());
+      if (tab && ipx.state.docserver) { ipx.state.docserver.newCount = tab.count ?? 0; ipx.save(); }
+      if (path === '/auth/dok_server/dokumenty_cteni.pl') docDetails();
+      return;
+    }
     remember(data);
     const common = { key: 'docserver', css: ['kit.css', 'pages/docserver.css'], title: nav.sectionLabel('courses.files'),
       subtitle: nav.label('courses'), extra: materials.actions(null) };
@@ -464,11 +506,21 @@
       // Only InSIS's own "mark as read" form (with its list) stays visible, in place; its rows are styled, not moved.
       ipx.ui.keepOnly(page, data.form);
       labelCells(data.form.querySelector('table:has(input[name="oznacene"])') || data.form.querySelector('table'));
-      // A course chip on each row of a course's document (a data attribute; CSS draws it before InSIS's folder link).
+      // Each row reads like the course page's document rows (course.js docRow): the type, the name, then "folder ·
+      // author · date" under it. Only data attributes are set (the role of each cell, the course chip, the readable
+      // folder name and the type); CSS lays InSIS's own cells out, and the folder link keeps its address and text.
       const folders = ipx.state.docserver?.folders || {};
+      const courseFolder = (code) => (ipx.state.docserver?.courses || []).find((c) => c.code === code);
       for (const x of data.docs) {
         const code = (x.folder?.id && folders[x.folder.id]) || x.folder?.name.match(CODE_RE)?.[1];
         if (code && x.cell) x.cell.setAttribute('data-ipx-course', code);
+        const a = x.cell?.querySelector('a[href]');
+        if (a && x.folder) {
+          const own = code && folderId(courseFolder(code)?.href) === x.folder.id;
+          const label = own || (code && CODE_RE.test(x.folder.name) && x.folder.name.startsWith(code)) ? T.courseFiles : ipx.folderLabel?.(x.folder.name) || x.folder.name;
+          if (label !== clean(a.textContent)) a.setAttribute('data-ipx-text', label);
+        }
+        if (x.row && x.type) x.row.querySelector('[data-ipx-col="file"] a[href]')?.setAttribute('data-ipx-type', x.type.slice(0, 4));
       }
       document.documentElement.classList.add('ipx-ds');
       styleSlotted('pages/docserver.css');

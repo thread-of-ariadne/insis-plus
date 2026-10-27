@@ -210,7 +210,7 @@
         // Numbers in a "Choose/View" cell of an icon only, or a plain value.
         return [`c${i}`, c.text || null];
       })));
-      const title = clean(table.previousElementSibling?.tagName === 'B' ? table.previousElementSibling.textContent : '');
+      const title = clean(ipx.kit.prev(table)?.tagName === 'B' ? ipx.kit.prev(table).textContent : '');
       return [title && sectionHead(title), kit.dataTable({ columns: cols, rows, empty: T.empty })];
     });
     return {

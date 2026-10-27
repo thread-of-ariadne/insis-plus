@@ -20,40 +20,44 @@
       filesN: (n) => `${n} ${n === 1 ? 'soubor' : n >= 2 && n <= 4 ? 'soubory' : 'souborů'}`, folderEmpty: 'Složka je zatím prázdná.',
       folderNote: 'Složky se otevírají v InSIS až na vaše kliknutí: otevření může označit soubory jako přečtené.', noFolder: 'Složku předmětu se nepodařilo spárovat podle kódu.',
       allFolders: 'Všechny složky', moodle: 'Někteří vyučující dávají materiály do Moodlu.', noBoxes: 'Pro tento předmět nejsou žádné odevzdávárny.',
-      topics: 'Přihlašování na témata', result: 'Výsledek', points: 'Průběžné body',
-      pointsText: 'Body z průběžného hodnocení ukazuje InSIS v listu předmětu.', examDates: 'Termíny zkoušek', tests: 'Online testy a kvízy',
+      topics: 'Přihlašování na témata', result: 'Výsledek', points: 'Průběžné hodnocení',
+      pointsLoad: 'Načítám body…', pointsNone: 'Body se nepodařilo načíst.', pointsEmpty: 'Vyučující vám v tomto předmětu zatím nezapsali žádné body.',
+      pointsLead: 'Body a hodnocení, které vám vyučující zapisují během semestru.', total: 'Celkem', notYet: 'zatím nic',
+      notCounted: 'nezapočteno', notCountedNote: 'Šedé hodnoty se do součtu nepočítají: InSIS sčítá jen čísla zapsaná ve správném tvaru.',
+      allStudents: 'Všichni studenti', pointsEarlier: 'Průběžné hodnocení minulých období InSIS+ nezobrazuje: najdete ho v listu předmětů daného období v InSIS.',
+      upNext: 'Ještě vás čeká', examDates: 'Termíny zkoušek', tests: 'Online testy a kvízy',
       classmates: 'Spolužáci', classmatesLoad: 'Načítám seznam…', classmatesNone: 'Seznam spolužáků se nepodařilo načíst.',
       classmatesAll: 'Celý seznam v InSIS', notMine: 'Tento předmět není mezi vašimi zapsanými předměty.',
-      lectures: 'List předmětu v InSIS', syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
+      syllabusLoad: 'Načítám sylabus…', syllabusNone: 'Sylabus se nepodařilo načíst.', syllabusFull: 'Celý sylabus v InSIS',
       teachersTitle: 'Vyučující', noTeachers: 'Vyučující se nepodařilo zjistit.', nextShort: 'příště', dueShort: 'odevzdat',
       coursesEmpty: 'Zapsané předměty se zatím nenačetly.', mineHint: (sem) => `Předměty ${sem ? `období ${sem}` : 'tohoto období'} podle e-indexu.`, finished: (n) => `Dokončené (${n})`,
       byCourse: 'Podle předmětů', newDocs: 'Nové dokumenty', tree: 'Strom dokumentů', search: 'Hledat', views: 'Pohledy na materiály', dsSettings: 'Nastavení', myFolders: 'Moje složky', courseFiles: 'Soubory předmětu', newInCourse: 'Nové v tomto předmětu', newInCourses: 'Nové ve vašich předmětech', fromList: (t) => `Podle seznamu Nové z ${t}`, openNew: 'Otevřít Nové', emptyFolders: (n) => `${n} ${ipx.kit.plural(n, 'prázdná složka', 'prázdné složky', 'prázdných složek')}`, noFiles: 'K tomuto předmětu zatím na dokumentovém serveru nejsou žádné soubory.', foldersTitle: 'Složky', openFolderHint: 'Složka se otevře v InSIS, v rámci tohoto předmětu.', earlier: 'Dřívější období', filesShort: (n) => `${n} ${ipx.kit.plural(n, 'soubor', 'soubory', 'souborů')}`, newShort: (n) => `${n} ${ipx.kit.plural(n, 'nový', 'nové', 'nových')}`, noNewYet: 'Nové dokumenty se ukážou, když otevřete Nové.', materials: 'Materiály', allFoldersTab: 'Všechny složky', displaySettings: 'E-mail a zobrazení', yourFolders: 'Vaše složky', settingsNote: 'InSIS+ čte strom dokumentů: když ho v nastavení necháte začínat níž, můžou se tu vaše předměty přestat ukazovat.', foldersEmpty: (v) => `${v}: zatím nic`, foldersHelp: 'Složky, které jste si na dokumentovém serveru sami založili (máte k nim plné právo SUPER). Studenti je obvykle nemají.',
       library: 'E-knihovna', libraryText: 'Veřejné studijní materiály, které zveřejňují katedry.',
       untilAt: (d) => `do ${d}`, closedOn: (d) => `uzavřeno ${d}`, confirmed: 'potvrzeno', submitted: 'odevzdáno', nothingIn: 'nic neodevzdáno', notOpen: (d) => `otevře se ${d}`,
       noResult: 'Výsledek zatím není zapsaný.', entered: (d) => `zapsáno ${d}`, attemptN: (n) => `${n}. pokus`, allAttempts: 'Všechny pokusy ve Výsledcích',
-      examText: 'Termíny zkoušek tohoto předmětu a přihlašování na ně jsou v Termínech zkoušek.', examLink: 'Moje termíny',
-      testsText: 'Online testy a kvízy předmětu se spouštějí v seznamu testů v InSIS.', testsLink: 'Seznam testů',
-      sheetLink: 'List předmětu', statusLabel: 'Stav předmětu' },
+      statusLabel: 'Stav předmětu' },
     en: { inProgress: 'In progress', passed: 'Passed', failed: 'Not passed',
       next: 'Next classes', noClasses: 'No more classes of this course in the timetable.', waiting: 'What is coming', nothing: 'Nothing waiting.',
       folder: 'Course folder on the document server', newN: (n) => `${n} new`, openFolder: 'Open in InSIS',
       filesN: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, folderEmpty: 'The folder is empty so far.',
       folderNote: 'Folders open in InSIS only when you click: opening one may mark its files as read.', noFolder: 'The course folder could not be matched by its code.',
       allFolders: 'All folders', moodle: 'Some teachers put materials in Moodle.', noBoxes: 'There are no submission boxes for this course.',
-      topics: 'Topic sign-up', result: 'Result', points: 'Points so far',
-      pointsText: 'InSIS shows the points of continuous assessment in the course sheet.', examDates: 'Exam dates', tests: 'Online tests and quizzes',
+      topics: 'Topic sign-up', result: 'Result', points: 'Regular assessment',
+      pointsLoad: 'Loading your points…', pointsNone: 'Your points could not be loaded.', pointsEmpty: 'Your teachers have not recorded any points for you in this course yet.',
+      pointsLead: 'The points and marks your teachers record for you during the term.', total: 'Total', notYet: 'nothing yet',
+      notCounted: 'not counted', notCountedNote: 'Grey values are not added to the total: InSIS adds only numbers entered in the correct form.',
+      allStudents: 'All students', pointsEarlier: 'InSIS+ does not show the regular assessment of earlier periods: it is in InSIS’s lectures sheet of that period.',
+      upNext: 'Still ahead', examDates: 'Exam dates', tests: 'Online tests and quizzes',
       classmates: 'Classmates', classmatesLoad: 'Loading the list…', classmatesNone: 'The list of classmates could not be loaded.',
       classmatesAll: 'Full list in InSIS', notMine: 'This course is not among your enrolled courses.',
-      lectures: 'Course sheet in InSIS', syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
+      syllabusLoad: 'Loading the syllabus…', syllabusNone: 'The syllabus could not be loaded.', syllabusFull: 'Full syllabus in InSIS',
       teachersTitle: 'Teachers', noTeachers: 'The teachers could not be found.', nextShort: 'next', dueShort: 'due',
       coursesEmpty: 'Your enrolled courses have not loaded yet.', mineHint: (sem) => `Courses of ${sem || 'this period'} from your study record.`, finished: (n) => `Finished (${n})`,
       byCourse: 'By course', newDocs: 'New documents', tree: 'Document tree', search: 'Search', views: 'Views of your materials', dsSettings: 'Settings', myFolders: 'My folders', courseFiles: 'Course files', newInCourse: 'New in this course', newInCourses: 'New in your courses', fromList: (t) => `From the New list at ${t}`, openNew: 'Open New', emptyFolders: (n) => `${n} empty ${n === 1 ? 'folder' : 'folders'}`, noFiles: 'There are no files on the document server for this course yet.', foldersTitle: 'Folders', openFolderHint: 'A folder opens in InSIS, inside this course.', earlier: 'Earlier periods', filesShort: (n) => `${n} ${n === 1 ? 'file' : 'files'}`, newShort: (n) => `${n} new`, noNewYet: 'New documents show here once you open New.', materials: 'Materials', allFoldersTab: 'All folders', displaySettings: 'E-mail and display', yourFolders: 'Your folders', settingsNote: 'InSIS+ reads the document tree: starting it lower in these settings can hide your courses here.', foldersEmpty: (v) => `${v}: nothing yet`, foldersHelp: 'Folders you set up yourself on the document server (you hold the full SUPER right to them). Students usually have none.',
       library: 'e-Library', libraryText: 'Public study materials published by departments.',
       untilAt: (d) => `until ${d}`, closedOn: (d) => `closed ${d}`, confirmed: 'confirmed', submitted: 'submitted', nothingIn: 'nothing submitted', notOpen: (d) => `opens ${d}`,
       noResult: 'No result has been entered yet.', entered: (d) => `entered ${d}`, attemptN: (n) => `attempt ${n}`, allAttempts: 'All attempts in Results',
-      examText: 'This course’s exam dates, and signing up for them, are in Exam dates.', examLink: 'My dates',
-      testsText: 'Online tests and quizzes of this course are started from InSIS’s list of tests.', testsLink: 'List of tests',
-      sheetLink: 'Course sheet', statusLabel: 'Course status' },
+      statusLabel: 'Course status' },
   }[lang];
 
   // ---------- the course model ----------
@@ -163,6 +167,7 @@
     const day = new Date(+m[4], +m[3] - 1, +m[2]).toLocaleDateString(locale, { weekday: 'short' });
     return [m[1], `${day} ${m[5]}`, m[6]?.trim()].filter(Boolean).join(' · ');
   }
+  ipx.folderLabel = folderLabel;
   const folderIdOf = (href) => /[?;&]id=(\d+)/.exec(href || '')?.[1] || null;
 
   // The folders of a course that hold files, as one flat list: the course folder itself ("Course files"), then every
@@ -267,6 +272,113 @@
     return facts.length ? h('p', { class: 'course-status', 'aria-label': T.statusLabel }, facts) : null;
   }
 
+  // ---------- points of regular assessment (student/list.pl …;predmet=…;prubezne=1) ----------
+  // InSIS's page: "Course - CODE Name", a help line, then per group of sheets a heading ("Sheets from seminars - 4XY101
+  // Se since 22.09.2026 14:00-17:00 RB 210", or "… - all students") and its sheets, each a bold name over a table of
+  // one header row and one row of values. A value InSIS adds to a sum is blue; the sum column is bold (Total).
+  // Read when the Points tab opens (read: on-open; reading it marks nothing, docs/ia/mapping.json), never stored.
+  const TOTAL = /^(total|součet|celkem|suma)$/i;
+  function parsePoints(root) {
+    const groups = [];
+    let group = null;
+    for (const el of root.querySelectorAll('big, table')) {
+      if (el.matches('big')) {
+        group = { title: clean(el.textContent), sheets: [] };
+        groups.push(group);
+        continue;
+      }
+      if (!group || el.closest('.portal_menu, table.portal_menu') || el.matches('.portal_menu')) continue;
+      let name = '';
+      // InSIS writes "<p /><b>Name</b><table>", which a parser reads as the name inside an open <p>.
+      for (let p = el.previousElementSibling; p; p = p.previousElementSibling) {
+        const b = p.matches('b') ? p : p.matches('p') ? p.querySelector(':scope > b:last-of-type') : null;
+        if (b) { name = clean(b.textContent); break; }
+        if (p.matches('table, big') || p.querySelector('big, table')) break;
+      }
+      const heads = [...el.querySelectorAll('thead th, tr.zahlavi > th, tr.zahlavi > td')].map((x) => clean(x.textContent));
+      const row = [...el.querySelectorAll('tbody tr')].find((tr) => !tr.classList.contains('zahlavi'));
+      if (!row) continue;
+      const columns = [...row.cells].map((td, k) => ({
+        head: heads[k] || '',
+        text: clean(td.textContent),
+        counted: !!td.querySelector('span[style*="blue"]'),
+        total: TOTAL.test(heads[k] || '') || (!!td.querySelector('b') && k === row.cells.length - 1),
+      }));
+      group.sheets.push({ name, columns });
+    }
+    return { groups: groups.filter((g) => g.sheets.length) };
+  }
+
+  // "Sheets from seminars - 4XY101 Se since 22.09.2026 14:00-17:00 RB 210" → "Seminars · Tue 14:00 · RB 210";
+  // "… - all students" → "All students"; anything else stays as InSIS wrote it.
+  function groupLabel(title) {
+    const [, kind, rest] = /^(.+?)\s+-\s+(.+)$/.exec(title) || [null, '', title];
+    if (/^(all students|všichni studenti)$/i.test(rest)) return { text: T.allStudents, kind };
+    const m = /^\S+\s+\S+\s+(?:since|od)\s+(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}:\d{2})(?:-\d{1,2}:\d{2})?\s*(.*)$/i.exec(rest);
+    if (!m) return { text: rest, kind };
+    const day = new Date(+m[3], +m[2] - 1, +m[1]).toLocaleDateString(locale, { weekday: 'short' });
+    return { text: [`${day} ${m[4]}`, m[5].trim()].filter(Boolean).join(' · '), kind };
+  }
+
+  function pointsView(d) {
+    if (!d.groups.length) return [h('p', { class: 'muted' }, T.pointsEmpty)];
+    let grey = false;
+    const sheet = (s) => {
+      // The grouping column ("Grouping"/"Slučka") of InSIS's summing sheets says nothing when it is empty.
+      const cols = s.columns.filter((x) => x.text || (!/^(grouping|slučka)$/i.test(x.head) && !x.total));
+      const total = cols.find((x) => x.total);
+      const parts = cols.filter((x) => x !== total);
+      // A sheet of one value (a mark, a sum kept elsewhere): the value is the sheet.
+      if (!total && parts.length === 1) {
+        const v = parts[0];
+        return h('div', { class: 'pt-sheet one' },
+          h('span', { class: 'pt-name' }, s.name || v.head),
+          h('span', { class: 'pt-total' + (v.text ? '' : ' none') }, v.text || T.notYet));
+      }
+      const summed = parts.some((x) => x.counted);
+      return h('div', { class: 'pt-sheet' },
+        h('div', { class: 'pt-sheet-head' },
+          h('span', { class: 'pt-name' }, s.name),
+          total && h('span', { class: 'pt-total' }, total.text || '0', h('small', {}, T.total))),
+        parts.length > 0 && h('ol', { class: 'pt-parts' }, parts.map((x) => {
+          const off = summed && x.text && !x.counted;
+          if (off) grey = true;
+          return h('li', { class: 'pt-part' + (x.text ? '' : ' none') + (off ? ' off' : ''), title: off ? T.notCounted : null },
+            h('small', {}, x.head), h('strong', {}, x.text || '–'));
+        })));
+    };
+    const out = d.groups.map((g) => {
+      const label = groupLabel(g.title);
+      return h('div', { class: 'pt-group' },
+        h('h3', { class: 'pt-group-title' }, label.text, label.kind && h('small', {}, label.kind)),
+        g.sheets.map(sheet));
+    });
+    if (grey) out.push(h('p', { class: 'muted small pt-note' }, T.notCountedNote));
+    return out;
+  }
+
+  // The course's points page: only for a course of the period the portal is on (its address carries that period).
+  const isCurrent = (c) => current().some((x) => x.code === c.code);
+  const pointsUrl = (c) => c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });
+  const points = new Map();
+  function pointsOf(c) {
+    const hit = points.get(c.code);
+    // Drawn again when data arrives (composed.js): one read per minute at most, not one per redraw.
+    if (hit && Date.now() - hit.at < 60e3) return hit.p;
+    const url = pointsUrl(c) && nav.safe(pointsUrl(c), 'fetch', { copied: true });
+    const p = !url ? Promise.resolve(null) : fetch(globalThis.__ipxFixtureFor?.(url) || url, { credentials: 'include' })
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(r.status))))
+      .then((html) => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const page = doc.getElementById('str1');
+        // Not InSIS's points page (a login page, an error): nothing, not "no points".
+        return page && /prubezne|průběžn|regular assessment|assessment sheets/i.test(html) ? parsePoints(page) : null;
+      })
+      .catch(() => null);
+    points.set(c.code, { at: Date.now(), p });
+    return p;
+  }
+
   const BUILD = {
     'course.overview': (c) => {
       const todo = ipx.todo ? ipx.todo.items({ course: c.code }) : [];
@@ -291,13 +403,7 @@
         box.replaceChildren(sanitizeLinks(ipx.syllabus.build({ ...d, facts: d.facts.filter((f) => f.key !== 'lecturers') }, { embedded: true, rail: own })));
       });
       const full = c.href && nav.safe(c.href, 'link', { copied: true });
-      const sheet = c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });
-      return [
-        box,
-        h('p', { class: 'course-links' },
-          full && anchor({ href: full }, {}, T.syllabusFull),
-          sheet && anchor({ href: sheet }, {}, T.lectures)),
-      ];
+      return [box, full && h('p', { class: 'course-links' }, anchor({ href: full }, {}, T.syllabusFull))];
     },
     'course.files': (c) => {
       // The course's files live here (04-materials.md §4.1): new documents first, then the folders that hold files
@@ -374,26 +480,37 @@
           topics && anchor({ href: topics }, {}, T.topics)),
       ];
     },
-    'course.points': (c) => {
-      // Decision 6 (03-pages.md §7): InSIS's result with the attempt (→ Results), then the way to this course's
-      // exam dates (→ Exam dates) and online tests, each a fact with its one link; no list of bare links, no past
-      // dates. Exam dates and tests are not read by InSIS+ yet, so their cards say where they are.
+    'course.points': (c, preread) => {
+      // What a student opens this tab for (03-pages.md §7, decision 6): InSIS's result once there is one, then the
+      // points of regular assessment themselves, read from InSIS's page for the course (list.pl …;prubezne=1, read on
+      // open) or, on that page itself, from the page at hand. While the course is not passed, one line says where the
+      // exam dates and online tests are. No other links: every fact is here.
       const st = statusOf(c);
       const results = nav.target('grades.results');
-      const exams = nav.target('exams.mine');
-      const tests = nav.target('exams.tests');
-      const sheet = c.predmet && portalLink('/auth/student/list.pl', { predmet: c.predmet, prubezne: 1 });
       const head = (title, link) => h('div', { class: 'card-head' }, h('h2', {}, title), link && anchor(link, { class: 'more' }, link.text));
+      const box = h('div', { class: 'pt-body' });
+      const draw = (d) => box.replaceChildren(...(d ? pointsView(d) : [h('p', { class: 'muted' }, T.pointsNone)]));
+      if (preread) draw(preread);
+      else if (!isCurrent(c)) box.replaceChildren(h('p', { class: 'muted' }, T.pointsEarlier));
+      else {
+        box.replaceChildren(ipx.ui.skeleton('rows', 2, T.pointsLoad));
+        pointsOf(c).then(draw);
+      }
+      const exams = c.passed !== true && nav.target('exams.mine');
+      const tests = c.passed !== true && nav.target('exams.tests');
       return [
-        h('section', { class: 'card pad' },
+        (c.result || c.passed != null) && h('section', { class: 'card pad' },
           head(T.result, results && { href: results, text: T.allAttempts }),
           h('p', { class: 'result-line' }, h('span', { class: `delta ${st.tone}` }, st.text), h('span', {}, c.result || T.noResult)),
           (c.entered || c.attempt) && h('p', { class: 'muted result-meta' },
             [c.attempt && T.attemptN(c.attempt), c.entered && T.entered(c.entered)].filter(Boolean).join(' · '))),
-        h('div', { class: 'course-grid' },
-          h('section', { class: 'card pad' }, head(T.points, sheet && { href: sheet, text: T.sheetLink }), h('p', { class: 'muted' }, T.pointsText)),
-          c.passed !== true && h('section', { class: 'card pad' }, head(T.examDates, exams && { href: exams, text: T.examLink }), h('p', { class: 'muted' }, T.examText)),
-          c.passed !== true && h('section', { class: 'card pad' }, head(T.tests, tests && { href: tests, text: T.testsLink }), h('p', { class: 'muted' }, T.testsText))),
+        h('section', { class: 'card pad pt-card' },
+          h('div', { class: 'card-head' }, h('h2', {}, T.points)),
+          h('p', { class: 'muted small pt-lead' }, T.pointsLead),
+          box),
+        (exams || tests) && h('p', { class: 'course-links pt-next' }, h('span', { class: 'muted' }, `${T.upNext}:`),
+          exams && anchor({ href: exams }, {}, T.examDates),
+          tests && anchor({ href: tests }, {}, T.tests)),
       ];
     },
     'course.people': (c) => {
@@ -423,6 +540,34 @@
       ];
     },
   };
+
+  // InSIS's points page of a course (list.pl …;predmet=…;prubezne=1) is that course's Points tab: the same header,
+  // tabs and content as #ipx:course.points, read from the page at hand (nothing is fetched). The page has no action:
+  // its one form holds only InSIS's hidden study id, so nothing of it needs to stay. A course not of mine keeps its
+  // name as InSIS gives it, without the course tabs.
+  ipx.ready.then(() => {
+    const r = nav.route(document.baseURI.split('#')[0]);
+    if (r.path !== '/auth/student/list.pl' || !r.params?.has('prubezne') || !r.params.has('predmet')) return;
+    const page = document.getElementById('str1');
+    if (!page || document.getElementById('insis-plus-page')) return;
+    const id = r.params.get('predmet');
+    const mine = courses().find((x) => x.predmet === id) || null;
+    // "Course - 4XY101 Name" / "Předmět - 4XY101 Název"
+    const named = /^\S+\s+-\s+(\S+)\s+(.+)$/.exec(clean(page.querySelector('font[size="+1"]')?.textContent || '')) || [];
+    const c = mine || { code: named[1] || '', name: named[2] || nav.label('course.points'), predmet: id };
+    const data = parsePoints(page);
+    ipx.ui.takeover({
+      key: 'course-points',
+      css: ['syllabus.css', 'course.css'],
+      title: c.name,
+      subtitle: nav.label('courses'),
+      build: () => h('div', { class: 'course-page' },
+        c.code && header(c),
+        mine && statusLine(c),
+        mine && courseTabs(c.code, 'course.points'),
+        BUILD['course.points'](c, data)),
+    });
+  });
 
   // Classmates of a course: read when the People tab opens (read: on-open), first page only, never stored.
   async function loadClassmates(url, box) {
@@ -489,13 +634,24 @@
     walk(f.tree);
     return found;
   };
+  // A document's details page (dokumenty_cteni.pl …;id=<folder>;dok=…) belongs where its folder is: one step below
+  // it, the document's name last in the path. Its name is the first line of InSIS's details table.
+  const DOC_PAGE = '/auth/dok_server/dokumenty_cteni.pl';
+  const docHere = () => nav.route(document.baseURI.split('#')[0]).path === DOC_PAGE
+    ? clean(document.querySelector('#str1 form[action*="dokumenty_cteni"] table tr:first-child > td:nth-child(2)')?.textContent) || null : null;
+  // The folder page of the folder at hand (inside the course when the student came from it).
+  const folderPage = (id, inCourse) => {
+    const to = id && plainLink(`/auth/dok_server/slozka.pl?id=${id}`);
+    return to && `${to}${inCourse ? '#ipx-in=course' : ''}`;
+  };
+
   ipx.kit.section({
     id: 'course-folder',
     css: ['course.css'],
     title: () => folderHere()?.course.name || nav.sectionLabel('courses.files'),
     // The same header as the course page itself (title the course, eyebrow Courses).
     subtitle: () => nav.label('courses'),
-    pages: { '/auth/dok_server/slozka.pl': (r) => (folderHere() ? 'course.files' : undefined) },
+    pages: { '/auth/dok_server/slozka.pl': (r) => (folderHere() ? 'course.files' : undefined), [DOC_PAGE]: () => (folderHere() ? 'course.files' : undefined) },
     views: () => {
       const here = folderHere();
       return here ? TABS.map((node) => ({ id: node, href: nav.composedUrl(node, here.code), text: nav.label(node) })) : [];
@@ -504,10 +660,14 @@
     lead: () => {
       const here = folderHere();
       if (!here) return null;
+      const doc = docHere();
+      const folder = folderName(here) || '…';
+      const back = doc && folderPage(here.id, true);
       return h('div', { class: 'course-folder-lead' },
         courseOf(here.code) && header(here.course),
         h('nav', { class: 'folder-path', 'aria-label': T.foldersTitle },
-          anchor({ href: nav.composedUrl('course.files', here.code) }, {}, T.materials), ' › ', h('strong', {}, folderName(here) || '…')));
+          anchor({ href: nav.composedUrl('course.files', here.code) }, {}, T.materials), ' › ',
+          doc ? [back ? anchor({ href: back }, {}, folder) : folder, ' › ', h('strong', {}, doc)] : h('strong', {}, folder)));
     },
   });
 
@@ -515,7 +675,8 @@
   // (dok_server/#ipx-folder=<id>); the folder itself last. Canonical: from the folder's place, not from history.
   function treePath() {
     const r = nav.route(document.baseURI.split('#')[0]);
-    if (r.path !== '/auth/dok_server/slozka.pl') return null;
+    if (r.path !== '/auth/dok_server/slozka.pl' && r.path !== DOC_PAGE) return null;
+    const doc = docHere();
     const index = ipx.state.docserver?.index || {};
     const id = r.params?.get?.('id');
     const chain = [];
@@ -523,9 +684,12 @@
     const tree = plainLink('/auth/dok_server/');
     if (!chain.length || !tree) return null;
     const step = (fid, name) => anchor({ href: `${tree}#ipx-folder=${encodeURIComponent(fid)}` }, {}, folderLabel(name));
+    // On a document's details page the folder itself links back to its page, and the document comes last.
+    const last = (fid, name) => (doc ? anchor({ href: folderPage(fid, false) || `${tree}#ipx-folder=${encodeURIComponent(fid)}` }, {}, folderLabel(name)) : h('strong', {}, folderLabel(name)));
     return h('nav', { class: 'folder-path', 'aria-label': T.foldersTitle },
       anchor({ href: tree }, {}, T.allFoldersTab),
-      chain.flatMap(([fid, name], i) => [' › ', i === chain.length - 1 ? h('strong', {}, folderLabel(name)) : step(fid, name)]));
+      chain.flatMap(([fid, name], i) => [' › ', i === chain.length - 1 ? last(fid, name) : step(fid, name)]),
+      doc && [' › ', h('strong', {}, doc)]);
   }
 
   // Materials › Settings › Your folders (moje_dok.pl): InSIS's help paragraph is said in one line by InSIS+, and an
@@ -586,10 +750,14 @@
     title: () => nav.sectionLabel('courses.files'),
     subtitle: () => nav.label('courses'),
     // A folder page outside a course's context is a place in All folders: that tab stays marked.
-    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search', '/auth/dok_server/slozka.pl': 'tree' },
+    pages: { '/auth/dok_server/': 'tree', '/auth/dok_server/nove_dok.pl': 'new', '/auth/dok_server/vyhledavani.pl': 'search', '/auth/dok_server/slozka.pl': 'tree',
+      [DOC_PAGE]: (r) => (r.params?.get?.('app_zpet') === 'nove_dok' ? 'new' : 'tree') },
     lead: () => treePath(),
     views: () => {
-      const fresh = courseNewCount();
+      // The New documents tab counts what its list holds: every unread document, as InSIS's own tab says ("New
+      // documents (10)", kept fresh from every document-server page by docserver.js), not only the course folders'
+      // (those numbers are per course, on the course rows). None when there is nothing new or the count is not known.
+      const fresh = ipx.state.docserver?.newCount > 0 ? ipx.state.docserver.newCount : null;
       return [
         { id: 'course', href: nav.composedUrl('courses.files'), text: T.byCourse },
         { id: 'new', href: plainLink('/auth/dok_server/nove_dok.pl'), text: T.newDocs, count: fresh },

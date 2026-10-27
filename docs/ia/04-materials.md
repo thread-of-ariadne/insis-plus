@@ -22,7 +22,7 @@ safety/feasibility, §7); their decisions are folded in.
 |---|---|---|
 | `dok_server/` tree | every folder the student can see. A course is `CODE Name` › *On-site classes* › one folder per class ("Lecture - since 25.09.2026 14:00-16:15, RB 212 (4x)") and › *Teachers* › one folder per teacher; most of these are empty containers. Faculty and university branches go 5–6 levels deep, folders of up to ~110 items. Counts "(new / all)" per folder. | none |
 | `slozka.pl?id` folder | one folder: subfolders and documents (name, comment, who, when, file). **Never opened by the crawl**: markup, paging and whether opening it marks documents as read are unknown. | opening a file (a download), maybe inserting documents in folders the student administers, maybe InSIS's ignore control |
-| `nove_dok.pl` New documents | every unread document, newest first, with folder, author, date, type; links to the folder with the document, to its details (`dokumenty_cteni.pl`, probably marks it read) and the download | **Mark the selected / all as read** (one form with a checkbox per row) |
+| `nove_dok.pl` New documents | every unread document, newest first, with folder, author, date, type; links to the folder with the document, to its details (`dokumenty_cteni.pl`, probably marks it read) and the download. InSIS+ lays its rows out like the course page's document rows, in place; the tab's count is InSIS's own "New documents (N)" | **Mark the selected / all as read** (one form with a checkbox per row) |
 | `vyhledavani.pl` Search | text, author, date range, with/without attachment, folder | the search (a form) |
 | `moje_dok.pl` All my folders | four sub-views (`zobraz_dok`): My documents · My folders (default) · Copy folders · Ignored folders | managing own folders, un-ignoring (unseen) |
 | `nastaveni_stromu.pl` DS settings | **one form**: items per page (`po_dok`, folder and list pages are paged), e-mail information (`info`, `notif`: which one concerns *reading* students is to be confirmed), the folder the tree starts from (`id_slozky_od`, changes what InSIS+ can read) | **Save changes** |
@@ -140,6 +140,10 @@ the folder view component.
   the snapshot); reload New and the tree and compare. A negative result allows on-open reading of folder pages
   (files inline in the course tab); a positive one keeps folders as InSIS's pages. The same once for
   `dokumenty_cteni.pl`.
+- `dokumenty_cteni.pl` (a document's details) is drawn below its folder: inside the course (course tabs, path
+  Materials › folder › document) when opened from the course's folder, else in Materials (All folders, or New
+  documents when opened from New) with the tree path. InSIS's form stays in place as one card; its download button
+  is InSIS's own.
 - The folder map, the tree and the New list are session data; folder file lists (after the check) go to a session
   cache of their own (LRU ~30 folders, slim rows, never download links).
 

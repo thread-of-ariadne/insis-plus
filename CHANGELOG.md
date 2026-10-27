@@ -6,6 +6,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+- Course › Points shows the points themselves: each regular-assessment sheet with its parts and total (values
+  InSIS does not add up are marked), read from InSIS's points page of the course when the tab opens. That InSIS
+  page is drawn as the same tab. The tab lost its cards that only pointed elsewhere; Exam dates and Online tests
+  are one line while the course is open.
+- Grades & credits: a course opens its course page on the Points tab (it used to open the catalogue syllabus,
+  without the course tabs).
+- Materials › New documents: InSIS's rows read like the course page's document rows (type, name, then folder ·
+  author · date), with readable folder names; still InSIS's own list and form.
+- The New documents tab counts what the list holds (InSIS's own number, kept current from every document-server
+  page), not only the course folders; the course numbers stay on the course rows.
+
+### Fixed
+- Extra-semestral courses showed three "Enrolment open now" lists on the live page (the later and the finished ones
+  too, unfolded, with wrong counts): InSIS's table manager puts its toolbox and scripts between a list and its
+  heading, past where the heading was looked for. Headings above tables are now found past those insertions on
+  every page that reads them (exam dates, results, submissions, topics, theses, departments, study plans, …).
+- A document's details (View information) kept InSIS's own tab row, so the Materials header changed on that page:
+  it now has the Materials header (or the course's, when opened from the course) with the path to the document,
+  and the details as one card.
+
 ## [0.10.0] - 2026-10-27
 
 ### Added

@@ -162,8 +162,10 @@ adopted (they override the teardowns):
 4. Thesis topics: node `studies.thesis`, view tabs *Faculty topics · Department topics*; *Propose a topic* is a page
    action; the department page links to its topics. Theses archive stays in Campus › Information.
 5. Registration overview: composed page with live state on every step (open now / opens on / closed).
-6. Course › Points: InSIS's result, the attempt count (link to Results), upcoming dates (link to Exam dates); no
-   past dates; online tests only here.
+6. Course › Points: InSIS's result with the attempt (link to Results), then the points of regular assessment
+   themselves (InSIS's points page of the course, `list.pl …;prubezne=1`, read when the tab opens; the same view
+   on that InSIS page, which is drawn as the course's Points tab); while the course is not passed, one line with
+   Exam dates and Online tests. No cards that only point elsewhere. Grades & credits opens a course here.
 7. Excuse notes: no "Absent?" link in My week; gloss "Your excuse notes" until the add form is seen.
 8. Rules 6–8 of §1 (top-bar places, titles, empty views), the States, filter-form, moving and background-read rules
    of §2, treatment B of §3.

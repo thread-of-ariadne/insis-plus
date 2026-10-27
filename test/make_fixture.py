@@ -41,7 +41,7 @@ window.__ipxFixtureFor = (url) => {
   // Most specific first: other addresses carry a link back to the portal (zpet=…moje_studium.pl).
   const map = [[/rozvrh_student/, 'timetable-personal'], [/moje_studium/, 'student-portal'],
     [/pruchod_studiem/, 'study-record'], [/odevzdavarny/, 'submissions', 'submissions-cs-real'], [/dok_server\/$/, 'docserver'],
-    [/posta\/slozka/, 'mailbox', 'mailbox']];
+    [/posta\/slozka/, 'mailbox', 'mailbox'], [/list\.pl.*prubezne=1/, 'points']];
   // Public pages (syllabi) come from the public snapshots one folder up.
   if (/syllabus\.pl/.test(url)) return new URL(cs ? '../syllabus-cs.html' : '../syllabus-en.html', location.href).href;
   const hit = map.find(([re]) => re.test(url));

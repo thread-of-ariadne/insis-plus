@@ -118,7 +118,7 @@
   ];
 
   function kindOf(table, roles) {
-    for (let el = table.previousElementSibling, i = 0; el && i < 12; el = el.previousElementSibling, i++) {
+    for (let el = ipx.kit.prev(table), i = 0; el && i < 12; el = ipx.kit.prev(el), i++) {
       if (el.tagName === 'TABLE') break;
       const sys = el.querySelector?.('[data-sysid^="dekorace-"]')?.getAttribute('data-sysid');
       if (sys && KIND_BY_ICON[sys]) return { kind: KIND_BY_ICON[sys], heading: el };

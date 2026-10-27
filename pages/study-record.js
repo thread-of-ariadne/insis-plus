@@ -154,8 +154,8 @@
 
   // The semester label InSIS writes in bold before each course table.
   function periodLabel(table) {
-    let el = table.previousElementSibling;
-    for (let i = 0; el && i < 6; i++, el = el.previousElementSibling) {
+    let el = ipx.kit.prev(table);
+    for (let i = 0; el && i < 6; i++, el = ipx.kit.prev(el)) {
       if (el.tagName === 'TABLE') break;
       const b = el.tagName === 'B' ? el : null;
       const t = clean(b?.textContent).replace(/:$/, '');
@@ -402,7 +402,11 @@
   function courseRow(r) {
     const fac = facultyFor(r.code);
     const badge = r.grade != null ? String(r.grade) : r.ectsGrade || (r.passed === true ? '✓' : r.passed === false ? '×' : '–');
-    const name = r.href ? h('a', { class: 'sr-name', href: r.href }, r.name) : h('strong', { class: 'sr-name' }, r.name);
+    // The course opens as InSIS+'s course page, on its Points tab (the result and the points of regular assessment):
+    // that is what a student looking at grades wants next, with the course's other tabs a click away. The catalogue
+    // syllabus (r.href) is on the course page's Overview.
+    const page = r.code && ipx.nav.composedUrl('course.points', r.code);
+    const name = page || r.href ? h('a', { class: 'sr-name', href: page || r.href }, r.name) : h('strong', { class: 'sr-name' }, r.name);
     return h('li', { class: `sr-row t-${tone(r)}`, style: `--fac: ${facultyColors(fac)[1]}` },
       h('span', { class: 'sr-badge', title: r.result || statusText(r) }, badge),
       h('div', { class: 'sr-course' },

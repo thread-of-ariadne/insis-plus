@@ -390,8 +390,8 @@
     const out = [];
     for (const t of tables) {
       // The kind of body is the bold word before the table ("Kind of body: advisory").
-      let prev = t.previousElementSibling;
-      while (prev && /^(BR|P)$/.test(prev.tagName) && !clean(prev.textContent)) prev = prev.previousElementSibling;
+      let prev = ipx.kit.prev(t);
+      while (prev && /^(BR|P)$/.test(prev.tagName) && !clean(prev.textContent)) prev = ipx.kit.prev(prev);
       const kind = prev?.tagName === 'B' ? clean(prev.textContent) : '';
       const d = kit.readTable(t);
       const rows = d.rows.filter((r) => r.cells.length >= 2).map((r) => {

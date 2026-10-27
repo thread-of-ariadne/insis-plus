@@ -129,7 +129,7 @@
 
   // Which of the three tables this is: by the decoration icon of its heading, then by its columns.
   function sectionOf(table, cols) {
-    for (let n = table.previousElementSibling, k = 0; n && k < 6; n = n.previousElementSibling, k++) {
+    for (let n = ipx.kit.prev(table), k = 0; n && k < 6; n = ipx.kit.prev(n), k++) {
       const sys = n.querySelector?.('[data-sysid^="dekorace-terminy"]')?.getAttribute('data-sysid') || '';
       if (sys.endsWith('-neprihlasovaci')) return 'closed';
       if (sys.endsWith('-prihlasovaci')) return 'done';

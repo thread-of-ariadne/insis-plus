@@ -120,7 +120,7 @@
 
   // The bold heading right before a node (InSIS puts <b>Heading</b><p></p>[<div.small>] before each block).
   function headingBefore(node) {
-    for (let n = node.previousElementSibling, k = 0; n && k < 8; n = n.previousElementSibling, k++) {
+    for (let n = ipx.kit.prev(node), k = 0; n && k < 8; n = ipx.kit.prev(n), k++) {
       if (n.tagName === 'B') return n;
       if (n.tagName === 'TABLE' || n.tagName === 'FORM') return null;
     }
