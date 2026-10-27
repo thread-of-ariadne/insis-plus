@@ -38,9 +38,22 @@ a.folder-row:hover .glist-go { color: var(--accent); }
 .folder-row .glist-go { color: var(--faint); }
 .muted.small { margin: 12px 0 0; font-size: 12.5px; }
 .folder-row.is-empty .glist-text strong { color: var(--muted); font-weight: 500; }
-.files-course .card-head { align-items: center; }
-.files-course .course-code { font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; }
-.files-course h2 a:hover { color: var(--accent); }
+/* Materials › By course: a course row opens in place to its folders (the Files tab's rows) and a link to the course */
+.files-course + .files-course { border-top: 1px solid var(--line); }
+.files-course > summary { list-style: none; cursor: pointer; }
+.files-course > summary::-webkit-details-marker { display: none; }
+.files-course > summary:hover { background: var(--hover); }
+.files-course > summary .glist-go svg { transition: transform .15s ease; }
+.files-course[open] > summary .glist-go { color: var(--accent); }
+.files-course[open] > summary .glist-go svg { transform: rotate(180deg); }
+.files-course-body { padding: 2px 10px 12px 86px; }
+.files-course-body .folder-list { margin: 0 -10px; }
+.files-course-body > .muted { margin: 4px 0 0; }
+.files-course-open { margin: 6px 0 0; font-size: 13px; font-weight: 600; }
+.files-course-open a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); }
+.files-course-open svg { width: 14px; height: 14px; }
+@media (max-width: 640px) { .files-course-body { padding-left: 10px; } }
+@media (prefers-reduced-motion: reduce) { .files-course > summary .glist-go svg { transition: none; } }
 
 /* Course page: the status line under the header (the facts of the course card), one chip per fact. */
 .course-status { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
@@ -85,7 +98,6 @@ a.doc-row:hover, a.files-row:hover { background: var(--hover); }
   .doc-row strong, .files-row strong { white-space: normal; }
   .doc-row, .files-row { min-height: 44px; }
 }
-.course-folder-lead { display: flex; flex-direction: column; gap: 10px; }
 
 /* Course › Points: the regular-assessment sheets. A group per class (its time and room), each sheet a row with its
    total on the right and the parts (dates or tasks) under it as small tiles; a one-value sheet is just name · value.

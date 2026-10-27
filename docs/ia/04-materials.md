@@ -48,11 +48,16 @@ The course page's **Materials** tab is the only home of a course's files. Every 
 page: course header and view tabs with *Materials* active, the sidebar on *My courses*.
 
 - **InSIS's folder page of a course folder** (`slozka.pl?id` whose id is in the stored course-folder map) is drawn
-  as that course page, one level down. Folders outside courses belong to Courses › Materials.
+  in the place it was opened from, carried by a fragment on the links that lead to it and kept by folder.js on the
+  page's subfolder and details links: `#ipx-in=course` (the course's Files tab) draws it as that course page one
+  level down (code, status and facts above the tabs, as on the course page); `#ipx-in=bycourse` (Materials › By
+  course) draws it in Materials with *By course* marked; without one (All folders, New, Search) it is a place in All
+  folders. The student is never moved from one place to another by opening a folder or a document's details.
+  Folders outside courses belong to Courses › Materials.
 - The tab shows, top to bottom:
   1. **New in this course** — the course's unread documents (from the New list the student last opened, with its
      time; see 4.4), each linking to the folder page with the document highlighted.
-  2. **Folders** — *flattened*: containers without files of their own are skipped; the folders that hold files are
+  2. **Files by folder** — *flattened*: containers without files of their own are skipped; the folders that hold files are
      one list with readable names: *Course files* (the course folder itself), *Lecture · Fri 14:00 · RB 212*,
      *Seminar · Thu 9:15 · SB 321*, then each teacher folder under the teacher's name. Each row: name, n files,
      k new. Empty folders fold into one muted line ("3 empty folders"). A course with no files: "No files on the
@@ -67,7 +72,7 @@ One row of view tabs, the same on its four views:
 
 | View | Content |
 |---|---|
-| **By course** (default) | *New in your courses*: the newest 10 course documents as file rows with a course chip (from the last New list; stale label with its time); then one compact row per course of this period (code, name, n files, n new) opening the course's Materials tab; earlier periods in a collapsed group |
+| **By course** (default) | *New in your courses*: the newest 10 course documents as file rows with a course chip (from the last New list; stale label with its time); then one compact row per course of this period (code, name, n files, n new) that opens in place to the course's folders (the Files tab's rows, opening with By course marked) and a link to the course; earlier periods in a collapsed group |
 | **New** (count of course documents; "+ n other") | InSIS's own list, in place and in InSIS's order (its rows belong to the mark-as-read form): a course chip on each row (CSS, from a data attribute), a summary above ("6 in your courses · 4 other", per course with links to the course tab). Never filtered or regrouped (hidden rows next to *Mark all as read* would be marked unseen) |
 | **All folders** | a drill-down browser of the whole tree (from the background-read tree, subfolders only): canonical breadcrumbs from the folder's place (*FIS › Dean's office › …*), one row per folder (name, n files, k new), one interaction per row, empty folders folded, a *Jump to folder* filter over all folder names (results with their path); course folders open the course page (4.1) |
 | **Search** | InSIS's search form in a form card (InSIS's own results below, styled) |
@@ -79,9 +84,15 @@ with the sidebar section) disappear as labels.
 
 Wherever a folder is drawn (course tab, All folders, InSIS's folder page):
 
-- **Path**: canonical, derived from the folder's place, never from where the student came from (stable on reload,
-  in a new tab, on shared links). Course folders start at the course (`Materials › Lecture · Fri 14:00`), others
-  at their root. On phones: "… › Parent › Current".
+- **Path**: derived from the folder's place in the tree, starting at the marked tab (stable on reload, in a new
+  tab, on shared links). In a course place it starts at the tab and runs from below the course's folder, with
+  readable names (`Files › Teachers › Ing. Novák`, `By course › 4XY101 › Lecture · Fri 14:00`; the course's folder
+  itself is *Course files*); in All folders it is the whole tree path. Every step opens that folder in the same
+  place; a document's details add the document last. On phones: "… › Parent › Current".
+- **Rows**: a document is the same row on the course page, New documents and a folder page (grey type tile, name,
+  then "comment · author · date" or "folder · author · date", the red "new" on the right); on InSIS's pages the row
+  is InSIS's download link stretched over it, with details, author and folder links above it. A subfolder is the
+  course page's folder row (icon, readable name, last change; InSIS's English name in English).
 - **Subfolders** as rows (folder icon, readable name, n files · k new); the whole row is a link; no expand/collapse
   triangles anywhere.
 - **Files** (only where InSIS+ may show them, §5): type badge (PDF, DOCX, PPTX, ZIP…), name, one line of comment, who
@@ -140,9 +151,9 @@ the folder view component.
   the snapshot); reload New and the tree and compare. A negative result allows on-open reading of folder pages
   (files inline in the course tab); a positive one keeps folders as InSIS's pages. The same once for
   `dokumenty_cteni.pl`.
-- `dokumenty_cteni.pl` (a document's details) is drawn below its folder: inside the course (course tabs, path
-  Materials › folder › document) when opened from the course's folder, else in Materials (All folders, or New
-  documents when opened from New) with the tree path. InSIS's form stays in place as one card; its download button
+- `dokumenty_cteni.pl` (a document's details) is drawn below its folder, in its folder's place: inside the course
+  (course tabs, path Files › folder › document) or By course when opened from there, else in Materials (All
+  folders, or New documents when opened from New) with the tree path. InSIS's form stays in place as one card; its download button
   is InSIS's own.
 - The folder map, the tree and the New list are session data; folder file lists (after the check) go to a session
   cache of their own (LRU ~30 folders, slim rows, never download links).

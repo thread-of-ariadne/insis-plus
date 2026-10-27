@@ -15,7 +15,7 @@
    | Sidebar | Přehled · Předměty · Rozvrh · Zkoušky · Známky a kredity · Studijní záležitosti · Kampus a lidé, and at the bottom All services and Classic view. The current destination opens its sections under it (a submenu); there is no row of tabs above the page |
    | K vyřízení | Things to do with deadlines (submission boxes closing within 7 days, a study restriction, InSIS's personal data check), or "Nic nečeká", and one line saying what is watched and when it was updated |
    | Moje předměty | This semester's courses; finished ones under "Dokončené" (grey cover, ✓ with the result); each card opens the course page |
-   | Right column | The week, Rozvrh with "Full timetable →", new materials by course (a row opens that course's Materials tab), teaching hours |
+   | Right column | The week, Rozvrh with "Full timetable →", new materials by course (a row opens that course's Files tab), teaching hours |
    | Top bar | Search, Messages (envelope), Notifications (bell), ?, the light/dark button, the language button (globe + CS/EN: a menu with Čeština · Slovenčina · English, the current one ticked), avatar menu (Account, Change password, InSIS+ settings, Log out). Below 900 px the theme and language are in the avatar menu |
 
 4. Go through the sections (each opens from the sidebar submenu; the page title is the section, the line above it

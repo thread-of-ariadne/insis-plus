@@ -178,7 +178,8 @@
   // section at load time; generic.js and the modules draw the header from here.
   //   section({ id, title: () => text, subtitle: () => text, pages: { '/auth/…': view | null | (route) => view },
   //             views: () => [{ id, text, href, count? }], actions: (view) => [nodes],
-  //             lead: () => node (a path or note above the content), node: () => node id (where the sidebar marks the page),
+  //             head: () => node (above the view tabs, as a course page has its code, status and facts there),
+//             lead: () => node (a path or note above the content), node: () => node id (where the sidebar marks the page),
   //             css: extra stylesheets for the header parts, keepRow: (table) => true to keep one of InSIS's tab rows })
   // A page function returning undefined declines the page, so another section can claim it.
   // A page mapped to null belongs to the section but is none of its views (a step below it): no tab is marked.

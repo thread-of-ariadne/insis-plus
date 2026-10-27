@@ -44,6 +44,7 @@
         key: 'generic', css: ['kit.css', ...[].concat(section.css || [])], title: section.title(), subtitle: section.subtitle?.(), extra: section.actions?.(view),
         slotted: [page],
         build: () => ipx.ui.h('div', { class: 'kit-page' },
+          section.head?.(),
           ipx.kit.sectionTabs(section, view),
           section.lead?.() || (view == null && insisName !== section.title() && ipx.ui.h('h2', { class: 'section-title' }, insisName)),
           ipx.ui.h('slot')),

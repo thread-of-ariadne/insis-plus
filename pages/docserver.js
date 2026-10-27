@@ -519,6 +519,8 @@
           const own = code && folderId(courseFolder(code)?.href) === x.folder.id;
           const label = own || (code && CODE_RE.test(x.folder.name) && x.folder.name.startsWith(code)) ? T.courseFiles : ipx.folderLabel?.(x.folder.name) || x.folder.name;
           if (label !== clean(a.textContent)) a.setAttribute('data-ipx-text', label);
+          // InSIS opens the folder in a new window (target="blank"); every other folder link opens in place.
+          if (a.getAttribute('target') === 'blank') a.removeAttribute('target');
         }
         if (x.row && x.type) x.row.querySelector('[data-ipx-col="file"] a[href]')?.setAttribute('data-ipx-type', x.type.slice(0, 4));
       }

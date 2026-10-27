@@ -22,7 +22,7 @@ PROBE = r"""() => {
   const slotted = !!(str1 && host && host.contains(str1) && vis(str1));
   const inStr = (sel) => slotted ? [...str1.querySelectorAll(sel)].filter(vis) : [];
   // Marked by a module: the element or an ancestor inside #str1 carries a data-ipx-* attribute or an ipx class.
-  const marked = (e) => { for (let x = e; x && x !== str1; x = x.parentElement) { if ([...x.attributes].some(a => a.name.startsWith('data-ipx') && a.name !== 'data-ipx-keep') || /ipx/.test(x.className || '')) return true; } return false; };
+  const marked = (e) => { for (let x = e; x && x !== str1; x = x.parentElement) { if ([...x.attributes].some(a => a.name.startsWith('data-ipx') && a.name !== 'data-ipx-keep') || /\bipx/.test(x.className || '')) return true; } return false; };
   const rawTables = inStr('table').filter(t => !marked(t) && t.querySelectorAll('tr').length > 2 && !t.closest('form'));
   const rawFormTables = inStr('form table').filter(t => !marked(t) && t.querySelectorAll('tr').length > 2);
   const oldIcons = inStr('img').filter(i => /\.(gif|png)$/i.test(i.getAttribute('src') || '') && i.width > 0);

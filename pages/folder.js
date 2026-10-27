@@ -56,6 +56,8 @@
       tables.find((t) => /comments?|komentar/.test(norm(t.querySelector('thead, tr.zahlavi')?.textContent || '')));
     const dirs = tables.find((t) => t !== docs && /enter folder|vstup do slozky/.test(norm(t.querySelector('thead, tr.zahlavi')?.textContent || '')));
     const hl = /[#&]ipx-file=(\d+)/.exec(location.hash)?.[1] || null;
+    // The place the folder was opened from (course.js): the course page, Materials › By course, or none (All folders).
+    const ctx = /[#&]ipx-in=(course|bycourse)\b/.exec(location.hash)?.[1] || null;
 
     if (docs) {
       markTable(docs, DOC_COLS, 'docs');
@@ -69,7 +71,7 @@
         }
         // InSIS's read state icon: anything but "read" (stav-precteno) counts as new.
         const state = tr.querySelector('[data-ipx-col="state"] [data-sysid]')?.getAttribute('data-sysid') || '';
-        if (state && state !== 'stav-precteno') tr.querySelector('[data-ipx-col="name"]')?.setAttribute('data-ipx-new', T.fresh);
+        if (state && state !== 'stav-precteno') tr.setAttribute('data-ipx-new', T.fresh);
         tr.querySelector('[data-ipx-col="info"] a')?.setAttribute('title', T.info);
         // The document asked for (#ipx-file=<id>, digits only): compared with each row's download id, never used
         // as a selector.
@@ -114,16 +116,21 @@
     if (dirs) {
       markTable(dirs, DIR_COLS, 'folders');
       dirs.setAttribute('data-ipx-title', T.folders);
-      // Inside a course (reached from the course page), a subfolder of the same course opens inside the course too:
-      // only the fragment of InSIS's link is extended (#ipx-in=course), which changes nothing that is requested.
-      const inCourse = /[#&]ipx-in=course\b/.test(location.hash);
+      // A course's folder opened from the course or from Materials › By course: a subfolder of the same course opens
+      // in that place too. Only the fragment of InSIS's link is extended (#ipx-in=…), which changes nothing requested.
       const courseFolders = ipx.state.docserver?.folders || {};
       for (const tr of dirs.querySelectorAll('tbody > tr')) {
         const sel = tr.querySelector('[data-ipx-col="select"]');
         if (sel && !sel.querySelector('input')) sel.setAttribute('data-ipx-empty', '');
         const enter = tr.querySelector('[data-ipx-col="enter"] a[href]');
         const id = enter && nav.parse(enter.href)?.params.get('id');
-        if (inCourse && id && courseFolders[id] && !enter.getAttribute('href').includes('#')) enter.setAttribute('href', `${enter.getAttribute('href')}#ipx-in=course`);
+        if (ctx && id && courseFolders[id] && !enter.getAttribute('href').includes('#')) enter.setAttribute('href', `${enter.getAttribute('href')}#ipx-in=${ctx}`);
+        // The folder's name as the course page writes it: InSIS's English name in English (when it has one), and a
+        // timetable name in its readable form (course.js folderLabel); drawn by folder.css, the cell keeps its text.
+        const nameTd = tr.querySelector('[data-ipx-col="name"]');
+        const raw = (lang === 'en' && clean(tr.querySelector('[data-ipx-col="english"]')?.textContent)) || clean(nameTd?.textContent);
+        const label = ipx.folderLabel?.(raw) || raw;
+        if (nameTd && label && label !== clean(nameTd.textContent)) nameTd.setAttribute('data-ipx-text', label);
       }
       // The subfolders block (its "list of subfolders" line and its form) comes first, as in any file browser.
       const form = dirs.closest('form');
@@ -134,17 +141,19 @@
       if (line?.classList.contains('small')) line.setAttribute('data-ipx-block', dirs.querySelector('tbody > tr a[href*="slozka.pl"]') ? 'folders-line' : 'folders-empty');
     }
 
-    // A document's details (View information) opened from a course's folder stay inside the course too: the same
-    // fragment on InSIS's own link (it changes nothing that is requested; the details page reads it, course.js).
-    if (/[#&]ipx-in=course/.test(location.hash)) {
+    // A document's details (View information) stay in the same place as its folder: the same fragment on InSIS's own
+    // link (it changes nothing that is requested; the details page reads it, course.js).
+    if (ctx) {
       for (const a of page.querySelectorAll('a[href*="dokumenty_cteni.pl"]')) {
-        if (!a.getAttribute('href').includes('#')) a.setAttribute('href', `${a.getAttribute('href')}#ipx-in=course`);
+        if (!a.getAttribute('href').includes('#')) a.setAttribute('href', `${a.getAttribute('href')}#ipx-in=${ctx}`);
       }
     }
 
     // The folder's administrators line (InSIS's intro paragraph) and the actions row ("Transactions in folder").
     const intro = [...page.querySelectorAll(':scope div.small')].find((d) => d.querySelector('a[href*="clovek.pl"]'));
     intro?.setAttribute('data-ipx-block', 'admins');
+    // Read as one line, "Folder administered by: A, B" (folder.css shows only InSIS's own links of the paragraph).
+    intro?.setAttribute('data-ipx-label', T.admins);
     const ops = page.querySelector('.rada-ikon[data-rada="ds-operace_slozky"]');
     if (ops) {
       ops.parentElement.setAttribute('data-ipx-block', 'ops');

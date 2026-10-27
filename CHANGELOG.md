@@ -17,12 +17,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   author · date), with readable folder names; still InSIS's own list and form.
 - The New documents tab counts what the list holds (InSIS's own number, kept current from every document-server
   page), not only the course folders; the course numbers stay on the course rows.
+- Documents look the same everywhere: a folder page's files and subfolders now use the course page's rows (type,
+  name, then comment · author · date; folder icon, readable and, in English, English names), InSIS's long folder
+  paragraph is one "Folder administered by" line, and a row of New documents opens the file like a folder's row.
+- Materials › By course: a course opens in place to its folders instead of jumping to My courses; its folders and
+  documents open with By course still marked.
+- One path rule: a folder's path starts at the marked tab and follows the tree (in a course from below the course's
+  folder, `Files › Teachers › …`; in All folders the whole tree), every step opening in the same place. The course
+  card on a course's folder page has its code, status and facts above the tabs, as on the course page.
+- Course › Files: the list is titled "Files by folder"; in Czech the tab is "Soubory" (it was "Materiály", the
+  name of the whole Materials section).
 
 ### Fixed
 - Extra-semestral courses showed three "Enrolment open now" lists on the live page (the later and the finished ones
   too, unfolded, with wrong counts): InSIS's table manager puts its toolbox and scripts between a list and its
   heading, past where the heading was looked for. Headings above tables are now found past those insertions on
   every page that reads them (exam dates, results, submissions, topics, theses, departments, study plans, …).
+- A document's details opened from a course's folder threw the student to Materials › All folders: the marker that
+  keeps it in the course was never added to the link (a broken character in the pattern). The same broken pattern
+  made the maintainer sweep miss InSIS+'s own classes.
+- Materials › New documents opened a folder in a new window.
 - A document's details (View information) kept InSIS's own tab row, so the Materials header changed on that page:
   it now has the Materials header (or the course's, when opened from the course) with the path to the document,
   and the details as one card.

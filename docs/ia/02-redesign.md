@@ -168,8 +168,8 @@ right rail (this week, timetable, new materials, teaching hours). On phones the 
 - **Catalogue**: InSIS's course search (choose the period on InSIS's form); syllabi of any course; pass rates.
 - **Course evaluation / Anketa**: InSIS's list of questionnaires.
 - **Materials / Materiály** (second tab of Courses, right after My courses — the document server is one of the most
-  used places): one card per course of this period with its new-file count and its top-level folders as rows (a row
-  opens that folder in InSIS; the course name opens the course's Materials tab); then InSIS's document server views
+  used places): one row per course of this period with its new-file count, opening in place to its folders (a row
+  opens that folder with By course still marked; a link opens the course's Files tab); then InSIS's document server views
   (new documents, the whole tree, search) and the e-library. The same course card (cover, code, name, next class,
   deadline, new files) is used on Home and My courses. InSIS's whole-tree page keeps only the tree and points here.
 
