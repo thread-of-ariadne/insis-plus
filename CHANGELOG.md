@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-27
+
 ### Added
 - Extension icons (16–128 px), and a separate Chrome build (`insis-plus-x.y.z-chrome.zip`) without the
   Firefox-only manifest keys Chrome warns about.
@@ -254,7 +256,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 - Ctrl+K search over InSIS pages, indexed as you browse; favourites and frequently used pages.
 
-[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.8.0...v0.9.0
 [0.5.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.2.0...v0.3.0
