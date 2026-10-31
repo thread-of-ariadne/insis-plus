@@ -310,22 +310,28 @@ open box *Enter new file*: InSIS's quota message and a form-edit table with InSI
 multipart form of its own) and Description, then **Insert file** (`vlozit_soubor`, a form InSIS opens inside the
 table).
 
-**Handing in is two steps** (InSIS's help, page 8958): insert the file, then confirm with **Odevzdat soubory**; a
-file only inserted is not handed in and the teacher cannot see it (the closed snapshot is exactly that case). The
-page says so:
+**Handing in is two steps** (InSIS's help, page 8958): insert the file, then press **Submit files** (*Odevzdat
+soubory*); a file only inserted is not handed in and the teacher cannot see it. With a file inserted (captured
+2026-10-31) the list's form holds the row's checkbox (`smazat`), **Remove file** (`odebrat`, for the ticked rows),
+InSIS's red message "Files have not been properly handed in, only inserted." (on an open box too), a help line and
+**Submit files** (`odevzdat`); a closed box has the message and no buttons. The page says so:
 - Header: title = box name, eyebrow *All submissions*, page action **Course page**.
-- Lead: course (→ its course page) · "Open until <day time>" with a countdown / "Closed on …" / "Opens on …" · the
-  state: nothing handed in yet · N inserted, not handed in · N handed in · N not handed in properly. An open box shows
-  *How to hand in* — 1 Insert the file, 2 Hand it in — the step at hand marked (now / done), the button names taken
-  from InSIS's own buttons; a closed box says in one line what became of the work. The facts as one compact card.
-- Content, InSIS's own forms in place (data attributes and CSS only): the upload table as one card (the drop area as
-  a dashed box with the file button, Description, the quota and the file-name rule as captions), **Insert file**
-  under it; *Your files* as list rows (type badge = InSIS's download link over the row; size · date · author under
-  the name; Description on the right), shown even when empty ("No file inserted yet"), InSIS's hand-in button
-  primary. The step at hand comes first: the upload while nothing is inserted, the list once something is.
-- Safety: nothing is clicked, filled or submitted; the file input stays InSIS's. **Still unverified**: the markup of
-  the list once a file is inserted (the hand-in button is found by its name or label, odevzd/hand) and of a group
-  box; checked on a synthetic page only.
+- Lead: one status card, toned by the state: a title and one sentence with what to do next (nothing handed in yet ·
+  not handed in yet, press Submit files in step 2 · handed in · not handed in (closed with only an inserted file) ·
+  closed · not open yet), then the facts as label/value pairs: course (→ its course page), closes with a countdown,
+  opens, quota, announced for; a group box adds one line. The red message counts as "not handed in" only once the
+  box is closed: while open it is the pending state.
+- Content, InSIS's own forms in place (data attributes and CSS only): on an open box the two blocks are the two
+  numbered steps, always in this order, each a title (number, a tick once done), one line on what to do and a card
+  holding its own buttons. **1 Add your file**: the drop area (a dashed box with the file button; one line once a
+  file is inserted), Description (optional, a small box that grows when focused), the file-name rule, **Insert
+  file** pulled into the card's footer, quiet until InSIS's drop area lists a chosen file, then primary; the quota as
+  a caption under the step's line. **2 Hand it in**: the file rows (checkbox, type badge = InSIS's download link over
+  the row, name, size · date · author, Description and Edit), **Submit files** primary in the card's footer, **Remove
+  file** next to it only once a row is ticked ("Tick a file to remove it" until then), "No file inserted yet" while
+  empty. The step at hand is ringed. A closed box shows only *Your files*.
+- Safety: nothing is clicked, filled or submitted; the file input stays InSIS's; no button's value is changed.
+  **Still unverified**: the list once the files are handed in on an open box, and a group box.
 
 #### Topics (`temata_prihlasovani.pl`, L; now S)
 On the InSIS page: portal bar **and a second tab row** *Course topics · Final theses topics* (two rows of tabs,
@@ -520,7 +526,7 @@ Collected read-only while logged in, each by the student's own click (folders an
 | Page | State needed | Why |
 |---|---|---|
 | `dok_server/slozka.pl` | a course folder with files, one with new files | the most used page; markup unknown |
-| `student/odevzdavarny_odevzdani.pl` | an open group box, a box with an inserted file (open individual box captured 2026-10-31) | group wording, the hand-in button's markup |
+| `student/odevzdavarny_odevzdani.pl` | an open group box, an open box after handing in (empty, inserted and closed boxes captured 2026-10-31) | group wording, the handed-in list |
 | `student/registrace.pl` | during a round; after its results | the wish/priority form; `verify_data` registration results |
 | `student/list.pl` | per course with points entered; the overview | points grid, Settings (notification) cell markup, whether reading marks anything as seen |
 | `student/spoluzaci.pl` | overview and per course (seminar group) | HTML of rows, paging (`on`), group e-mail and photo forms |

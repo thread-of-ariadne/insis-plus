@@ -7,11 +7,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Changed
-- A submission box explains handing in: InSIS takes two steps (insert the file, then "Odevzdat soubory"), and a file
-  only inserted is not handed in. An open box shows both steps with the current one marked, its state (nothing yet ·
-  inserted, not handed in · handed in) and InSIS's upload form as one card with a drop area, the quota and the
-  file-name rule; Your files is always there, its hand-in button primary; a closed box says in one line what became
-  of the work. The old hint ("handed in when InSIS confirms it") was wrong and is gone.
+- A submission box reads as one status and two steps. The status card says where the work stands (nothing yet ·
+  inserted, not handed in · handed in · not handed in properly · closed) with what to do next, and the box's facts
+  under it. An open box then shows 1 "Add your file" (drop area, optional description, "Insert file" in the card,
+  primary once a file is chosen) and 2 "Hand it in" (the files, "Submit files" in the card; "Remove file" only once a
+  file is ticked), always in that order, the step at hand marked. A closed box shows only its files.
+
+### Fixed
+- An open box with an inserted file no longer says it was not handed in before the box closed (InSIS shows its red
+  "only inserted" message on open boxes too), and the upload form no longer comes before the files waiting to be
+  handed in.
 
 ## [0.11.0] - 2026-10-28
 
