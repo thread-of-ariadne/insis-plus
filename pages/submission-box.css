@@ -1,0 +1,99 @@
+/* InSIS+ — a submission box (pages/submission-box.js). Injected into the page after lists.css: InSIS's own forms and
+   controls are styled where they stand (nothing is moved out of a form). Scoped to html.ipx-generic.ipx-il.ipx-box. */
+
+/* ---------- the step at hand first: InSIS's blocks in one column, ordered by the box's state ---------- */
+html.ipx-box #str1 [data-ipx-flow] { display: flex; flex-direction: column; }
+html.ipx-box #str1 [data-ipx-flow] > p:empty, html.ipx-box #str1 [data-ipx-flow] > hr, html.ipx-box #str1 [data-ipx-flow] > br { display: none; }
+html.ipx-box #str1 [data-ipx-flow="upload"] > [data-ipx-part="upload"] { order: 1; }
+html.ipx-box #str1 [data-ipx-flow="upload"] > [data-ipx-part="list"] { order: 2; margin-top: 10px; }
+html.ipx-box #str1 [data-ipx-flow="list"] > [data-ipx-part="list"] { order: 1; }
+html.ipx-box #str1 [data-ipx-flow="list"] > [data-ipx-part="upload"] { order: 2; }
+html.ipx-box #str1 [data-ipx-flow="list"] > [data-ipx-part="list"] { margin-bottom: 14px; }
+
+/* ---------- Insert a file: InSIS's form-edit table as one card ---------- */
+html.ipx-box #str1 [data-il-heading][data-ipx-part] { margin: 0 0 6px; }
+/* InSIS's quota message ("Quota for inserting files 5.00 MiB."): a caption under the heading, not an alert */
+html.ipx-box #str1 .uis_msg[data-ipx-quota] { margin: 0 0 10px !important; padding: 0 !important; background: none !important; color: var(--muted) !important; }
+html.ipx-box #str1 .uis_msg[data-ipx-quota] .text { font-weight: 500; font-size: 13px; }
+html.ipx-box #str1 table[data-ipx-upload] { display: block; width: 100% !important; max-width: 100%; margin: 0; padding: 18px; border: 0; border-radius: 16px;
+  background: var(--surface); box-shadow: var(--shadow-card); box-sizing: border-box; }
+/* The file-name rule as the card's last line */
+html.ipx-box #str1 table[data-ipx-upload]::after { content: attr(data-ipx-upload); display: block; margin-top: 12px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+html.ipx-box #str1 table[data-ipx-upload] > tbody { display: flex; flex-direction: column; gap: 14px; }
+html.ipx-box #str1 table[data-ipx-upload] > tbody > tr { display: grid; grid-template-columns: 110px minmax(0, 1fr); align-items: start; gap: 6px 16px; }
+html.ipx-box #str1 table[data-ipx-upload] > tbody > tr[data-ipx-empty] { display: none; }
+html.ipx-box #str1 table[data-ipx-upload] > tbody > tr > td { display: block; padding: 0 !important; border: 0 !important; background: none !important; }
+html.ipx-box #str1 table[data-ipx-upload] > tbody > tr > td:first-child { padding-top: 8px !important; color: var(--fg-2); font-size: 13.5px; font-weight: 600; }
+html.ipx-box #str1 table[data-ipx-upload] form { margin: 0; }
+/* InSIS's drop area (its own uploader): a dashed box with the file button in the middle */
+html.ipx-box #str1 table[data-ipx-upload] .mfu-container { display: flex !important; width: 100% !important; max-width: none !important; box-sizing: border-box; flex-direction: column; align-items: center; gap: 10px; min-height: 0 !important;
+  margin: 0 !important; padding: 22px 16px !important; border: 1.5px dashed color-mix(in srgb, var(--accent) 35%, var(--line)) !important; border-radius: 12px !important;
+  background: color-mix(in srgb, var(--accent) 4%, transparent) !important; box-shadow: none !important; text-align: center; opacity: 1 !important; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-container.dz-drag-hover,
+html.ipx-box #str1 table[data-ipx-upload] .mfu-container:hover { border-color: var(--accent) !important; background: var(--accent-soft) !important; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-info { order: 2; margin: 0 !important; color: var(--muted); font-size: 13px; font-style: normal !important; text-align: center !important; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-upload { order: 1; margin: 0 !important; text-align: center !important; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-files { order: 0; width: 100%; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-files:empty { display: none; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-extraform-before:empty, html.ipx-box #str1 table[data-ipx-upload] .mfu-extraform-after:empty { display: none; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-upload-btn { position: relative; display: inline-flex !important; align-items: center; min-height: 38px; padding: 0 16px !important;
+  border: 0 !important; border-radius: 10px !important; background: var(--accent) !important; color: var(--accent-ink, #fff) !important; font-size: 14px; font-weight: 700;
+  box-shadow: none !important; cursor: pointer; overflow: hidden; }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-upload-btn:hover { filter: brightness(1.08); }
+html.ipx-box #str1 table[data-ipx-upload] .mfu-upload-btn input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+/* A chosen file in InSIS's list of the drop area */
+html.ipx-box #str1 table[data-ipx-upload] .mfu-files > * { padding: 4px 6px; color: var(--fg); font-size: 13.5px; text-align: left; }
+html.ipx-box #str1 table[data-ipx-upload] textarea { display: block; width: 100% !important; max-width: 100%; height: 76px; min-height: 52px; margin: 0; padding: 10px 12px;
+  border: 1px solid var(--line) !important; border-radius: 10px; background: var(--surface) !important; color: var(--fg); font: inherit; font-size: 14px;
+  box-sizing: border-box; resize: vertical; }
+html.ipx-box #str1 table[data-ipx-upload] textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 1px; }
+/* InSIS's "Insert file" under the card, at its own width */
+html.ipx-box #str1 [data-ipx-insert] { align-self: flex-start; margin: 12px 0 18px !important; }
+
+/* ---------- Your files ---------- */
+/* Always shown on the page (an empty list says so instead of disappearing) */
+html.ipx-box #str1 table[data-il][data-ipx-files][data-il-empty] { display: block !important; }
+html.ipx-box #str1 table[data-il][data-ipx-files] tr[data-il-row="none"] { display: block !important; padding: 6px 16px 16px; border: 0; }
+html.ipx-box #str1 table[data-il][data-ipx-files] tr[data-il-row="none"] > td { display: block; padding: 0 !important; border: 0 !important; background: none !important;
+  font-size: 0 !important; text-align: left !important; }
+html.ipx-box #str1 table[data-il][data-ipx-files] tr[data-il-row="none"] > td::after { content: attr(data-ipx-files); color: var(--muted); font-size: 13.5px; }
+/* A file: [tick] [type] name / size · date · author [Description] — the tile is InSIS's download link over the row */
+html.ipx-box #str1 table[data-il][data-ipx-files] { --il-lead-w: 58px; }
+html.ipx-box #str1 table[data-il][data-ipx-files]:has(td[data-il-col="pick"]) { --il-lead: 92px; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="pick"] { top: 50%; width: auto; margin-top: -9px; }
+html.ipx-box #str1 table[data-il][data-ipx-files]:has(td[data-il-col="pick"]) td[data-il-col="lead"] { left: 50px; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="lead"] { top: 50%; margin-top: -20px; width: auto; }
+html.ipx-box #str1 table[data-il][data-ipx-files] a[data-il-file] { width: 40px; height: 40px; margin: 0; border-radius: 9px; background: var(--chip); color: var(--fg-2); }
+html.ipx-box #str1 table[data-il][data-ipx-files] a[data-il-file="PDF"] { background: var(--chip); color: var(--fg-2); }
+html.ipx-box #str1 table[data-il][data-ipx-files] tr:hover a[data-il-file] { background: var(--accent-soft); color: var(--accent); }
+html.ipx-box #str1 table[data-il][data-ipx-files] tr[data-il-row] { min-height: 42px; align-content: center; padding-right: 136px; }
+/* InSIS's Description link (and any other control of the row) on the right, centred over both lines */
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="act"] { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); z-index: 2; margin: 0; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="title"] { overflow-wrap: anywhere; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"] { order: 5; font-size: 12.5px; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"][data-il-label]::before { content: none; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"] + td[data-il-col="sub"] { margin-left: -14px; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"] + td[data-il-col="sub"]::before { content: "·" !important; margin: 0 6px; color: var(--faint); }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"][data-il-show] { font-size: 0 !important; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"][data-il-show]::after { content: attr(data-il-show); font-size: 12.5px; }
+html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="sub"][data-il-show]::before { font-size: 12.5px; }
+/* InSIS's buttons under the list (hand in, delete selected …): quiet, the hand-in one primary */
+html.ipx-box #str1 form[data-il-holder] :is(input[type="submit"], button) { margin: 0 8px 18px 0; }
+html.ipx-box #str1 form[data-il-holder] :is(input[type="submit"], button):not([data-ipx-primary]) { background: var(--chip) !important; color: var(--fg) !important; }
+html.ipx-box #str1 form[data-il-holder] [data-ipx-primary] { min-height: 40px; padding: 0 18px; font-size: 14.5px; }
+/* InSIS's message in the list's form (kept where the lead does not say it) */
+html.ipx-box #str1 form[data-il-holder] .uis_msg { margin: 0 0 12px; }
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+  html.ipx-box #str1 table[data-ipx-upload] { padding: 14px; }
+  html.ipx-box #str1 table[data-ipx-upload] > tbody > tr { grid-template-columns: minmax(0, 1fr); }
+  html.ipx-box #str1 table[data-ipx-upload] > tbody > tr > td:first-child { padding-top: 0 !important; }
+  html.ipx-box #str1 [data-ipx-insert] { align-self: stretch; width: 100%; }
+  html.ipx-box #str1 table[data-il][data-ipx-files] { --il-lead: 58px !important; }
+  html.ipx-box #str1 table[data-il][data-ipx-files]:has(td[data-il-col="pick"]) { --il-lead: 92px !important; }
+  html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="lead"] { position: absolute; left: 16px; flex-basis: auto; }
+  html.ipx-box #str1 table[data-il][data-ipx-files] tr[data-il-row] { padding-right: 16px; }
+  html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="act"] { position: static; transform: none; order: 8; margin-top: 6px; }
+  html.ipx-box #str1 table[data-il][data-ipx-files] td[data-il-col="title"] { flex-basis: 100%; }
+}

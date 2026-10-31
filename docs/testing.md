@@ -37,7 +37,7 @@
    | Envelope (Messages) | InSIS mail: New message and University e-mail in the header, where mail is forwarded, folders as tabs; the sidebar shows InSIS mail · Noticeboard |
    | Bell (Notifications) | New documents and newly entered results; opening it clears the dot |
    | Zkoušky › Termíny zkoušek | One header with four views; dates as rows (date block, course, room, deadlines, InSIS's own sign-up controls); How it works folded; Filter opens InSIS's own form |
-   | A submission box (from All submissions) | Box name as title, status with a countdown, InSIS's upload form as a card, handed-in files as rows |
+   | A submission box (from All submissions) | Box name as title, status with a countdown and the hand-in state; an open box shows the two steps (insert, hand in) with the current one marked, InSIS's upload form as one card and Your files (also when empty); a closed box says what became of the work |
    | Registrace a zápis | Next round with a countdown, enrolled courses and credits, rows to extra-semestral courses, minor tracks, favourites, statistics |
    | Studijní záležitosti › Potvrzení a rozhodnutí | Tabs Get a confirmation · Delivered · Printed; delivered documents with InSIS's Open button (opening records receipt) |
    | Kampus a lidé › a teacher's name | The person's page: contacts, consulting hours, Write in InSIS, "You have this teacher in" |

@@ -40,3 +40,26 @@ html.ipx-generic #str1 table[data-ipx-ds-empty] > * { display: none !important; 
 html.ipx-generic #str1 table[data-ipx-ds-empty]::before { content: attr(data-ipx-ds-empty); display: block; color: var(--fg); font-size: 15px; font-weight: 700; }
 html.ipx-generic #str1 table[data-ipx-ds-empty][data-ipx-ds-help]::after { content: attr(data-ipx-ds-help); display: block; max-width: 560px; margin: 6px auto 0; color: var(--muted);
   font-size: 13.5px; line-height: 1.45; }
+
+/* A submission box (pages/submission-box.js): the two steps of handing in (insert, then hand in), the one at hand
+   marked; the box's facts as one compact card of label/value pairs. */
+.bx-steps ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.bx-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; padding: 12px 14px; border-radius: 12px; background: var(--chip); }
+.bx-num { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--surface); color: var(--muted);
+  font-size: 13.5px; font-weight: 800; box-shadow: inset 0 0 0 1.5px var(--line); }
+.bx-num svg { width: 16px; height: 16px; stroke-width: 2.4; }
+.bx-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.bx-text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--fg); font-size: 14.5px; font-weight: 700; }
+.bx-text small { color: var(--fg-2); font-size: 13px; line-height: 1.45; }
+.bx-now, .bx-done { padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
+.bx-step.now { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent); }
+.bx-step.now .bx-num { background: var(--accent); color: var(--accent-ink, #fff); box-shadow: none; }
+.bx-now { background: var(--accent); color: var(--accent-ink, #fff); }
+.bx-step.done .bx-num { background: var(--ok); color: #fff; box-shadow: none; }
+.bx-done { background: var(--ok-soft); color: var(--ok); }
+.bx-step.later { opacity: .8; }
+.bx-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, auto)); justify-content: start; gap: 12px 32px; margin: 0; padding: 14px 18px; }
+.bx-facts > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bx-facts dt { color: var(--muted); font-size: 12.5px; }
+.bx-facts dd { margin: 0; color: var(--fg); font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .bx-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; } }

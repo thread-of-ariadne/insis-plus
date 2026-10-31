@@ -301,17 +301,31 @@ list: "Files are uploaded on InSIS's page of each box: press Insert files."
 **Safety**: no form on the page; `odevzdavarny_odevzdani.pl` opened by the student's click.
 
 #### Box page (`odevzdavarny_odevzdani.pl`, F; now S)
-On the InSIS page (crawl, a closed box): portal bar; heading "Individual coursework submission – <course>"; key–value
-rows Name · Type · Status · Date of opening · Date of conclusion · Announced for · Coursework submission quota;
-table *List of entered files* Name · File · Description · Size · Entered on · Entered by; two forms (empty while
-closed); links to download a file (`…stahnuti…`) and to edit its description (`…popisek…`). Rebuild: header title =
-box name, eyebrow *All submissions*, chips `<CODE>` · individual/group; page action **Course page**. Summary: status
-line "Open until <day time> (in 2 days)" / "Closed on …", files handed in (N, "nothing handed in yet" in warning
-tone while open), quota. Content: the key–value rows as a description list; *Your files* rows (name, size, date,
-by; InSIS's own download and description links adopted). InSIS's upload form slotted as a form card with one line:
-"Choose the file and press InSIS's button; the file is handed in when InSIS confirms it." Safety: `action:
-unverified`; InSIS+ never touches the file input. **Needs a snapshot of an open box** (individual and group), and of
-the confirmation after an upload.
+On the InSIS page (snapshots of a closed box and, 2026-10-31, an open individual box): portal bar; heading
+"Individual coursework submission – <course>"; key–value rows Name · Type · Status · Date of opening · Date of
+conclusion · Announced for · Coursework submission quota; the form of *List of entered files* (InSIS's help in two
+paragraphs; once closed its message "Files failed to properly handed in." with an explanation; the table [Sel.] · Name ·
+File · Description · Size · Entered on · Entered by · [Modify]; download `…stahnuti…`, description `…popisek…`); on an
+open box *Enter new file*: InSIS's quota message and a form-edit table with InSIS's drop area and file button (a
+multipart form of its own) and Description, then **Insert file** (`vlozit_soubor`, a form InSIS opens inside the
+table).
+
+**Handing in is two steps** (InSIS's help, page 8958): insert the file, then confirm with **Odevzdat soubory**; a
+file only inserted is not handed in and the teacher cannot see it (the closed snapshot is exactly that case). The
+page says so:
+- Header: title = box name, eyebrow *All submissions*, page action **Course page**.
+- Lead: course (→ its course page) · "Open until <day time>" with a countdown / "Closed on …" / "Opens on …" · the
+  state: nothing handed in yet · N inserted, not handed in · N handed in · N not handed in properly. An open box shows
+  *How to hand in* — 1 Insert the file, 2 Hand it in — the step at hand marked (now / done), the button names taken
+  from InSIS's own buttons; a closed box says in one line what became of the work. The facts as one compact card.
+- Content, InSIS's own forms in place (data attributes and CSS only): the upload table as one card (the drop area as
+  a dashed box with the file button, Description, the quota and the file-name rule as captions), **Insert file**
+  under it; *Your files* as list rows (type badge = InSIS's download link over the row; size · date · author under
+  the name; Description on the right), shown even when empty ("No file inserted yet"), InSIS's hand-in button
+  primary. The step at hand comes first: the upload while nothing is inserted, the list once something is.
+- Safety: nothing is clicked, filled or submitted; the file input stays InSIS's. **Still unverified**: the markup of
+  the list once a file is inserted (the hand-in button is found by its name or label, odevzd/hand) and of a group
+  box; checked on a synthetic page only.
 
 #### Topics (`temata_prihlasovani.pl`, L; now S)
 On the InSIS page: portal bar **and a second tab row** *Course topics · Final theses topics* (two rows of tabs,
@@ -506,7 +520,7 @@ Collected read-only while logged in, each by the student's own click (folders an
 | Page | State needed | Why |
 |---|---|---|
 | `dok_server/slozka.pl` | a course folder with files, one with new files | the most used page; markup unknown |
-| `student/odevzdavarny_odevzdani.pl` | an open individual box, an open group box, after an upload | upload form, group wording, confirmation |
+| `student/odevzdavarny_odevzdani.pl` | an open group box, a box with an inserted file (open individual box captured 2026-10-31) | group wording, the hand-in button's markup |
 | `student/registrace.pl` | during a round; after its results | the wish/priority form; `verify_data` registration results |
 | `student/list.pl` | per course with points entered; the overview | points grid, Settings (notification) cell markup, whether reading marks anything as seen |
 | `student/spoluzaci.pl` | overview and per course (seminar group) | HTML of rows, paging (`on`), group e-mail and photo forms |
