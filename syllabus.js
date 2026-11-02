@@ -18,15 +18,17 @@
     cs: { ects: 'ECTS kredity', work: (n) => `≈ ${n} h práce`, completion: 'Ukončení', language: 'Jazyk výuky',
       mode: 'Výuka týdně', modeHint: 'přednášky / cvičení', semester: 'Semestr', lecturers: 'Vyučující',
       grading: 'Z čeho se skládá hodnocení', workload: 'Časová zátěž', details: 'Další údaje', total: 'Celkem',
-      table: 'Zobrazit tabulku', syllabusLang: 'Jazyk sylabu', output: 'PDF a další formáty',
-      outputLead: 'Vyberte formát a stiskněte Zobrazit; InSIS ho vytvoří. Druhá podoba sylabu:', coursePage: 'Stránka předmětu', passRates: 'Úspěšnost',
+      table: 'Zobrazit tabulku', syllabusLang: 'Jazyk sylabu', output: 'PDF a další formáty', form: 'Podoba', formSyllabus: 'Sylabus', formSheet: 'Karta předmětu (EU)',
+      eqf: 'Úroveň EQF', participation: 'Forma účasti', assessment: 'Hodnocení',
+      outputLead: 'Vyberte formát a stiskněte Zobrazit; InSIS ho vytvoří.', coursePage: 'Stránka předmětu', passRates: 'Úspěšnost',
       none: 'Žádné údaje.', next: 'Příští', held: 'Proběhlo', heldOf: (a, b) => `${a} z ${b}`, heldFoot: 'termínů tohoto rozvrhu',
       every: 'Každý týden', today: 'dnes', tomorrow: 'zítra', inDays: (n) => (n < 5 ? `za ${n} dny` : `za ${n} dní`), capacity: 'kapacita', allHeld: 'Všechny termíny proběhly', mine: 'Moje skupina', allGroups: (n) => `Všechny skupiny (${n})`, groups: 'Skupiny' },
     en: { ects: 'ECTS credits', work: (n) => `≈ ${n} h of work`, completion: 'Completion', language: 'Language',
       mode: 'Teaching per week', modeHint: 'lectures / seminars', semester: 'Semester', lecturers: 'Lecturers',
       grading: 'How the grade is made up', workload: 'Workload', details: 'More details', total: 'Total',
-      table: 'Show table', syllabusLang: 'Syllabus language', output: 'PDF and other formats',
-      outputLead: 'Choose a format and press Display; InSIS creates it. The other form of the syllabus:', coursePage: 'Course page', passRates: 'Pass rates',
+      table: 'Show table', syllabusLang: 'Syllabus language', output: 'PDF and other formats', form: 'View', formSyllabus: 'Syllabus', formSheet: 'Course sheet (EU)',
+      eqf: 'EQF level', participation: 'Participation', assessment: 'Assessment',
+      outputLead: 'Choose a format and press Display; InSIS creates it.', coursePage: 'Course page', passRates: 'Pass rates',
       none: 'No data.', next: 'Next', held: 'Held', heldOf: (a, b) => `${a} of ${b}`, heldFoot: 'sessions of this timetable',
       every: 'Every week', today: 'today', tomorrow: 'tomorrow', inDays: (n) => `in ${n} days`, capacity: 'capacity', allHeld: 'All sessions have taken place', mine: 'My group', allGroups: (n) => `All groups (${n})`, groups: 'Groups' },
   }[lang];
@@ -37,7 +39,10 @@
     ['code', /^course code|^kod predmetu/],
     ['ects', /ects/],
     ['completion', /mode of completion|zpusob ukonceni|ukonceni/],
-    ['language', /^language of instruction|^jazyk vyuky/],
+    ['language', /^language of instruction|^jazyk vyuky|^primary language|^primarni jazyk/],
+    ['eqf', /\(eqf\)|^level of the learning|^uroven/],
+    ['participation', /^form of participation|^forma ucasti/],
+    ['assessment', /^types of course assessment|^typy hodnoceni|^zpusob hodnoceni/],
     ['mode', /mode of delivery|zpusob vyuky|forma vyuky|rozsah/],
     ['semester', /^semester|^semestr|^obdobi/],
     ['lecturers', /lecturer|vyucujici/],
@@ -49,10 +54,12 @@
   // ---------- reading the original page ----------
 
   function parse(doc = document) {
-    const title = doc.querySelector('#titulek h1');
+    // The course's title line: InSIS's #titulek heading, or (InSIS's newer layout, a breadcrumb instead) the page's
+    // title, which says the same.
+    const titleText = clean(doc.querySelector('#titulek h1')?.textContent) || (/^(course syllabus|sylabus predmetu)\s/.test(norm(doc.title || '')) ? clean(doc.title) : '');
     const labels = [...doc.querySelectorAll('td > b > span.nowrap')];
     const isSyllabus = doc.querySelector('table.portal_menu a[href*="syllabus.pl"]');
-    if (!title || !isSyllabus || labels.length < 5) return null;
+    if (!titleText || !isSyllabus || labels.length < 5) return null;
 
     const main = labels[0].closest('table');
     const facts = [];
@@ -73,19 +80,33 @@
     }
 
     // "Course syllabus 4XY101 - Digital Transformation (FIS - SS 2026/2027)"
-    const m = clean(title.textContent).match(/(\S+)\s+-\s+(.+?)\s*\(([^)]*)\)\s*$/);
+    const m = titleText.match(/(\S+)\s+-\s+(.+?)\s*\(([^)]*)\)\s*$/);
     // InSIS's tab rows: one with the output types (Syllabus · Course syllabus), one with the languages.
     const isLang = (t) => /^(czech|english|cesky|anglicky|cestina|anglictina)$/.test(norm(t));
     const versions = [...doc.querySelectorAll('table.portal_menu a[href*="syllabus.pl"]')].map((a) => ({
       href: ipx.nav?.safe(a.href, 'link', { copied: true }) || null, text: clean(a.textContent), active: !!a.closest('b') || !!a.querySelector('b'),
     })).filter((v) => v.href);
 
+    // The two forms of a syllabus (typ=1 the syllabus, typ=61 InSIS's "Course syllabus", the EU course sheet): InSIS's
+    // newer layout has no tab row for them, so they are this page's own address with the other typ (URL rule).
+    // InSIS's own tabs keep their links; their names say what each form is (InSIS calls both "syllabus").
+    let outputs = versions.filter((v) => !isLang(v.text))
+      .map((v) => ({ ...v, text: /[;&?]typ=61(?!\d)/.test(v.href) ? T.formSheet : /[;&?]typ=1(?!\d)/.test(v.href) ? T.formSyllabus : v.text }));
+    const own = versions.find((v) => v.active) || versions[0];
+    if (!outputs.length && own && ipx.nav) {
+      // Built from InSIS's own link of the current language, with the other typ (the same check as a copied link).
+      const typ = /[;&?]typ=(\d+)/.exec(own.href)?.[1] || '1';
+      const withTyp = (t) => ipx.nav.safe(/[;&?]typ=\d+/.test(own.href) ? own.href.replace(/([;&?])typ=\d+/, `$1typ=${t}`) : `${own.href};typ=${t}`, 'link', { copied: true });
+      outputs = [['1', T.formSyllabus], ['61', T.formSheet]].map(([t, text]) => ({ href: withTyp(t), text, active: typ === t })).filter((v) => v.href);
+      if (outputs.length < 2) outputs = [];
+    }
+
     return {
       code: m?.[1] || '',
-      name: m?.[2] || clean(title.textContent),
+      name: m?.[2] || titleText,
       meta: m?.[3] || '',
       languages: versions.filter((v) => isLang(v.text)),
-      outputs: versions.filter((v) => !isLang(v.text)),
+      outputs,
       form: [...doc.querySelectorAll('form')].find((f) => f.querySelector('select[name="vystup"]')) || null,
       facts,
       sections,
@@ -357,11 +378,13 @@
     const perCredit = Number(ectsRaw.match(/=\s*(\d+)/)?.[1]);
     const mode = text('mode').match(/\d+\/\d+/)?.[0];
     const people = fact('lecturers') ? lecturers(fact('lecturers').el) : [];
-    const others = d.facts.filter((f) => !f.key);
+    // InSIS's "-- item not defined --" / "-- not entered --": a field without a value is left out.
+    const blank = (el) => /^--.*--$/.test(clean(el?.textContent));
+    const others = d.facts.filter((f) => !f.key && !blank(f.el));
 
     const main = [];
     const rail = [];
-    d.sections.forEach((s, i) => {
+    d.sections.filter((s) => !blank(s.el)).forEach((s, i) => {
       const chart = shares(s.el);
       const units = !chart && readUnits(s.el);
       if (units) {
@@ -386,7 +409,11 @@
         kpi(T.completion, text('completion'), null, true),
         kpi(T.language, text('language'), null, true),
         kpi(T.mode, mode, mode && T.modeHint),
-        kpi(T.semester, text('semester'), null, true)),
+        kpi(T.semester, text('semester'), null, true),
+        // The EU course sheet's own facts
+        kpi(T.eqf, blank(fact('eqf')?.el) ? null : text('eqf')),
+        kpi(T.participation, blank(fact('participation')?.el) ? null : text('participation'), null, true),
+        kpi(T.assessment, blank(fact('assessment')?.el) ? null : text('assessment'), null, true)),
 
       h('div', { class: 'cols' },
         h('div', { class: 'stack' }, main.length > 2 && jump, main.map((b) => b.node)),
@@ -418,10 +445,14 @@
       : { href: nav.safe(new URL('/auth/student/hodnoceni.pl', document.baseURI).href, 'link'), text: T.passRates, icon: 'award' };
     const extra = action.href ? [anchor({ href: action.href }, { class: 'btn ghost' }, icon(action.icon), h('span', {}, action.text))] : null;
     // The syllabus language: a segmented control on the page's first row (the header keeps room for the title).
-    const languages = data.languages.length > 1 && h('div', { class: 'page-row syl-lang' }, h('div', { class: 'versions' },
-      h('span', {}, T.syllabusLang),
-      h('div', { class: 'seg-control', role: 'group', 'aria-label': T.syllabusLang },
-        data.languages.map((v) => anchor(v, { class: v.active ? 'on' : null, 'aria-current': v.active ? 'page' : null }, v.text)))));
+    // The syllabus's form (syllabus · EU course sheet) and language: segmented controls on the page's first row (the
+    // header keeps room for the title).
+    const seg = (label, list) => list.length > 1 && h('div', { class: 'versions' }, h('span', {}, label),
+      h('div', { class: 'seg-control', role: 'group', 'aria-label': label },
+        list.map((v) => anchor(v, { class: v.active ? 'on' : null, 'aria-current': v.active ? 'page' : null }, v.text))));
+    const forms = seg(T.form, data.outputs);
+    const langs = seg(T.syllabusLang, data.languages);
+    const languages = (forms || langs) && h('div', { class: 'page-row syl-lang' }, forms, langs);
     // InSIS's output form stays InSIS's element: the page is slotted and only the form is shown, in a card.
     const page = document.getElementById('str1');
     const form = data.form && page?.contains(data.form) ? data.form : null;
@@ -438,8 +469,7 @@
         buildPage(data),
         form && h('section', { class: 'card syl-output' },
           h('div', { class: 'card-head' }, h('h2', {}, T.output)),
-          h('p', { class: 'muted syl-output-lead' }, T.outputLead, ' ',
-            data.outputs.map((v, i) => [i ? ' · ' : '', v.active ? h('strong', {}, v.text) : anchor(v, {}, v.text)])),
+          h('p', { class: 'muted syl-output-lead' }, T.outputLead),
           h('slot'))),
     });
   });

@@ -43,6 +43,9 @@
       filter: 'Filtr', filterLead: 'Jen vybraný ústav nebo jen placené / neplacené předměty; InSIS seznam omezí po stisknutí tlačítka.',
       only: 'Zobrazeno jen', all: 'Zobrazit vše',
       showOver: (n) => `Zobrazit předměty po zápisu (${n})`, hideOver: 'Skrýt předměty po zápisu',
+      youreIn: 'Zapsáno', showNote: 'Zobrazit poznámku', hideNote: 'Skrýt poznámku',
+      f: { course: 'Předmět', comp: 'Ukončení', sup: 'Garant', fac: 'Fakulta', lang: 'Jazyk', group: 'Skupina', entered: 'Zapsáno', order: 'Pořadí', ttorder: 'Pořadí v rozvrhu', crd: 'Kredity', efrom: 'Zápis od', etill: 'Zápis do', tfrom: 'Výuka', limit: 'Místa', sum: 'zapsáno', tt: 'Rozvrh', ttlimit: 'Kapacita rozvrhu',
+        prereq: 'Prerekvizity', appr: 'Schválení', note: 'Poznámka' },
       // minor tracks
       tracks: (n) => `${n} ${kit.plural(n, 'specializace', 'specializace', 'specializací')}`, free: (n) => `${n} s volnými místy`, full: 'plno',
       print: 'Tisk', sortBy: 'Řadit:', catalogue: 'Katalog', statistics: 'Statistiky registrací',
@@ -67,6 +70,9 @@
       filter: 'Filter', filterLead: 'Only one institute, or only paid / free courses; InSIS narrows the list when you press its button.',
       only: 'Showing only', all: 'Show all',
       showOver: (n) => `Show courses whose enrolment is over (${n})`, hideOver: 'Hide courses whose enrolment is over',
+      youreIn: 'Enrolled', showNote: 'Show the note', hideNote: 'Hide the note',
+      f: { course: 'Course', comp: 'Completion', sup: 'Supervisor', fac: 'Faculty', lang: 'Language', group: 'Group', entered: 'Enrolled on', order: 'Order', ttorder: 'Timetable order', crd: 'Credits', efrom: 'Enrolment from', etill: 'Enrolment until', tfrom: 'Teaching', limit: 'Places', sum: 'enrolled', tt: 'Timetable',
+        ttlimit: 'Timetable capacity', prereq: 'Prerequisites', appr: 'Approvals', note: 'Note' },
       tracks: (n) => `${n} ${n === 1 ? 'track' : 'tracks'}`, free: (n) => `${n} with vacancies`, full: 'full',
       print: 'Print', sortBy: 'Sort by:', catalogue: 'Catalogue', statistics: 'Statistics of registrations',
       minorLead: 'Tracks are offered per university section. Pick one in the form; InSIS shows its tracks when you press its button.',
@@ -115,6 +121,8 @@
     for (const ic of root.querySelectorAll('[data-sysid]')) {
       const w = words[ic.getAttribute('data-sysid')];
       if (w) L.label(ic, w);
+      // The enrolment state of an extra-semestral course (zapis-zapsano …): InSIS's own word from the icon
+      else if (/^zapis-/.test(ic.getAttribute('data-sysid')) && clean(ic.getAttribute('title'))) L.label(ic, clean(ic.getAttribute('title')));
     }
   }
 
@@ -136,12 +144,14 @@
     let courses = 0;
     let credits = 0;
     if (enrolled) {
-      const { rows, cols } = L.mark(enrolled, (t) => (/^(code|kod)$/.test(t) ? 'lead' : /^(course|predmet)$/.test(t) ? 'title' : /^(crd|kr)/.test(t) ? 'meta'
-        : /(timetable|rozvrh)/.test(t) ? 'note' : /^(type|typ)/.test(t) ? null : 'sub'), { title: T.enrolled });
+      // The same table as the extra-semestral courses (registration.css): Course · Completion · Credits · Faculty ·
+      // Language · Group · Timetable; InSIS's teaching type ("usual") stays out.
+      const { rows, cols } = L.mark(enrolled, (t) => (/^(type|typ)/.test(t) ? 'hide' : EXTRA_ROLE(t)), { title: T.enrolled });
       const crd = cols.findIndex((x) => /^(crd|kr)/.test(norm(x)));
       courses = rows.length;
       for (const tr of rows) credits += Number(clean(tr.querySelector('td[data-il-col="meta"]')?.textContent)) || 0;
       iconWords(enrolled);
+      extraFields(enrolled, REG_HEAD, 'reg');
       if (crd < 0) credits = 0;
       ipx.ui.hideInSlot([headingBefore(enrolled)].filter(Boolean));
     }
@@ -188,23 +198,96 @@
   }
 
   // ---------- mimosemestr_zapis.pl ----------
-  const EXTRA_ROLE = (t) => (/^(sel|ozn)/.test(t) ? 'pick' : /^(course|predmet|nazev)$/.test(t) ? 'title' : /^(crd|kr)/.test(t) ? 'meta'
-    : /(enrol\w* till|enrol\w* to|zapis do)/.test(t) ? 'meta' : /(note|poznamka|timetable|rozvrh)/.test(t) ? 'note' : 'sub');
+  const EXTRA_ROLE = (t) => (/^(ord|por)/.test(t) ? 'hide' : /^(sel|ozn)/.test(t) ? 'pick' : /^(course|predmet|nazev)$/.test(t) ? 'title' : /^(crd|kr)/.test(t) ? 'meta'
+    : /(enrol\w* (till|to|until|from|since)|zapis (do|od))/.test(t) ? 'meta' : 'sub');
+  // Each column's field (by InSIS's header, Czech or English): a row reads
+  //   [tick]  Course name                                   Credits · Enrolment from · Enrolment until
+  //           CODE · completion · study period · supervisor · institute
+  //           Teaching 5 Jan – 31 Jan 2027 · Places ∞, 3 enrolled · Timetable … · Prerequisites …
+  // (pages/registration.css; the three right-hand columns line up under one header row).
+  const EXTRA_FIELD = [['code', /^(code|kod)$/], ['attr', /^(attr|atr|oblg|povin)/], ['status', /^(status|stav)$/], ['fac', /^(fac|fak)/],
+    ['group', /^(group|skupina)$/], ['lang', /^(lang|jazyk)/], ['entered', /(entered on|vlozeno|zapsano dne)/], ['ttorder', /(timetable ?order|rozvrh\w* ?poradi|poradi rozvrh)/],
+    ['order', /^(order|poradi)$/], ['period', /(study period|^obdobi)/], ['comp', /^(com|uk)/],
+    ['crd', /^(crd|kr)/], ['sup', /(supervisor|garant)/], ['inst', /(institute|pracoviste|katedra)/], ['ttlimit', /(timetable ?limit|limit rozvrh|rozvrh\w* limit)/],
+    ['limit', /^limit$/], ['sum', /^(sum|pocet|celkem|zapsano|obsazeno)/], ['appr', /(approval|schvalen)/], ['prereq', /(prerequisite|prerekvizit)/],
+    ['efrom', /(enrol\w* (from|since)|zapis od)/], ['etill', /(enrol\w* (till|to|until)|zapis do)/], ['tfrom', /(teaching (since|from)|vyuka od)/],
+    ['ttill', /(teaching (till|to|until)|vyuka do)/], ['tt', /(timetable|rozvrh)/], ['note', /(note|poznamka)/]];
+  const fieldOf = (label) => EXTRA_FIELD.find(([, re]) => re.test(norm(label)))?.[0] || null;
+  const day = (d, year) => d.toLocaleDateString(locale, { weekday: year ? undefined : 'short', day: 'numeric', month: 'short', year: year ? 'numeric' : undefined });
+  const time = (d) => d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+  // The columns of the table layout (registration.css), in InSIS+'s words in the header row.
+  const HEAD = new Set(['course', 'comp', 'crd', 'sup', 'limit', 'tfrom', 'efrom', 'etill']);
+  // (the enrolled courses on registrace.pl: data-ipx-extra="reg")
+  const REG_HEAD = new Set(['course', 'comp', 'crd', 'fac', 'lang', 'group', 'tt']);
+  function extraFields(table, head = HEAD, kind = '') {
+    table.setAttribute('data-ipx-extra', kind);
+    for (const th of table.querySelectorAll('tr[data-il-head] > th')) {
+      const t = clean(th.textContent);
+      const f = /^(course|predmet|nazev)$/.test(norm(t)) ? 'course' : fieldOf(t);
+      if (head.has(f)) th.setAttribute('data-ipx-f', f), th.setAttribute('data-ipx-text', T.f[f]);
+    }
+    for (const td of table.querySelectorAll('tr[data-il-row] > td[data-il-label]')) {
+      const f = fieldOf(td.getAttribute('data-il-label'));
+      if (!f) continue;
+      td.setAttribute('data-ipx-f', f);
+      if (T.f[f]) td.setAttribute('data-ipx-l', T.f[f]);
+      // Dates in the page's one format (InSIS's text stays in the cell, drawn over by CSS): enrolment as the day over
+      // its clock time, teaching as days with the year.
+      const d = /^(efrom|etill|tfrom|ttill|entered)$/.test(f) && kit.dateOf(clean(td.textContent));
+      if (d && f === 'entered') td.setAttribute('data-ipx-date', `${day(d)} ${time(d)}`);
+      else if (d && f[0] === 't') td.setAttribute('data-ipx-date', day(d, true));
+      else if (d) {
+        // (the year only when it is not this one)
+        td.setAttribute('data-ipx-date', `${day(d)}${d.getFullYear() !== new Date().getFullYear() ? ` ${d.getFullYear()}` : ''}`);
+        td.setAttribute('data-ipx-time', time(d));
+      }
+      // InSIS's note to the teaching: folded under "Show the note" (only the cell's attributes change; a click or
+      // Enter on its first line opens or closes it).
+      if (f === 'note' && clean(td.textContent)) fold(td);
+    }
+  }
+  function fold(td) {
+    const set = (open) => {
+      td.setAttribute('data-ipx-fold', open ? 'open' : 'closed');
+      td.setAttribute('data-ipx-l', open ? T.hideNote : T.showNote);
+      td.setAttribute('aria-expanded', String(open));
+    };
+    set(false);
+    td.setAttribute('role', 'button');
+    td.setAttribute('tabindex', '0');
+    const toggle = (e) => {
+      const open = td.getAttribute('data-ipx-fold') === 'open';
+      // An open note toggles only on its first line (the switch), so its text can be selected.
+      if (open && e.type === 'click' && e.offsetY > 24) return;
+      set(!open);
+    };
+    td.addEventListener('click', toggle);
+    td.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } });
+  }
+
   function extra(page) {
     const tables = [...page.querySelectorAll('table')].filter((t) => !t.classList.contains('portal_menu') && !t.closest('.uisLegend')
       && L.columns(t).some((x) => /^(code|kod)$/.test(norm(x))));
     const lists = tables.map((table) => {
       const b = headingBefore(table) || headingBefore(table.closest('form') || table);
       const text = norm(b?.textContent || '');
-      const kind = table.querySelector('input[type="checkbox"]') || /in progress|probiha/.test(text) ? 'open' : /future|budouc/.test(text) ? 'later'
-        : /over|skoncil|ukoncen/.test(text) ? 'over' : /enrolled|zapsan/.test(text) ? 'enrolled' : 'open';
+      // By InSIS's heading first: the list of enrolled courses has checkboxes too (to cancel), so a checkbox alone
+      // does not make a list "open for enrolment".
+      const kind = /in progress|probiha/.test(text) ? 'open' : /future|budouc/.test(text) ? 'later' : /over|skoncil|ukoncen/.test(text) ? 'over'
+        : /enrolled|zapsan/.test(text) ? 'enrolled' : 'open';
       const { rows } = L.mark(table, EXTRA_ROLE, { title: { open: T.openNow, later: T.later, over: T.over, enrolled: T.enrolledExtra }[kind] });
       iconWords(table);
+      extraFields(table);
       if (b) ipx.ui.hideInSlot([b]);
       if (kind === 'over') table.setAttribute('data-il-fold', '');
       return { table, kind, rows };
     });
     const count = (k) => lists.filter((l) => l.kind === k).reduce((s, l) => s + l.rows.length, 0);
+    // A course the student is enrolled in stays in InSIS's list of open courses too: there it is marked "Enrolled"
+    // (by its code), so the open list does not read as still to do.
+    const codeOf = (tr) => clean(tr.querySelector('td[data-ipx-f="code"]')?.textContent);
+    const mine = new Set(lists.filter((l) => l.kind === 'enrolled').flatMap((l) => l.rows.map(codeOf)).filter(Boolean));
+    for (const l of lists) if (l.kind !== 'enrolled') for (const tr of l.rows) if (mine.has(codeOf(tr))) tr.setAttribute('data-ipx-mine', T.youreIn);
     // The selection form: a card around InSIS's list and its button, with the line on what the button does.
     const selection = lists.find((l) => l.kind === 'open' && l.table.closest('form'))?.table.closest('form');
     selection?.setAttribute('data-il-form', T.extraLead);
@@ -313,6 +396,6 @@
     if (key === 'minor' && route().params?.get?.('detail')) return; // a track's detail page: generic.js frames it
     ({ reg: registration, extra, minor, fav: favourites })[key](page);
     L.chrome(page);
-    L.on(`ipx-reg-${key}`);
+    L.on(`ipx-reg-${key}`, key === 'extra' || key === 'reg' ? 'pages/registration.css' : []);
   });
 })();

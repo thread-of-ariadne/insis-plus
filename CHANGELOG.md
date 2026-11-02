@@ -7,6 +7,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Changed
+- Registration & enrolment: the courses you are enrolled in this period are the same table as the extra-semestral
+  ones (Course with its code, Completion, Credits, Faculty, Language, Group, Timetable under one header row; the
+  attribute as a chip), a card per course on a narrow screen. InSIS's teaching type ("usual") is left out.
+- Extra-semestral courses are a table: Course (code under it), Completion, Credits, Supervisor (institute under it),
+  Places (how many are enrolled under it), Teaching (from over until), Enrolment from and Enrolment until, aligned
+  under one header row; under each course its labelled facts (timetable, its capacity, prerequisites, study period,
+  and for your own courses enrolled on, group, order). InSIS's note to the teaching is folded under "Show the note".
+  On a narrow screen each course is a card with every field labelled. A course you are enrolled in is marked
+  Enrolled wherever InSIS lists it.
+- Syllabus: a View switch (Syllabus · Course sheet (EU)) next to the language; InSIS's EU course sheet is drawn like
+  the syllabus; empty "item not defined" fields are left out; the section bar wraps instead of being cut off.
 - A submission box reads as one status and two steps. The status card says where the work stands (nothing yet ·
   inserted, not handed in · handed in · not handed in properly · closed) with what to do next, and the box's facts
   under it. An open box then shows 1 "Add your file" (drop area, optional description, "Insert file" in the card,
@@ -14,6 +25,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   file is ticked), always in that order, the step at hand marked. A closed box shows only its files.
 
 ### Fixed
+- The syllabus page (and the course page's Syllabus tab) is drawn again on InSIS's newer layout, which dropped the
+  heading InSIS+ read the course from; it showed InSIS's raw page, with its misaligned language tabs.
+- Extra-semestral courses: the list of enrolled courses is no longer shown as "Enrolment open now" because it has
+  checkboxes.
 - An open box with an inserted file no longer says it was not handed in before the box closed (InSIS shows its red
   "only inserted" message on open boxes too), and the upload form no longer comes before the files waiting to be
   handed in.

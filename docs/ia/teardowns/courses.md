@@ -373,6 +373,10 @@ moved to the overview (one place), here one line → overview. In a round: InSIS
 as a form card (the wish list with its priority and add/remove controls), with the line "Your wishes are saved
 when you press InSIS's button; places are decided when the round closes." Safety: `action: unverified`,
 `verify_data` for results; no control is moved or pre-set. **Needs snapshots during a round and after its results.**
+Now (2026-11-02, outside a round): the enrolled courses are drawn in place as the extra-semestral table
+(`pages/registration.css`, `table[data-ipx-extra="reg"]`): Course (code under it) · Completion (attribute chip under
+it) · Credits · Faculty · Language · Group · Timetable; Type is hidden. The composed My courses page stays cards
+(it is built from the study record, with next class and new files; this list is InSIS's own table).
 
 #### Extra-semestral courses (`mimosemestr_zapis.pl`, L; now S)
 On the InSIS page (crawl): enrolled extra-semestral courses; a filter form (department, fee; *Restrict*); the main
@@ -386,6 +390,19 @@ as a compact toolbar card; **the selection table stays InSIS's form card** (styl
 and opens the online payment." The two information tables rebuilt as one list with the legend's states as chips.
 Safety: a payment action — InSIS+ never pre-ticks, never counts a price, never submits. Open: HTML snapshot (crawl
 only); what the payment step opens.
+Now (2026-11-02): a table where the list is at least 860 px wide (a container query; CSS grid on InSIS's own rows,
+the header row renamed in InSIS+'s words): Course (code under it) · Completion (attribute chips under it) · Credits
+(language under it) · Supervisor (institute or faculty under it) · Places (N enrolled under it) · Teaching (from over
+until) · Enrolment from · Enrolment until (each the day over its clock time); under the columns the labelled facts
+(Timetable, Timetable capacity, Prerequisites; study period or Enrolled on, Group, Order, Timetable order, the state
+or Approvals); InSIS's note to the teaching folded under "▸ Show the note" (the cell itself becomes the switch:
+role button, Enter or a click on its first line). Narrower: a card per course, every field labelled. A list's kind comes from InSIS's heading, never
+from its checkboxes (the enrolled list has them too, to cancel); a course the student is enrolled in that InSIS also
+lists as open is marked *Enrolled*. The list of enrolled courses (captured 2026-11-02) has its own columns: Sel. ·
+Status (InSIS's icon `zapis-zapsano`, drawn as its word) · Code · Course · Course supervisor · Faculty · Oblg. · Com. ·
+Crd. · Group · Lang. · Entered on · Limit · Order · Prerequisites · Enrollment from / till · Teaching since / till ·
+Timetable · Timetablelimit · Timetableorder, and InSIS's **Remove courses** (`odebrat_kurzy`, drawn as a quiet danger
+button); the enrolled course leaves InSIS's open list.
 
 #### Minor tracks (`vs_registrace.pl`, R; now S)
 On the InSIS page (crawl): view tabs *Catalogue · Statistics of registrations* (views of one list: kept); a unit
@@ -441,6 +458,12 @@ now; the course timetable as "When and where" rows (room → room page) in a clo
 programmes table as rows. At the end, the InSIS output form as a small form card: "PDF and other formats: choose
 one and press Display (InSIS creates it)." Safety: `zprac_dok_uloziste…` stores a document in the student's
 storage: InSIS's checkbox, never ticked by InSIS+.
+InSIS's newer layout (seen 2026-11-02): no `#titulek` heading (a breadcrumb instead; the course's line is the page's
+title, read from there) and no output-type tab row (only Czech · English). The two forms are then this page's own
+links with `typ=1` (the syllabus) and `typ=61` (InSIS's "Course syllabus", the EU course sheet: EQF level, primary
+language, participation, assessment types, accreditation, knowledge and skills), offered as a second segmented
+control *View: Syllabus · Course sheet (EU)* next to the language; the sheet's facts become KPI cards. Fields InSIS
+marks "-- item not defined --" / "-- not entered --" are left out; the section jump bar wraps instead of scrolling.
 
 #### Pass rates (`hodnoceni.pl`, R; now M for level 1, S below)
 Purpose: before registration, "how hard is this course" (a few times a year). Levels (crawl): (1) faculty picker
