@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-06
+
 ### Added
 - "This page watches": when InSIS's scripts on a page listen for copying, cutting, pasting, the context menu,
   selecting text, leaving the tab or window, or clipboard shortcuts, or touch the clipboard, an amber chip in the
@@ -331,7 +333,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 - Ctrl+K search over InSIS pages, indexed as you browse; favourites and frequently used pages.
 
-[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/thread-of-ariadne/insis-plus/compare/v0.8.0...v0.9.0
