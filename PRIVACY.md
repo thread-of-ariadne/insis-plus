@@ -50,6 +50,13 @@ between sessions, no settings, no pins, no record.
   operations). When you open one of those yourself, InSIS+ only draws its frame around InSIS's page. Every address InSIS+ reads or links to
   is checked against a reviewed list (`docs/ia/mapping.json`).
 
+- **What a page's own scripts watch** ("This page watches"): on every InSIS page a small script runs in the page's
+  own context, before InSIS's scripts, and notes which of them listen for copying, pasting, the context menu,
+  selecting, leaving the window or clipboard shortcuts, what they did when it happened, and the address of a
+  request they sent right after (not its content). It changes nothing the page does. What it notes is shown in the
+  panel and forgotten when you leave the page; it is never stored. "Copy page code" copies the page's HTML, as the
+  browser received it, to your clipboard and nowhere else.
+
 ## What it sends
 
 - **Nothing to us.** There is no InSIS+ server, no analytics, no tracking, no ads.

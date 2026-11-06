@@ -67,6 +67,16 @@ python test/serve.py
   install flow can be tested: run `localStorage.clear()` in the console, open `home-cs.built.html`, wait ~10 s.
   InSIS+ pages are at the same address with `#ipx:<node>`, e.g. `home-cs.built.html#ipx:course.overview/4XY101`.
 
+- "This page watches" and Copy page code: `http://localhost:8765/test/fixtures/watch/index.html`, fake online
+  tests whose scripts watch copying, pasting, the context menu, selecting, leaving the window and shortcuts in
+  different ways (jQuery, inline attributes, late listeners, beacons, a rewritten clipboard, InSIS's own
+  `uissafetest.js`) and a control page that watches nothing. Each keeps `window.__watchLog` (what its handlers saw)
+  and `window.__reports` (what it sent, only ever to `localhost:8765/__report`). `<page>.html` is a test being
+  written (classic view: InSIS+ never covers it), `<page>-plus.html` the list of tests in the InSIS+ view. Rebuild
+  with `python test/fixtures/watch/build.py`. A script's `Ctrl+C` from a test driver does not copy; copy from a click
+  handler (`document.execCommand('copy')`) to get a real copy event. After Copy page code, `__watchLog` and
+  `__reports` must not change.
+
 - All snapshot pages at once (maintainer only): build the test pages with `python test/sync_fixtures.py`, then
   `python -P test/sweep.py [--shots]`, a headless sweep that opens each `snap-*.open.built.html` at 1300 and 375 px with only localhost and InSIS's
   public scripts and styles reachable, and reports the header, tab rows, raw InSIS tables or tab rows, old icons,

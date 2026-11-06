@@ -25,6 +25,27 @@
         "https://insis.vse.cz/*"
       ],
       "js": [
+        "watch-main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://insis.vse.cz/*"
+      ],
+      "js": [
+        "watch.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://insis.vse.cz/*"
+      ],
+      "js": [
         "boot.js"
       ],
       "run_at": "document_start",
@@ -115,6 +136,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "insis-plus@students.vse",
+      "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": [
           "none"

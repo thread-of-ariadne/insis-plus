@@ -12,7 +12,8 @@
   const SKIP = /\/(logout|zmena_hesla|zmena_identity)\.pl$/;
 
   ipx.ready.then(() => {
-    if (document.getElementById('insis-plus-page')) return;
+    // A module drew the page, or asked for InSIS's own page to stay as it is (a test being written: pages/tests.js).
+    if (document.getElementById('insis-plus-page') || ipx.standAside) return;
     const page = document.getElementById('str1');
     if (!page || SKIP.test(location.pathname)) return;
 

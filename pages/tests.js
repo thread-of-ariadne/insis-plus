@@ -36,6 +36,12 @@
     if (route.path !== PATH) return;
     const page = document.getElementById('str1');
     if (!page) return;
+    // A test being written (InSIS's #testingform, or any answer field) is never covered or restyled: InSIS+ stands
+    // aside (generic.js too) and the page stays exactly as InSIS shows it. Only the list of tests is redrawn.
+    if (document.querySelector('#testingform, form textarea, form input[type="radio"], form input[type="checkbox"], form input[type="text"]')) {
+      ipx.standAside = true;
+      return;
+    }
     const tabs = kit.insisTabs(page)[0] || [];
     // Which view: the tab InSIS marks, else the address (vysledky = Submitted).
     const submittedView = tabs.length ? /vysledky/.test(tabs.find((t) => t.on)?.href || '') : route.params?.has('vysledky');

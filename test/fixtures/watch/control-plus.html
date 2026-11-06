@@ -1,0 +1,183 @@
+
+        <!DOCTYPE html>
+        <html>
+            <head>
+<base href="https://insis.vse.cz/auth/elis/ot/psani_testu.pl?test=90001;pokus=1;lang=en">
+<script>
+window.chrome = {
+  runtime: { getURL: (p) => 'http://localhost:8765/' + p },
+  storage: { local: {
+    get: async (k) => { try { return { [k]: JSON.parse(localStorage.getItem(k)) || undefined }; } catch { return {}; } },
+    set: async (o) => { try { for (const k in o) localStorage.setItem(k, JSON.stringify(o[k])); } catch {} },
+    remove: async (k) => { try { for (const key of [].concat(k)) localStorage.removeItem(key); } catch {} },
+  },
+  // Writes from other test pages (the sync frame) arrive as "storage" events.
+  onChanged: { addListener: (fn) => addEventListener('storage', (e) => {
+    try { e.key && fn({ [e.key]: { newValue: JSON.parse(e.newValue) } }, 'local'); } catch {}
+  }) } },
+};
+</script>
+<script src="http://localhost:8765/watch-main.js"></script>
+<script src="http://localhost:8765/watch.js"></script>
+
+                <title>Tests and examinations</title><!-- watch fixture: control-plus -->
+                <meta http-equiv="Content-Language" content="en" />
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                <meta name="description" content="University information system VŠE" />
+                <meta name="lang" content="en" />
+                <meta name="charset" content="UTF-8" />
+        <link rel="icon" href="/favicon/fav-prod.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon/fav-prod.svg" type="image/svg+xml" />
+    <meta name="robots" content="noindex,nofollow" /><meta property="al:ios:app_store_id" content="1486321400" /><meta property="al:ios:app_name" content="My College" /><meta name="apple-itunes-app" content="app-id=1486321400" /><meta property="al:android:package" content="cz.uis_info.moje_studium" /><meta property="al:android:app_name" content="My College" /><link rel="manifest" href="/manifest.json" /><script type="text/javascript">var defaultClass = ''; </script><style type="text/css">table.elis_test_question {padding:0; position: relative} .editable-canvas-tooltip.active  {display: none}
+					div.baze_otazek-otazka, .baze_otazek-otazka td {padding:5px}
+		                      table.elis_test_question p, .elis_test_question p, .baze_otazek-otazka p {margin:0}
+		                      .vzorec_latex {vertical-align: middle} 
+            .elis_test_question textarea {max-width: 100%; resize: vertical}
+            .elis_test_question td[valign=top] { vertical-align: middle}</style><link rel="stylesheet" type="text/css" href="/js/jquery/ui/ui-1.14.2/jquery-ui.min.css?1780903455" /><link rel="stylesheet" type="text/css" href="/js/polyfill/dialog-polyfill.css?1481550582" /><link rel="stylesheet" type="text/css" href="/css/uisbox.css?1684931086" /><link rel="stylesheet" type="text/css" href="/css/base.css?1791559824" /><link rel="stylesheet" type="text/css" href="/css/local.css?1673252855" /><link rel="stylesheet" type="text/css" href="/img.pl?css=34171" /><script type="text/javascript" src="/js/jquery/jquery/jquery-3.7.1/jquery-3.7.1.min.js"></script><script type="text/javascript" src="/js/jquery/jquery/jquery-3.7.1/jquery-migrate-3.6.0.min.js"></script><script>jQuery.uiBackCompat = true;</script><script type="text/javascript" src="/js/common.js?1515155616"></script><script type="text/javascript" src="/js/uisplugins/uis.js?1789128063"></script><script type="text/javascript" src="/js/translate.js?1777892588"></script><script type="text/javascript" src="/js/icons.js?1784896059"></script><script type="text/javascript" src="/js/js.cookie.min.js"></script><script type="text/javascript">uis.translator.setLang('EN');</script><script type="text/javascript" src="/js/pseudostrap.js?1789112839"></script><script type="text/javascript">uis.params.transport.add("lang","en");</script><script type="text/javascript" src="/js/jquery/ui/ui-1.14.2/jquery-ui.min.js?1780903455"></script><script type="text/javascript" src="/js/jquery/ui/corrector.js?1638201715"></script><script type="text/javascript" src="/js/polyfill/dialog-polyfill.js?1481550564"></script><script type="text/javascript" src="/js/polyfill/showModalDialog.js?1481722730"></script><script type="text/javascript" src="/js/uisplugins/uissafetest.js?1715343569"></script><script type="text/javascript" src="/js/uisplugins/uisbox.js?1790684750"></script><script type="text/javascript" src="/js/help.js?1758176588"></script>
+            </head>
+            <body>
+        
+
+
+
+
+<div id="base">
+   <div id="head"> <!-- head zacatek -->
+      <div id="uis-nazev">
+        <h1>Integrated Study Information System</h1>
+        <img class="in-header" src="/img.pl?userunid=8615" title="Today is" />
+        Oct 24, 2026 &nbsp; 7:35 p.m. 
+        &nbsp;&nbsp;&nbsp;
+        <img class="in-header" src="/img.pl?userunid=8616" title="We celebrate the name-day of" />
+        Nina
+      </div>
+     <div id="univerzita_en"><a href="http://www.vse.cz/english/"><span></span></a></div>
+
+<div id="shead"> <!-- prava -->
+
+<div id="vlajky">
+&nbsp;
+&nbsp;
+<a href="https://insis.vse.cz/auth/elis/ot/psani_testu.pl?lang=cz" title="">ČESKY</a>&nbsp;
+
+&nbsp;
+<a href="https://insis.vse.cz/auth/elis/ot/psani_testu.pl?lang=sk" title="">SLOVENSKY</a>
+</div> 
+
+
+</div> <!-- shead -->
+<div id="spomoc2">
+
+  <div id="ikonky">
+
+  </div>
+
+
+
+</div> <! -- konec spomoc2 -->
+ </div> <!-- end head --> 
+<!-- zacatek stranky -->
+
+
+
+
+
+<div id="navigace">
+
+<span id="ikonecky">
+
+
+
+
+
+<a href="/auth/system/logout.pl" title="Log out"><img class="in-header" src="/img.pl?userunid=24326" /></a>
+</span>
+
+<span id="logs">
+<strong>
+Logged in:</strong>&nbsp;Eva Ukázková
+</span>
+
+<ul>
+  <li><a href="https://outlook.com/vse.cz" title="">Office365</a> </li>
+  <li><a href="/auth/dok_server/nove_dok.pl" title="">6</a> <a href="/auth/dok_server/nove_dok.pl" title="">documents</a></li>
+  <li><a href="/auth/todo/" title="">0</a> <a href="/auth/todo/" title="">tasks</a></li>
+<ul>
+
+</div>
+
+<blockquote id="str">
+
+
+
+<div class="mainpage">
+<div id="str1">
+<div><div><div><div><div><div><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/auth" title=""><span class="uf-icon xs" role="img" data-sysid="base-home" data-id="2016" aria-label="Personal administration" alt="Personal administration" title="Personal administration" > <svg style="--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 5;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph1481" /></svg> </span></a></li><li class="breadcrumb-item"><a href="/auth/elis/ot/psani_testu.pl" title="">Tests and examinations</a></li><li class="breadcrumb-item active" aria-current="page"><span >Tests to do</span></li></ol><div class="searchinbreadcrumbs" data-icon-in-crumbs=""><span class="uf-icon xs" role="img" data-sysid="crumbs-search" data-id="4799" aria-label="Search" alt="Search" title="Search"  data-search-all="false"  > <svg style="--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 5;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph1021" /></svg><svg style="--uc-fill-inner:#FFFFFF;--_left: 14px;--_top: 14px;--_width: 20px;--_height: 20px;z-index: 10;" data-size-sysid="decorator" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph104" /></svg><svg style="--uc-fill-inner:#FFFFFF;--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 20;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph622" /></svg> </span></div><div class="helpinbreadcrumbs" data-icon-in-crumbs=""><a href="/auth/help.pl?page=13768;back=aHR0cHM6Ly9pbnNpcy52c2UuY3ovYXV0aC9lbGlzL290L3BzYW5pX3Rlc3R1LnBs" class="context-help-invoke" target="_blank" title="View application help" data-contextHelpPage="13768"><span class="uf-icon xs" role="img" data-sysid="base-help" data-id="1035" aria-label="" alt="" title="" > <svg style="--uc-fill-inner:#FFFFFF;--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 20;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph1218" /></svg><svg style="--uc-fill-inner:#231f20;--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 5;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph1021" /></svg> </span></a></div></nav><table class="portal_menu" data-pm-selected="1"><tbody ><tr class="" ><td class="odsazena" data-pm-sysid="1" nowrap="1" onclick="" align="left"><b><a href="/auth/elis/ot/psani_testu.pl">Tests to do</a></b></td><td class="odsazena" data-pm-sysid="2" nowrap="1" onclick="" align="left"><a href="/auth/elis/ot/psani_testu.pl?vysledky=1">Submitted tests</a></td></tr></tbody></table><p></p><div class="small"><span class="small">The list contains all tests available to you. If you can see no test and you are absolutely certain that at this particular time you are supposed to take a&nbsp;test, please contact the person in charge - system integrator, teacher - without further delay. To take the exam click on the relevant icon. This transaction is irreversible, from that moment on the test will be considered in progress. Unless no time limit for completing the test is specified, then the time is defined by the test designer.</span></div><br /><div class="uis_msg info" id=""><span class="uf-icon xs" role="img" data-sysid="vypis-info" data-id="4640" aria-label="" alt="" title="" > <svg style="--uc-fill-inner:#006cd6;--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 5;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph1021" /></svg><svg style="--uc-fill-inner:#FFFFFF;--_left: 0px;--_top: 0px;--_width: 48px;--_height: 48px;z-index: 20;" data-size-sysid="fullsize" aria-hidden="true" role="img" ><use xlink:href="/icons.svg?1772024892#uc-glyph368" /></svg> </span><div><div class="text">At the moment no tests are available for you to do.</div></div></div><form method="post" action="/auth/elis/ot/psani_testu.pl" enctype="application/x-www-form-urlencoded" name="check_ajax_form"><input type="hidden" name="correct_ajax" value="1" /></form><div class="pseudostrap-activated"></div></div></div></div></div></div></div>
+</div>
+</div>
+
+</blockquote>
+</div> <!-- konec base -->
+<div id="uis-control-data" data-nove_ikonky="1" data-uis_ang_lokalizace="GB" data-stat_tel_predvolba="+420" data-cookie_cooperation="" data-module_cookiebar="0"></div><script type="text/javascript">
+window.__watchLog = [];
+window.__reports = [];
+window.__wlog = function (e) {
+  var t = e && e.target;
+  window.__watchLog.push({t: Date.now(), ev: e && e.type, target: (t && (t.tagName || t.nodeName)) || (t === window ? 'window' : String(t))});
+};
+</script>
+<script src="http://localhost:8765/content.js"></script>
+<script src="http://localhost:8765/nav-data.js"></script>
+<script src="http://localhost:8765/nav.js"></script>
+<script src="http://localhost:8765/ui.js"></script>
+<script src="http://localhost:8765/kit.js"></script>
+<script src="http://localhost:8765/pages/rebuild.js"></script>
+<script src="http://localhost:8765/pages/lists.js"></script>
+<script src="http://localhost:8765/todo.js"></script>
+<script src="http://localhost:8765/composed.js"></script>
+<script src="http://localhost:8765/course.js"></script>
+<script src="http://localhost:8765/home.js"></script>
+<script src="http://localhost:8765/syllabus.js"></script>
+<script src="http://localhost:8765/catalog.js"></script>
+<script src="http://localhost:8765/pages/timetable.js"></script>
+<script src="http://localhost:8765/pages/student-portal.js"></script>
+<script src="http://localhost:8765/pages/submissions.js"></script>
+<script src="http://localhost:8765/pages/study-record.js"></script>
+<script src="http://localhost:8765/pages/docserver.js"></script>
+<script src="http://localhost:8765/pages/messages.js"></script>
+<script src="http://localhost:8765/pages/library.js"></script>
+<script src="http://localhost:8765/pages/plan-progress.js"></script>
+<script src="http://localhost:8765/pages/tests.js"></script>
+<script src="http://localhost:8765/pages/weeks.js"></script>
+<script src="http://localhost:8765/pages/study-plans.js"></script>
+<script src="http://localhost:8765/pages/ematerials.js"></script>
+<script src="http://localhost:8765/pages/surveys.js"></script>
+<script src="http://localhost:8765/pages/financing.js"></script>
+<script src="http://localhost:8765/pages/persons.js"></script>
+<script src="http://localhost:8765/pages/noticeboard.js"></script>
+<script src="http://localhost:8765/pages/requests.js"></script>
+<script src="http://localhost:8765/pages/exams.js"></script>
+<script src="http://localhost:8765/pages/folder.js"></script>
+<script src="http://localhost:8765/pages/papers.js"></script>
+<script src="http://localhost:8765/pages/excuses.js"></script>
+<script src="http://localhost:8765/pages/thesis.js"></script>
+<script src="http://localhost:8765/pages/abroad.js"></script>
+<script src="http://localhost:8765/pages/internships.js"></script>
+<script src="http://localhost:8765/pages/elections.js"></script>
+<script src="http://localhost:8765/pages/reg-stats.js"></script>
+<script src="http://localhost:8765/pages/study-map.js"></script>
+<script src="http://localhost:8765/pages/classmates.js"></script>
+<script src="http://localhost:8765/pages/topics.js"></script>
+<script src="http://localhost:8765/pages/submission-box.js"></script>
+<script src="http://localhost:8765/pages/registration.js"></script>
+<script src="http://localhost:8765/pages/eplans.js"></script>
+<script src="http://localhost:8765/pages/public-courses.js"></script>
+<script src="http://localhost:8765/pages/departments.js"></script>
+<script src="http://localhost:8765/pages/person.js"></script>
+<script src="http://localhost:8765/pages/rooms.js"></script>
+<script src="http://localhost:8765/pages/account.js"></script>
+<script src="http://localhost:8765/pages/help.js"></script>
+<script src="http://localhost:8765/pages/services.js"></script>
+<script src="http://localhost:8765/generic.js"></script>
+<script src="http://localhost:8765/sync.js"></script>
+</body></html>

@@ -28,6 +28,9 @@ vyhledávání Ctrl+K a čitelné sylaby. Vše běží jen ve vašem prohlíže�
 - **Personal timetable** as a week view; **e-index** with credits, average and status per course; **document
   server** by course with new-document badges; **coursework submissions** ordered by deadline; readable
   **syllabi** and **catalogue**.
+- **This page watches**: when InSIS's scripts on a page listen for copying, pasting, the right-click menu,
+  selecting, leaving the window or shortcuts (InSIS's online tests do), a chip says so and logs what they caught and
+  reported. **Copy page code** copies the page's HTML without the page's copy listeners noticing.
 - **Ctrl+K search** over InSIS pages, diacritics-insensitive and typo-tolerant. `Ctrl+D` pins a page.
 - **Never acts for you**: every action happens on InSIS's own page, by your click. Data read from InSIS lives only
   for the session (see [PRIVACY.md](PRIVACY.md)); a shared-computer mode keeps nothing.

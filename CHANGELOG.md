@@ -6,6 +6,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+- "This page watches": when InSIS's scripts on a page listen for copying, cutting, pasting, the context menu,
+  selecting text, leaving the tab or window, or clipboard shortcuts, or touch the clipboard, an amber chip in the
+  corner says so (in classic view and in the InSIS+ view). Its panel lists what is watched and by which script, and
+  logs each moment the page caught it: noticed, blocked, read the text, changed what goes to the clipboard, sent a
+  request right after. InSIS+ blocks and sends nothing.
+- Copy page code: a small button in the same corner copies the page's HTML as InSIS sent it, without a copy event,
+  so the page's copy listeners never run; the button's own clicks and keys never reach the page.
+
 ### Changed
 - Registration & enrolment: the courses you are enrolled in this period are the same table as the extra-semestral
   ones (Course with its code, Completion, Credits, Faculty, Language, Group, Timetable under one header row; the
@@ -25,6 +34,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   file is ticked), always in that order, the step at hand marked. A closed box shows only its files.
 
 ### Fixed
+- An online test being written (InSIS's test form, any answer field on the Online tests page) is no longer covered
+  by the "No test is open right now" page: InSIS+ stands aside and InSIS's page stays as it is.
 - The syllabus page (and the course page's Syllabus tab) is drawn again on InSIS's newer layout, which dropped the
   heading InSIS+ read the course from; it showed InSIS's raw page, with its misaligned language tabs.
 - Extra-semestral courses: the list of enrolled courses is no longer shown as "Enrolment open now" because it has
